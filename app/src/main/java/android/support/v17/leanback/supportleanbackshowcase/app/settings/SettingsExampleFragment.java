@@ -32,7 +32,7 @@ import java.util.Stack;
 
 public class SettingsExampleFragment extends LeanbackSettingsFragment implements DialogPreference.TargetFragment {
 
-    protected final Stack<Fragment> fragments = new Stack<Fragment>();
+    private final Stack<Fragment> fragments = new Stack<Fragment>();
 
     @Override
     public void onPreferenceStartInitialScreen() {
@@ -60,7 +60,6 @@ public class SettingsExampleFragment extends LeanbackSettingsFragment implements
 
     private PreferenceFragment buildPreferenceFragment(int preferenceResId, String root) {
         PreferenceFragment fragment = new PrefFragment();
-        fragment.setTargetFragment(SettingsExampleFragment.this, 0);
         Bundle args = new Bundle();
         args.putInt("preferenceResource", preferenceResId);
         args.putString("root", root);
@@ -68,14 +67,7 @@ public class SettingsExampleFragment extends LeanbackSettingsFragment implements
         return fragment;
     }
 
-    public static class PrefFragment extends LeanbackPreferenceFragment {
-
-        SettingsExampleFragment mOuterFragment;
-
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-        }
+    private class PrefFragment extends LeanbackPreferenceFragment {
 
         @Override
         public void onCreatePreferences(Bundle bundle, String s) {
@@ -102,14 +94,13 @@ public class SettingsExampleFragment extends LeanbackSettingsFragment implements
 
         @Override
         public void onAttach(Context context) {
-            mOuterFragment = (SettingsExampleFragment) getTargetFragment();
-            mOuterFragment.fragments.push(this);
+            fragments.push(this);
             super.onAttach(context);
         }
 
         @Override
         public void onDetach() {
-            mOuterFragment.fragments.pop();
+            fragments.pop();
             super.onDetach();
         }
     }
