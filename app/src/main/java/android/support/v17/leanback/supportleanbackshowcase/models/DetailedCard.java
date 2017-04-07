@@ -30,6 +30,7 @@ public class DetailedCard {
     @SerializedName("characters") private Card[] mCharacters = null;
     @SerializedName("recommended") private Card[] mRecommended = null;
     @SerializedName("year") private int mYear = 0;
+    @SerializedName("videoUrl") private String mVideoUrl = null;
 
 
     public String getPrice() {
@@ -54,6 +55,10 @@ public class DetailedCard {
 
     public String getTitle() {
         return mTitle;
+    }
+
+    public String getVideoUrl() {
+        return mVideoUrl;
     }
 
     public Card[] getCharacters() {

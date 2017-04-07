@@ -13,12 +13,13 @@
  */
 
 package android.support.v17.leanback.supportleanbackshowcase.app.details;
-
-import android.graphics.Bitmap;
+;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v17.leanback.app.DetailsFragment;
+import android.support.v17.leanback.app.DetailsFragmentBackgroundController;
+import android.support.v17.leanback.media.MediaPlayerGlue;
 import android.support.v17.leanback.supportleanbackshowcase.models.DetailedCard;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.utils.CardListRow;
@@ -54,7 +55,13 @@ public class DetailViewExampleFragment extends DetailsFragment implements OnItem
     public static final String TRANSITION_NAME = "t_for_transition";
     public static final String EXTRA_CARD = "card";
 
+    // Play trailer on the background or not
+    private boolean BACKGROUND_PLAYER = true;
+
     private ArrayObjectAdapter mRowsAdapter;
+    private MediaPlayerGlue mMediaPlayerGlue;
+    private final DetailsFragmentBackgroundController mDetailsBackground =
+            new DetailsFragmentBackgroundController(this);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -145,6 +152,24 @@ public class DetailViewExampleFragment extends DetailsFragment implements OnItem
                 startEntranceTransition();
             }
         }, 500);
+        updateBackground(data);
+    }
+
+    private void updateBackground(DetailedCard data) {
+        mDetailsBackground.enableParallax();
+        if (BACKGROUND_PLAYER) {
+            mDetailsBackground.setCoverBitmap(null);
+            mDetailsBackground.enableParallax();
+            mMediaPlayerGlue = new MediaPlayerGlue(getActivity());
+            mDetailsBackground.setupVideoPlayback(mMediaPlayerGlue);
+
+            mMediaPlayerGlue.setArtist(data.getDescription());
+            mMediaPlayerGlue.setTitle(data.getTitle());
+            mMediaPlayerGlue.setVideoUrl(data.getVideoUrl());
+        } else {
+            mDetailsBackground.setCoverBitmap(BitmapFactory.decodeResource(getResources(),
+                    R.drawable.background_canyon));
+        }
     }
 
     private void setupEventListeners() {
@@ -157,6 +182,7 @@ public class DetailViewExampleFragment extends DetailsFragment implements OnItem
                               RowPresenter.ViewHolder rowViewHolder, Row row) {
         if (!(item instanceof Action)) return;
         Action action = (Action) item;
+
         if (action.getId() == 3) {
             setSelectedPosition(1);
         } else {
@@ -174,5 +200,9 @@ public class DetailViewExampleFragment extends DetailsFragment implements OnItem
         } else {
             getView().setBackground(null);
         }
+    }
+
+    public void setBackgroundVideo(boolean backgroundVideo) {
+        BACKGROUND_PLAYER = backgroundVideo;
     }
 }
