@@ -161,10 +161,10 @@ public class DetailViewExampleFragment extends DetailsFragment implements OnItem
                 startEntranceTransition();
             }
         }, 500);
-        updateBackground(data);
+        initializeBackground(data);
     }
 
-    private void updateBackground(DetailedCard data) {
+    private void initializeBackground(DetailedCard data) {
         mDetailsBackground.enableParallax();
         mDetailsBackground.setCoverBitmap(BitmapFactory.decodeResource(getResources(),
                 R.drawable.background_canyon));

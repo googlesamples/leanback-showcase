@@ -14,6 +14,7 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.details;
 
+import android.app.Fragment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v17.leanback.app.DetailsFragment;
@@ -54,16 +55,15 @@ public class DetailViewExampleWithVideoBackgroundFragment extends DetailsFragmen
     public static final String TRANSITION_NAME = "t_for_transition";
     public static final String EXTRA_CARD = "card";
 
-    private static final long ACTION_PLAY = 1;
-    private static final long ACTION_BUY = 2;
-    private static final long ACTION_WISHLIST = 3;
-    private static final long ACTION_RELATED = 4;
+    private static final long ACTION_BUY = 1;
+    private static final long ACTION_WISHLIST = 2;
+    private static final long ACTION_RELATED = 3;
 
-    private Action mActionPlay;
     private Action mActionBuy;
     private Action mActionWishList;
     private Action mActionRelated;
     private ArrayObjectAdapter mRowsAdapter;
+    private DetailedCard data;
     private MediaPlayerGlue mMediaPlayerGlue;
     private final DetailsFragmentBackgroundController mDetailsBackground =
             new DetailsFragmentBackgroundController(this);
@@ -80,7 +80,7 @@ public class DetailViewExampleWithVideoBackgroundFragment extends DetailsFragmen
         // anywhere in a real world app, e.g. a server.
         String json = Utils
                 .inputStreamToString(getResources().openRawResource(R.raw.detail_example));
-        DetailedCard data = new Gson().fromJson(json, DetailedCard.class);
+        data = new Gson().fromJson(json, DetailedCard.class);
 
         // Setup fragment
         setTitle(getString(R.string.detail_view_title));
@@ -132,7 +132,6 @@ public class DetailViewExampleWithVideoBackgroundFragment extends DetailsFragmen
         detailsOverview.setImageDrawable(getResources().getDrawable(imageResId, null));
         ArrayObjectAdapter actionAdapter = new ArrayObjectAdapter();
 
-        mActionPlay = new Action(ACTION_PLAY, getString(R.string.action_play));
         mActionBuy = new Action(ACTION_BUY, getString(R.string.action_buy) + data.getPrice());
         mActionWishList = new Action(ACTION_WISHLIST, getString(R.string.action_wishlist));
         mActionRelated = new Action(ACTION_RELATED, getString(R.string.action_related));
@@ -163,10 +162,10 @@ public class DetailViewExampleWithVideoBackgroundFragment extends DetailsFragmen
                 startEntranceTransition();
             }
         }, 500);
-        updateBackground(data);
+        initializeBackground();
     }
 
-    private void updateBackground(DetailedCard data) {
+    private void initializeBackground() {
         mDetailsBackground.enableParallax();
 
         mMediaPlayerGlue = new MediaPlayerGlue(getActivity());
@@ -175,6 +174,17 @@ public class DetailViewExampleWithVideoBackgroundFragment extends DetailsFragmen
         mMediaPlayerGlue.setTitle(data.getTitle().concat(" (Trailer)"));
         mMediaPlayerGlue.setArtist(data.getDescription());
         mMediaPlayerGlue.setVideoUrl(data.getTrailerUrl());
+    }
+
+    private void playMainVideoOnBackground() {
+        mMediaPlayerGlue.reset();
+
+        mMediaPlayerGlue.setTitle(data.getTitle());
+        mMediaPlayerGlue.setArtist(data.getDescription());
+        mMediaPlayerGlue.setVideoUrl(data.getVideoUrl());
+
+        Fragment mVideoFragment = mDetailsBackground.findOrCreateVideoFragment();
+        mVideoFragment.getView().requestFocus();
     }
 
     private void setupEventListeners() {
@@ -192,14 +202,11 @@ public class DetailViewExampleWithVideoBackgroundFragment extends DetailsFragmen
         ArrayObjectAdapter actionAdapter = (ArrayObjectAdapter)
                 ((DetailsOverviewRow) getAdapter().get(0)).getActionsAdapter();
 
-        if (id == ACTION_PLAY) {
-            // TODO: play main video on background
-            Toast.makeText(getActivity(), getString(R.string.action_cicked), Toast.LENGTH_LONG)
-                    .show();
-        } else if (id == ACTION_BUY) {
-            actionAdapter.add(0, mActionPlay);
+        if (id == ACTION_BUY) {
             actionAdapter.remove(mActionBuy);
             setTitle(getTitle() + "(Owned)");
+
+            playMainVideoOnBackground();
         } else if (action.getId() == ACTION_RELATED) {
             setSelectedPosition(1);
         } else {
