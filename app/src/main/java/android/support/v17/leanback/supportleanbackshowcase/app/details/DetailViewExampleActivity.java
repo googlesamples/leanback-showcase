@@ -24,16 +24,6 @@ import android.support.v17.leanback.supportleanbackshowcase.R;
  */
 public class DetailViewExampleActivity extends Activity {
 
-    /***
-     * True if using trailer as a background.
-     */
-    protected boolean hasBackgroundVideo() {
-        return false;
-    }
-
-    /**
-     * Called when the activity is first created.
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +31,6 @@ public class DetailViewExampleActivity extends Activity {
 
         if (savedInstanceState == null) {
             DetailViewExampleFragment fragment = new DetailViewExampleFragment();
-            fragment.setBackgroundVideo(hasBackgroundVideo());
             getFragmentManager().beginTransaction()
                     .replace(R.id.details_fragment, fragment)
                     .commit();

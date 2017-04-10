@@ -14,18 +14,17 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.details;
 
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v17.leanback.app.DetailsFragment;
 import android.support.v17.leanback.app.DetailsFragmentBackgroundController;
 import android.support.v17.leanback.media.MediaPlayerGlue;
-import android.support.v17.leanback.supportleanbackshowcase.models.DetailedCard;
 import android.support.v17.leanback.supportleanbackshowcase.R;
-import android.support.v17.leanback.supportleanbackshowcase.utils.CardListRow;
-import android.support.v17.leanback.supportleanbackshowcase.utils.Utils;
 import android.support.v17.leanback.supportleanbackshowcase.cards.presenters.CardPresenterSelector;
 import android.support.v17.leanback.supportleanbackshowcase.models.Card;
+import android.support.v17.leanback.supportleanbackshowcase.models.DetailedCard;
+import android.support.v17.leanback.supportleanbackshowcase.utils.CardListRow;
+import android.support.v17.leanback.supportleanbackshowcase.utils.Utils;
 import android.support.v17.leanback.widget.Action;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.ClassPresenterSelector;
@@ -49,16 +48,18 @@ import com.google.gson.Gson;
 /**
  * Displays a card with more details using a {@link DetailsFragment}.
  */
-public class DetailViewExampleFragment extends DetailsFragment implements OnItemViewClickedListener,
+public class DetailViewExampleWithVideoBackgroundFragment extends DetailsFragment implements OnItemViewClickedListener,
         OnItemViewSelectedListener {
 
     public static final String TRANSITION_NAME = "t_for_transition";
     public static final String EXTRA_CARD = "card";
 
-    private static final long ACTION_BUY = 1;
-    private static final long ACTION_WISHLIST = 2;
-    private static final long ACTION_RELATED = 3;
+    private static final long ACTION_PLAY = 1;
+    private static final long ACTION_BUY = 2;
+    private static final long ACTION_WISHLIST = 3;
+    private static final long ACTION_RELATED = 4;
 
+    private Action mActionPlay;
     private Action mActionBuy;
     private Action mActionWishList;
     private Action mActionRelated;
@@ -131,6 +132,7 @@ public class DetailViewExampleFragment extends DetailsFragment implements OnItem
         detailsOverview.setImageDrawable(getResources().getDrawable(imageResId, null));
         ArrayObjectAdapter actionAdapter = new ArrayObjectAdapter();
 
+        mActionPlay = new Action(ACTION_PLAY, getString(R.string.action_play));
         mActionBuy = new Action(ACTION_BUY, getString(R.string.action_buy) + data.getPrice());
         mActionWishList = new Action(ACTION_WISHLIST, getString(R.string.action_wishlist));
         mActionRelated = new Action(ACTION_RELATED, getString(R.string.action_related));
@@ -166,8 +168,13 @@ public class DetailViewExampleFragment extends DetailsFragment implements OnItem
 
     private void updateBackground(DetailedCard data) {
         mDetailsBackground.enableParallax();
-        mDetailsBackground.setCoverBitmap(BitmapFactory.decodeResource(getResources(),
-                R.drawable.background_canyon));
+
+        mMediaPlayerGlue = new MediaPlayerGlue(getActivity());
+        mDetailsBackground.setupVideoPlayback(mMediaPlayerGlue);
+
+        mMediaPlayerGlue.setTitle(data.getTitle().concat(" (Trailer)"));
+        mMediaPlayerGlue.setArtist(data.getDescription());
+        mMediaPlayerGlue.setVideoUrl(data.getTrailerUrl());
     }
 
     private void setupEventListeners() {
@@ -180,8 +187,20 @@ public class DetailViewExampleFragment extends DetailsFragment implements OnItem
                               RowPresenter.ViewHolder rowViewHolder, Row row) {
         if (!(item instanceof Action)) return;
         Action action = (Action) item;
+        long id = action.getId();
 
-        if (action.getId() == ACTION_RELATED) {
+        ArrayObjectAdapter actionAdapter = (ArrayObjectAdapter)
+                ((DetailsOverviewRow) getAdapter().get(0)).getActionsAdapter();
+
+        if (id == ACTION_PLAY) {
+            // TODO: play main video on background
+            Toast.makeText(getActivity(), getString(R.string.action_cicked), Toast.LENGTH_LONG)
+                    .show();
+        } else if (id == ACTION_BUY) {
+            actionAdapter.add(0, mActionPlay);
+            actionAdapter.remove(mActionBuy);
+            setTitle(getTitle() + "(Owned)");
+        } else if (action.getId() == ACTION_RELATED) {
             setSelectedPosition(1);
         } else {
             Toast.makeText(getActivity(), getString(R.string.action_cicked), Toast.LENGTH_LONG)
