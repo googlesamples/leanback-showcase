@@ -14,16 +14,21 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.details;
 
+import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v17.leanback.app.DetailsFragment;
 import android.support.v17.leanback.app.DetailsFragmentBackgroundController;
 import android.support.v17.leanback.media.MediaPlayerGlue;
 import android.support.v17.leanback.supportleanbackshowcase.R;
+import android.support.v17.leanback.supportleanbackshowcase.app.wizard.WizardExampleActivity;
 import android.support.v17.leanback.supportleanbackshowcase.cards.presenters.CardPresenterSelector;
 import android.support.v17.leanback.supportleanbackshowcase.models.Card;
 import android.support.v17.leanback.supportleanbackshowcase.models.DetailedCard;
+import android.support.v17.leanback.supportleanbackshowcase.models.Movie;
 import android.support.v17.leanback.supportleanbackshowcase.utils.CardListRow;
 import android.support.v17.leanback.supportleanbackshowcase.utils.Utils;
 import android.support.v17.leanback.widget.Action;
@@ -40,6 +45,7 @@ import android.support.v17.leanback.widget.OnItemViewSelectedListener;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -55,11 +61,13 @@ public class DetailViewExampleWithVideoBackgroundFragment extends DetailsFragmen
     public static final String TRANSITION_NAME = "t_for_transition";
     public static final String EXTRA_CARD = "card";
 
-    private static final long ACTION_BUY = 1;
-    private static final long ACTION_WISHLIST = 2;
-    private static final long ACTION_RELATED = 3;
+    private static final long ACTION_PLAY = 1;
+    private static final long ACTION_RENT = 2;
+    private static final long ACTION_WISHLIST = 3;
+    private static final long ACTION_RELATED = 4;
 
-    private Action mActionBuy;
+    private Action mActionPlay;
+    private Action mActionRent;
     private Action mActionWishList;
     private Action mActionRelated;
     private ArrayObjectAdapter mRowsAdapter;
@@ -132,11 +140,12 @@ public class DetailViewExampleWithVideoBackgroundFragment extends DetailsFragmen
         detailsOverview.setImageDrawable(getResources().getDrawable(imageResId, null));
         ArrayObjectAdapter actionAdapter = new ArrayObjectAdapter();
 
-        mActionBuy = new Action(ACTION_BUY, getString(R.string.action_buy) + data.getPrice());
+        mActionPlay = new Action(ACTION_PLAY, getString(R.string.action_play));
+        mActionRent = new Action(ACTION_RENT, getString(R.string.action_rent));
         mActionWishList = new Action(ACTION_WISHLIST, getString(R.string.action_wishlist));
         mActionRelated = new Action(ACTION_RELATED, getString(R.string.action_related));
 
-        actionAdapter.add(mActionBuy);
+        actionAdapter.add(mActionRent);
         actionAdapter.add(mActionWishList);
         actionAdapter.add(mActionRelated);
         detailsOverview.setActionsAdapter(actionAdapter);
@@ -177,11 +186,9 @@ public class DetailViewExampleWithVideoBackgroundFragment extends DetailsFragmen
     }
 
     private void playMainVideoOnBackground() {
-        mMediaPlayerGlue.reset();
-
-        mMediaPlayerGlue.setTitle(data.getTitle());
+        mMediaPlayerGlue.setTitle(data.getTitle() + " (Main Video)");
         mMediaPlayerGlue.setArtist(data.getDescription());
-        mMediaPlayerGlue.setVideoUrl(data.getVideoUrl());
+        mMediaPlayerGlue.setMediaSource(Uri.parse(data.getVideoUrl()));
 
         Fragment mVideoFragment = mDetailsBackground.findOrCreateVideoFragment();
         mVideoFragment.getView().requestFocus();
@@ -192,6 +199,26 @@ public class DetailViewExampleWithVideoBackgroundFragment extends DetailsFragmen
         setOnItemViewClickedListener(this);
     }
 
+    private void startWizardActivityForPayment() {
+        Intent intent = new Intent(getActivity(),
+                WizardExampleActivity.class);
+
+        // Prepare extras which contains the Movie and will be passed to the Activity
+        // which is started through the Intent.
+        Bundle extras = new Bundle();
+        String json = Utils.inputStreamToString(
+                getResources().openRawResource(R.raw.wizard_example));
+        Movie movie = new Gson().fromJson(json, Movie.class);
+        extras.putSerializable("movie", movie);
+        intent.putExtras(extras);
+
+
+        Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity())
+                .toBundle();
+        startActivityForResult(intent,
+                DetailViewExampleWithVideoBackgroundActivity.BUY_MOVIE_REQUEST, bundle);
+    }
+
     @Override
     public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
                               RowPresenter.ViewHolder rowViewHolder, Row row) {
@@ -199,13 +226,9 @@ public class DetailViewExampleWithVideoBackgroundFragment extends DetailsFragmen
         Action action = (Action) item;
         long id = action.getId();
 
-        ArrayObjectAdapter actionAdapter = (ArrayObjectAdapter)
-                ((DetailsOverviewRow) getAdapter().get(0)).getActionsAdapter();
-
-        if (id == ACTION_BUY) {
-            actionAdapter.remove(mActionBuy);
-            setTitle(getTitle() + "(Owned)");
-
+        if (id == ACTION_RENT) {
+            startWizardActivityForPayment();
+        } else if (action.getId() == ACTION_PLAY) {
             playMainVideoOnBackground();
         } else if (action.getId() == ACTION_RELATED) {
             setSelectedPosition(1);
@@ -223,6 +246,35 @@ public class DetailViewExampleWithVideoBackgroundFragment extends DetailsFragmen
             getView().setBackgroundColor(backgroundColor);
         } else {
             getView().setBackground(null);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent returnIntent) {
+        if (requestCode == DetailViewExampleWithVideoBackgroundActivity.BUY_MOVIE_REQUEST) {
+            if (resultCode == Activity.RESULT_OK) {
+                ArrayObjectAdapter actionAdapter = (ArrayObjectAdapter)
+                        ((DetailsOverviewRow) getAdapter().get(0)).getActionsAdapter();
+
+                actionAdapter.add(0, mActionPlay);
+                actionAdapter.remove(mActionRent);
+                setTitle(getTitle() + " (Owned)");
+
+                boolean watchNow = returnIntent
+                        .getBooleanExtra(DetailViewExampleWithVideoBackgroundActivity.WATCH_NOW,
+                                false);
+
+                if (watchNow) {
+                    // Leave a delay for playing the video in order to focus on the video fragment
+                    // after coming back from Wizard activity
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            playMainVideoOnBackground();
+                        }
+                    }, 500);
+                }
+            }
         }
     }
 }
