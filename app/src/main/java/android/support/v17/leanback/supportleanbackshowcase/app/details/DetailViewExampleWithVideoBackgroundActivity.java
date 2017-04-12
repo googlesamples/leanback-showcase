@@ -12,8 +12,6 @@ import android.support.v17.leanback.supportleanbackshowcase.R;
 
 public class DetailViewExampleWithVideoBackgroundActivity extends Activity {
 
-    public static String WATCH_NOW = "watch_movie_now";
-
     static final int BUY_MOVIE_REQUEST = 987;
 
     @Override

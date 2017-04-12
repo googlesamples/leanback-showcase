@@ -261,7 +261,7 @@ public class DetailViewExampleWithVideoBackgroundFragment extends DetailsFragmen
                 setTitle(getTitle() + " (Owned)");
 
                 boolean watchNow = returnIntent
-                        .getBooleanExtra(DetailViewExampleWithVideoBackgroundActivity.WATCH_NOW,
+                        .getBooleanExtra(WizardExampleActivity.WATCH_NOW,
                                 false);
 
                 if (watchNow) {

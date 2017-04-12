@@ -67,7 +67,7 @@ public class WizardExample4thStepFragment extends WizardExampleBaseStepFragment 
         if (ACTION_ID_WATCH == action.getId()) {
             Toast.makeText(getActivity(), getString(R.string.wizard_example_watch_now_clicked),
                     Toast.LENGTH_SHORT).show();
-            returnIntent.putExtra(DetailViewExampleWithVideoBackgroundActivity.WATCH_NOW, true);
+            returnIntent.putExtra(WizardExampleActivity.WATCH_NOW, true);
 
         }
 
