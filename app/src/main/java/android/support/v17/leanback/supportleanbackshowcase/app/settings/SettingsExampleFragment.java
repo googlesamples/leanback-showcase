@@ -100,6 +100,7 @@ public class SettingsExampleFragment extends LeanbackSettingsFragment implements
 
         @Override
         public void onDetach() {
+            if (fragments.size()>0)
             fragments.pop();
             super.onDetach();
         }
