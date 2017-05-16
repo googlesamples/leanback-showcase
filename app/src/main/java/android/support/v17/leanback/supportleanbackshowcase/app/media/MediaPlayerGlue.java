@@ -118,7 +118,7 @@ public abstract class MediaPlayerGlue extends PlaybackControlGlue {
 
     @Override public void onActionClicked(Action action) {
         if (action instanceof PlaybackControlsRow.ShuffleAction
-                ||action instanceof PlaybackControlsRow.RepeatAction) {
+                || action instanceof PlaybackControlsRow.RepeatAction) {
             ((PlaybackControlsRow.MultiAction) action).nextIndex();
             notifySecondaryActionChanged(action);
         } else if (action == mThumbsUpAction) {
