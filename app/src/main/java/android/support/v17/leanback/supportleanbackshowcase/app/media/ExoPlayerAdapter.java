@@ -26,6 +26,9 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
+/**
+ * This implementation extends the {@link PlayerAdapter} with a {@link SimpleExoPlayer}.
+ */
 public class ExoPlayerAdapter extends PlayerAdapter implements ExoPlayer.EventListener{
 
     Context mContext;
@@ -45,11 +48,6 @@ public class ExoPlayerAdapter extends PlayerAdapter implements ExoPlayer.EventLi
     boolean mHasDisplay;
     boolean mBufferingStart;
     @C.StreamType int mAudioStreamType;
-
-    void notifyBufferingStartEnd() {
-        getCallback().onBufferingStateChanged(ExoPlayerAdapter.this,
-                mBufferingStart || !mInitialized);
-    }
 
     /**
      * Constructor.
@@ -91,7 +89,16 @@ public class ExoPlayerAdapter extends PlayerAdapter implements ExoPlayer.EventLi
     }
 
     /**
-     * Release internal MediaPlayer. Should not use the object after call release().
+     * Notify the state of buffering. For example, an app may enable/disable a loading figure
+     * according to the state of buffering.
+     */
+    void notifyBufferingStartEnd() {
+        getCallback().onBufferingStateChanged(ExoPlayerAdapter.this,
+                mBufferingStart || !mInitialized);
+    }
+
+    /**
+     * Release internal {@link SimpleExoPlayer}. Should not use the object after call release().
      */
     public void release() {
         changeToUninitialized();
@@ -186,12 +193,16 @@ public class ExoPlayerAdapter extends PlayerAdapter implements ExoPlayer.EventLi
         if (!mInitialized) {
             return;
         }
-        mPlayer.seekTo((int) newPosition);
+        mPlayer.seekTo(newPosition);
     }
 
     @Override
     public long getBufferedPosition() {
         return mPlayer.getBufferedPosition();
+    }
+
+    public Context getContext() {
+        return mContext;
     }
 
     /**
@@ -218,9 +229,15 @@ public class ExoPlayerAdapter extends PlayerAdapter implements ExoPlayer.EventLi
         mAudioStreamType = audioStreamType;
     }
 
-    public MediaSource prepareMediaSource() {
+    /**
+     * Set {@link MediaSource} for {@link SimpleExoPlayer}. An app may override this method in order
+     * to use different {@link MediaSource}.
+     * @param uri The url of media source
+     * @return MediaSource for the player
+     */
+    public MediaSource onCreateMediaSource(Uri uri) {
         String userAgent = Util.getUserAgent(mContext, "ExoPlayerAdapter");
-        return new ExtractorMediaSource(mMediaSourceUri,
+        return new ExtractorMediaSource(uri,
                 new DefaultDataSourceFactory(mContext, userAgent),
                 new DefaultExtractorsFactory(),
                 null,
@@ -230,7 +247,7 @@ public class ExoPlayerAdapter extends PlayerAdapter implements ExoPlayer.EventLi
     private void prepareMediaForPlaying() {
         reset();
         if (mMediaSourceUri != null) {
-            MediaSource mediaSource = prepareMediaSource();
+            MediaSource mediaSource = onCreateMediaSource(mMediaSourceUri);
             mPlayer.prepare(mediaSource);
         } else {
             return;
