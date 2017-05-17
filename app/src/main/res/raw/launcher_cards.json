@@ -47,16 +47,16 @@
       {
         "id": 6,
         "type": "DEFAULT",
-        "title": "Detail Examples with Video Background",
-        "localImageResource": "thumbnail_example_detail",
-        "description": "Using ExoPlayer on main video"
+        "title": "Video consumption Examples",
+        "localImageResource": "thumbnail_example_video_consumption",
+        "description": "Showcase of various card design and layouts"
       },
       {
         "id": 7,
         "type": "DEFAULT",
-        "title": "Video consumption Examples",
+        "title": "Video consumption Examples with ExoPlayer",
         "localImageResource": "thumbnail_example_video_consumption",
-        "description": "Showcase of various card design and layouts"
+        "description": "Video with ExoPlayer"
       },
       {
         "id": 8,

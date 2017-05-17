@@ -21,12 +21,12 @@ import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.app.cards.CardExampleActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.details.DetailViewExampleActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.details.DetailViewExampleWithVideoBackgroundActivity;
-import android.support.v17.leanback.supportleanbackshowcase.app.details.DetailViewExampleWithVideoBackgroundExoPlayerActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.dialog.DialogExampleActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.grid.GridExampleActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.grid.VideoGridExampleActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.media.MusicExampleActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.media.VideoExampleActivity;
+import android.support.v17.leanback.supportleanbackshowcase.app.media.VideoExampleWithExoPlayerActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.page.PageAndListRowActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.settings.SettingsExampleActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.wizard.WizardExampleActivity;
@@ -139,12 +139,12 @@ public class MainFragment extends BrowseFragment {
                 }
                 case 6: {
                     intent = new Intent(getActivity().getBaseContext(),
-                            DetailViewExampleWithVideoBackgroundExoPlayerActivity.class);
+                            VideoExampleActivity.class);
                     break;
                 }
                 case 7: {
                     intent = new Intent(getActivity().getBaseContext(),
-                            VideoExampleActivity.class);
+                            VideoExampleWithExoPlayerActivity.class);
                     break;
                 }
                 case 8: {
