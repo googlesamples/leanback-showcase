@@ -10,6 +10,7 @@ import android.support.v17.leanback.media.SurfaceHolderGlueHost;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.view.SurfaceHolder;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -43,6 +44,7 @@ public class ExoPlayerAdapter extends PlayerAdapter implements ExoPlayer.EventLi
     Uri mMediaSourceUri = null;
     boolean mHasDisplay;
     boolean mBufferingStart;
+    @C.StreamType int mAudioStreamType;
 
     void notifyBufferingStartEnd() {
         getCallback().onBufferingStateChanged(ExoPlayerAdapter.this,
@@ -208,21 +210,33 @@ public class ExoPlayerAdapter extends PlayerAdapter implements ExoPlayer.EventLi
         return true;
     }
 
+    public int getAudioStreamType() {
+        return mAudioStreamType;
+    }
+
+    public void setAudioStreamType(@C.StreamType int audioStreamType) {
+        mAudioStreamType = audioStreamType;
+    }
+
+    public MediaSource prepareMediaSource() {
+        String userAgent = Util.getUserAgent(mContext, "ExoPlayerAdapter");
+        return new ExtractorMediaSource(mMediaSourceUri,
+                new DefaultDataSourceFactory(mContext, userAgent),
+                new DefaultExtractorsFactory(),
+                null,
+                null);
+    }
+
     private void prepareMediaForPlaying() {
         reset();
         if (mMediaSourceUri != null) {
-            String userAgent = Util.getUserAgent(mContext, "ClassicalMusicQuiz");
-            MediaSource mediaSource = new ExtractorMediaSource(mMediaSourceUri,
-                    new DefaultDataSourceFactory(mContext, userAgent),
-                    new DefaultExtractorsFactory(),
-                    null,
-                    null);
+            MediaSource mediaSource = prepareMediaSource();
             mPlayer.prepare(mediaSource);
         } else {
             return;
         }
 
-        mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mPlayer.setAudioStreamType(mAudioStreamType);
         mPlayer.setVideoListener(new SimpleExoPlayer.VideoListener() {
             @Override
             public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees,
