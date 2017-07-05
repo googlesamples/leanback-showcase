@@ -35,9 +35,10 @@ If you use Android Studio as recommended, the following dependencies will **auto
 git clone https://github.com/googlesamples/leanback-showcase.git
 ```
 
-- In the local.properties file add the location to your Android SDK (You need to install Android SDK 'N').
+- Create a local.properties file if you haven't set ANDROID_HOME (You need to install Android SDK 'N').
 - Open the project in [Android Studio][studio].
 - Compile and deploy to your Android TV emulator or device (such as a Nexus Player).
+- Open Live Channels [App][live] in your Android TV to add simulated TV channel service.
 
 
 ## Screenshots
@@ -67,3 +68,4 @@ Licensed under the Apache 2.0 license. See the [LICENSE file][license] for detai
 [bugs]: https://github.com/googlesamples/androidtv-Leanback/issues/new
 [contributing]: CONTRIBUTING.md
 [license]: LICENSE
+[live]: https://play.google.com/store/apps/details?id=com.google.android.tv&amp;hl=en

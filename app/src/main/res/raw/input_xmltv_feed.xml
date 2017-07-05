@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE tv SYSTEM "xmltv.dtd">
+<!--
+xmltv.dtd are extended to be align with Android TV Input Framework and contain static video
+contents. For details, please see the documentation of XmlTvParser class.
+-->
+<tv>
+    <channel id="android.support.v17.leanback.supportleanbackshowcase.2-1" repeat-programs="true">
+        <display-name>Google</display-name>
+        <display-number>2-1</display-number>
+        <icon src="https://storage.googleapis.com/android-tv/images/google.png"/>
+        <app-link color="#4caf50"
+            intent-uri="intent:#Intent;component=android.support.v17.leanback.supportleanbackshowcase/.input.widget.ChannelLinkSidePanelActivity;S.display-number=2-4;end"
+            poster-uri="android.resource://android.support.v17.leanback.supportleanbackshowcase/drawable/badge"
+            text="Google IO">
+            <icon src="https://storage.googleapis.com/android-tv/images/mpeg_dash.png"/>
+        </app-link>
+    </channel>
+    <channel id="android.support.v17.leanback.supportleanbackshowcase.2-2" repeat-programs="true">
+        <display-name>Creative Commons</display-name>
+        <display-number>2-2</display-number>
+        <icon src="https://storage.googleapis.com/android-tv/images/cc.png"/>
+        <app-link color="#4caf50"
+            intent-uri="intent:#Intent;component=android.support.v17.leanback.supportleanbackshowcase/.input.widget.ChannelLinkDetailsActivity;S.display-number=2-4;end"
+            poster-uri="android.resource://android.support.v17.leanback.supportleanbackshowcase/drawable/movie"
+            text="Open Source Movie">
+            <icon src="https://storage.googleapis.com/android-tv/images/mpeg_dash.png"/>
+        </app-link>
+        <advertisement
+            type="VAST">
+            <request-url><![CDATA[https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=]]></request-url>
+        </advertisement>
+    </channel>
+    <programme
+        channel="android.support.v17.leanback.supportleanbackshowcase.2-1"
+        start="20150817000000 +0000"
+        stop="20150817000147 +0000"
+        video-src="https://commondatastorage.googleapis.com/android-tv/Sample%20videos/April%20Fool's%202013/Introducing%20Gmail%20Blue.mp4"
+        video-type="HTTP_PROGRESSIVE">
+        <title>Introducing Gmail Blue</title>
+        <desc>Introducing Gmail Blue</desc>
+        <category>EDUCATION</category>
+        <category>TECH_SCIENCE</category>
+        <icon src="https://storage.googleapis.com/android-tv/images/gmail.png"/>
+        <rating system="com.android.tv">
+            <value>com.android.tv/US_TV/US_TV_14/US_TV_D/US_TV_L</value>
+        </rating>
+    </programme>
+    <programme
+        channel="android.support.v17.leanback.supportleanbackshowcase.2-1"
+        start="20150817000147 +0000"
+        stop="20150817004502 +0000"
+        video-src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/GoogleIO-2014-CastingToTheFuture.mp4"
+        video-type="HTTP_PROGRESSIVE">
+        <title>Google I/O 2014 - Casting To The Future</title>
+        <desc>Google I/O 2014 - Casting To The Future</desc>
+        <category>EDUCATION</category>
+        <category>TECH_SCIENCE</category>
+        <icon
+            src="https://storage.googleapis.com/gtv-videos-bucket/sample/images_480x270/ToTheFuture2-480x270.jpg"/>
+        <rating system="com.android.tv">
+            <value>com.android.tv/US_TV/US_TV_PG/US_TV_D</value>
+        </rating>
+    </programme>
+    <programme
+        channel="android.support.v17.leanback.supportleanbackshowcase.2-1"
+        start="20150817004502 +0000"
+        stop="20150817005902 +0000"
+        video-src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/GoogleIO-2014-MakingGoogleCastReadyAppsDiscoverable.mp4"
+        video-type="HTTP_PROGRESSIVE">
+        <title>Google I/O 2014 - Making Google Cast Ready Apps Discoverable</title>
+        <desc>Google I/O 2014 - Making Google Cast Ready Apps Discoverable</desc>
+        <category>EDUCATION</category>
+        <category>TECH_SCIENCE</category>
+        <icon
+            src="https://storage.googleapis.com/gtv-videos-bucket/sample/images_480x270/MakingGoogleCastReadyAppsDiscoverable-480-270.jpg"/>
+        <rating system="com.android.tv">
+            <value>com.android.tv/US_TV/US_TV_14/US_TV_D/US_TV_L</value>
+        </rating>
+    </programme>
+    <programme
+        channel="android.support.v17.leanback.supportleanbackshowcase.2-1"
+        start="20150817005902 +0000"
+        stop="20150817010113 +0000"
+        video-src="https://commondatastorage.googleapis.com/android-tv/Sample%20videos/April%20Fool's%202013/Introducing%20Google%20Fiber%20to%20the%20Pole.mp4"
+        video-type="HTTP_PROGRESSIVE">
+        <title>Introducing Google Fiber to the Pole</title>
+        <desc>Introducing Google Fiber to the Pole.</desc>
+        <category>EDUCATION</category>
+        <category>TECH_SCIENCE</category>
+        <icon src="https://storage.googleapis.com/android-tv/images/fiber.png"/>
+        <rating system="com.android.tv">
+            <value>com.android.tv/US_TV/US_TV_PG/US_TV_D</value>
+        </rating>
+    </programme>
+    <programme
+        channel="android.support.v17.leanback.supportleanbackshowcase.2-1"
+        start="20150817010113 +0000"
+        stop="20150817010315 +0000"
+        video-src="http://commondatastorage.googleapis.com/android-tv/Sample%20videos/April%20Fool's%202013/Introducing%20Google%20Nose.mp4"
+        video-type="HTTP_PROGRESSIVE">
+        <title>Introducing Google Nose</title>
+        <desc>Introducing Google Nose</desc>
+        <category>EDUCATION</category>
+        <category>TECH_SCIENCE</category>
+        <icon src="http://commondatastorage.googleapis.com/android-tv/Sample%20videos/April%20Fool's%202013/Introducing%20Google%20Nose/card.jpg"/>
+        <rating system="US_TV">
+            <value>com.android.tv/US_TV/US_TV_PG/US_TV_D</value>
+        </rating>
+        <rating system="com.android.tv">
+            <value>com.android.tv/US_TV/US_TV_PG/US_TV_D</value>
+        </rating>
+    </programme>
+    <programme
+        channel="android.support.v17.leanback.supportleanbackshowcase.2-2"
+        start="20150817000000 +0000"
+        stop="20150817001053 +0000"
+        video-src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+        video-type="HTTP_PROGRESSIVE">
+        <title>Elephants Dream</title>
+        <desc>Do elephants dream of electric sheep?</desc>
+        <category>MOVIES</category>
+        <category>FAMILY_KIDS</category>
+        <icon
+            src="https://storage.googleapis.com/gtv-videos-bucket/sample/images_480x270/ElephantsDream.jpg"/>
+        <rating system="com.android.tv">
+            <value>com.android.tv/US_TV/US_TV_14/US_TV_D/US_TV_L</value>
+        </rating>
+    </programme>
+    <programme
+        channel="android.support.v17.leanback.supportleanbackshowcase.2-2"
+        start="20150817001053 +0000"
+        stop="20150817002540 +0000"
+        video-src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+        video-type="HTTP_PROGRESSIVE">
+        <title>Sintel</title>
+        <desc>Sintel a movie clip.</desc>
+        <category>MOVIES</category>
+        <category>FAMILY_KIDS</category>
+        <icon
+            src="https://storage.googleapis.com/gtv-videos-bucket/sample/images_480x270/Sintel.jpg"/>
+        <rating system="com.android.tv">
+            <value>com.android.tv/US_TV/US_TV_PG/US_TV_D</value>
+        </rating>
+    </programme>
+</tv>

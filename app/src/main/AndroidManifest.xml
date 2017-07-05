@@ -7,12 +7,28 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
+
+    <!-- Required to update or read existing channel and program information in TvProvider. -->
+    <uses-permission android:name="com.android.providers.tv.permission.READ_EPG_DATA" />
+
+    <!-- Required to update channel and program information in TvProvider. -->
+    <uses-permission android:name="com.android.providers.tv.permission.WRITE_EPG_DATA" />
+
+    <!-- Required to sync EPG data after reboot. For details,
+    please see {@link JobInfo.Builder#setPersisted}-->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false"/>
     <uses-feature
         android:name="android.software.leanback"
         android:required="true"/>
+
+
+    <uses-feature
+        android:name="android.software.live_tv"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -92,6 +108,82 @@
             android:theme="@style/Theme.Example.LeanbackMusic"/>
 
         <service android:exported="false" android:name=".app.media.MusicPlaybackService"/>
+
+
+        <!-- Launched by the TV app before it uses TvInputService. This registers channels and
+        sets up LeanbackTvProgramSync to provide program information in the background. -->
+        <activity android:name=".input.widget.InputSetupActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+
+        <!-- A full-screen activity which will be launched by the TV app when a user clicks
+        the app-link connected to this activity. -->
+        <activity
+            android:name=".input.widget.ChannelLinkDetailsActivity"
+            android:theme="@style/Theme.Transparent">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".input.widget.WebViewActivity"
+            android:theme="@style/Theme.Transparent">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+
+        <!-- A side-panel activity which will be launched by the TV app when a user clicks
+        the app-link connected to this activity. -->
+        <activity
+            android:name=".input.widget.ChannelLinkSidePanelActivity"
+            android:theme="@style/Theme.Panel">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+
+        <!-- TV input which provides channels based on the streaming contents.
+        Requires "android.permission.BIND_TV_INPUT" to ensure that only system services can bind.
+        This provides the full implementation of TvInputService including EPG, subtitles,
+        multi-audio, parental controls, and overlay view.
+        -->
+        <service
+            android:name=".input.service.TvInputService"
+            android:label="@string/label"
+            android:permission="android.permission.BIND_TV_INPUT">
+            <!-- Required filter used by the system to launch our account service. -->
+            <intent-filter>
+                <action android:name="android.media.tv.TvInputService" />
+            </intent-filter>
+            <!-- An XML file which describes this input. This provides pointers to the
+            InputSetupActivity to the system/TV app. -->
+            <meta-data
+                android:name="android.media.tv.input"
+                android:resource="@xml/inputservice" />
+        </service>
+
+        <!-- This service is for using JobScheduler to sync EPG data. -->
+        <service
+            android:name=".input.service.LeanbackTvProgramSync"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true" />
+
+        <!-- This receiver is for sync job schedule well after reboot. -->
+        <receiver android:name=".input.service.SyncJobReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Required by IMA SDK to fetch the version number of Google Play Service -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
     </application>
 
 </manifest>
