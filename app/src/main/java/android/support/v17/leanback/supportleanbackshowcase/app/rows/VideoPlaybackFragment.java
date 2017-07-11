@@ -1,18 +1,20 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright (C) 2017 The Android Open Source Project
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-package android.support.v17.leanback.supportleanbackshowcase.app.media;
+package android.support.v17.leanback.supportleanbackshowcase.app.rows;
 
 import android.content.Context;
 import android.media.AudioManager;
@@ -22,13 +24,14 @@ import android.support.v17.leanback.app.VideoFragment;
 import android.support.v17.leanback.app.VideoFragmentGlueHost;
 import android.support.v17.leanback.media.MediaPlayerAdapter;
 import android.support.v17.leanback.media.PlaybackGlue;
-import android.support.v17.leanback.supportleanbackshowcase.app.rows.VideoPlaybackActivity;
-import android.support.v17.leanback.supportleanbackshowcase.app.rows.VideoContent;
-import android.support.v17.leanback.widget.PlaybackControlsRow;
+import android.support.v17.leanback.supportleanbackshowcase.app.media.PlaybackSeekDiskDataProvider;
+import android.support.v17.leanback.supportleanbackshowcase.app.media.VideoMediaPlayerGlue;
 import android.util.Log;
 
-
-public class VideoConsumptionExampleFragment extends VideoFragment {
+/**
+ * A video playback fragment whose main task is to load and play videos
+ */
+public class VideoPlaybackFragment extends VideoFragment {
 
     private static final String URL = "https://storage.googleapis.com/android-tv/Sample videos/"
             + "April Fool's 2013/Explore Treasure Mode with Google Maps.mp4";
@@ -52,12 +55,12 @@ public class VideoConsumptionExampleFragment extends VideoFragment {
         }
     }
 
-    public static VideoConsumptionExampleFragment newInstance(VideoContent selectedClip) {
-        VideoConsumptionExampleFragment playbackFragment = new VideoConsumptionExampleFragment();
+    public static VideoPlaybackFragment newInstance(VideoContent selectedVideo) {
+        VideoPlaybackFragment videoPlaybackFragment = new VideoPlaybackFragment();
         Bundle args = new Bundle(1);
-        args.putParcelable(VideoPlaybackActivity.VIDEO_CONTENT, selectedClip);
-        playbackFragment.setArguments(args);
-        return playbackFragment;
+        args.putParcelable(VideoPlaybackActivity.VIDEO_CONTENT, selectedVideo);
+        videoPlaybackFragment.setArguments(args);
+        return videoPlaybackFragment;
     }
 
     AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener
@@ -74,6 +77,7 @@ public class VideoConsumptionExampleFragment extends VideoFragment {
         mMediaPlayerGlue = new VideoMediaPlayerGlue(getActivity(),
                 new MediaPlayerAdapter(getActivity()));
         mMediaPlayerGlue.setHost(mHost);
+
         AudioManager audioManager = (AudioManager) getActivity()
                 .getSystemService(Context.AUDIO_SERVICE);
         if (audioManager.requestAudioFocus(mOnAudioFocusChangeListener, AudioManager.STREAM_MUSIC,
@@ -81,15 +85,15 @@ public class VideoConsumptionExampleFragment extends VideoFragment {
             Log.w(TAG, "video player cannot obtain audio focus!");
         }
 
-        mMediaPlayerGlue.setMode(PlaybackControlsRow.RepeatAction.NONE);
-        MediaMetaData intentMetaData = getActivity().getIntent().getParcelableExtra(
-                VideoExampleActivity.TAG);
-        if (intentMetaData != null) {
-            mMediaPlayerGlue.setTitle(intentMetaData.getMediaTitle());
-            mMediaPlayerGlue.setSubtitle(intentMetaData.getMediaArtistName());
+        Bundle args = getArguments();
+        VideoContent video = args.getParcelable(VideoPlaybackActivity.VIDEO_CONTENT);
+        if (video != null) {
+            mMediaPlayerGlue.setTitle(video.getTitle());
+            mMediaPlayerGlue.setSubtitle(video.getDescription());
             mMediaPlayerGlue.getPlayerAdapter().setDataSource(
-                    Uri.parse(intentMetaData.getMediaSourcePath()));
+                    Uri.parse(video.getVideoUrl()));
         } else {
+            // when videoContent has not been set, play the default video
             mMediaPlayerGlue.setTitle("Diving with Sharks");
             mMediaPlayerGlue.setSubtitle("A Googler");
             mMediaPlayerGlue.getPlayerAdapter().setDataSource(Uri.parse(URL));
@@ -108,3 +112,4 @@ public class VideoConsumptionExampleFragment extends VideoFragment {
     }
 
 }
+

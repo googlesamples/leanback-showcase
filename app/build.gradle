@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 'android-O'
-    buildToolsVersion '26.0.0-rc2'
+    compileSdkVersion 'android-26'
+    buildToolsVersion '26.0.0'
 
     defaultConfig {
         applicationId "android.support.v17.leanback.supportleanbackshowcase"
-        minSdkVersion 17
-        targetSdkVersion 'O'
+        minSdkVersion 23
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -22,7 +22,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile "com.android.support:recyclerview-v7:+"
+    compile "com.android.support:recyclerview-v7:26.0.0-beta2"
     compile "com.android.support:leanback-v17:+"
     compile "com.android.support:appcompat-v7:+"
 
@@ -34,6 +34,6 @@ dependencies {
     compile "com.android.support:palette-v7:+"
     compile 'com.google.android.exoplayer:exoplayer:r2.2.0'
 
-    compile 'com.github.bumptech.glide:glide:3.7.0'
-
+    compile 'com.github.bumptech.glide:glide:4.0.0-RC1'
+    compile 'com.android.support:support-tv-provider:26.0.0-beta2'
 }

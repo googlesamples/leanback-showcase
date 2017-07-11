@@ -90,6 +90,43 @@
             android:name=".app.media.MusicExampleActivity"
             android:exported="true"
             android:theme="@style/Theme.Example.LeanbackMusic"/>
+        <activity
+            android:name=".app.rows.DynamicVideoRowsActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:scheme="rowsnewapi"
+                    android:host="android.support.v17.leanback.supportleanbackshowcase"
+                    android:path="/startapp" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".app.rows.VideoPlaybackActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:scheme="rowsnewapi"
+                    android:host="android.support.v17.leanback.supportleanbackshowcase"
+                    android:path="/resumevideo" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".app.rows.ScreenChannelRowActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:scheme="rowsnewapi"
+                    android:host="android.support.v17.leanback.supportleanbackshowcase"
+                    android:pathPrefix="/playvideo"
+                    />
+            </intent-filter>
+        </activity>
 
         <service android:exported="false" android:name=".app.media.MusicPlaybackService"/>
     </application>
