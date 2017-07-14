@@ -88,35 +88,41 @@ public class VideoContent implements Parcelable {
      */
     private long mProgramId;
 
-    /* package */ void setProgramId(long programId) {
+    /**
+     * Getter and Setter for class's member
+     *
+     * Set access permission to public so other component outside of this package can access
+     */
+
+    public void setProgramId(long programId) {
         mProgramId = programId;
     }
 
-    /* package */ String getVideoId() {
+    public String getVideoId() {
         return mVideoId;
     }
 
-    /* package */ String getTitle() {
+    public String getTitle() {
         return mTitle;
     }
 
-    /* package */ String getDescription() {
+    public String getDescription() {
         return mDescription;
     }
 
-    /* package */ String getVideoUrl() {
+    public String getVideoUrl() {
         return mVideoUrl;
     }
 
-    /* package */ String getPreviewVideoUrl() {
+    public String getPreviewVideoUrl() {
         return mPreviewVideoUrl;
     }
 
-    /* package */ String getCardImageUrl() {
+    public String getCardImageUrl() {
         return mCardImageUrl;
     }
 
-    /* package */ URI getBackgroundImageURI() {
+    public URI getBackgroundImageURI() {
         try {
             return new URI(mBgImageUrl);
         } catch (URISyntaxException e) {
@@ -170,6 +176,9 @@ public class VideoContent implements Parcelable {
         }
     };
 
+    /**
+     * For debugging purpose
+     */
     @Override
     public String toString() {
         return "VideoContent{" +

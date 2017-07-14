@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v17.leanback.supportleanbackshowcase.R;
+import android.support.v17.leanback.supportleanbackshowcase.app.media.VideoConsumptionExampleFragment;
 
 /**
  * VideoPlaybackActivity for video playback that loads PlaybackFragment
@@ -36,8 +37,8 @@ public class VideoPlaybackActivity extends Activity {
 
         if (savedInstanceState == null) {
             VideoContent mVideo = getIntent().getParcelableExtra(VIDEO_CONTENT);
-            VideoPlaybackFragment videoPlaybackFragment =
-                    VideoPlaybackFragment.newInstance(mVideo);
+            VideoConsumptionExampleFragment videoPlaybackFragment =
+                    VideoConsumptionExampleFragment.newInstance(mVideo);
 
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
             fragmentTransaction.add(android.R.id.content, videoPlaybackFragment);

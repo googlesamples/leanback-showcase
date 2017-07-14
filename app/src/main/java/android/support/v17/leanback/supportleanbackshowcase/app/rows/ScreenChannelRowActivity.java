@@ -66,6 +66,6 @@ public class ScreenChannelRowActivity extends Activity {
             playVideo.putExtra(VideoPlaybackActivity.VIDEO_CONTENT, videoContent);
             startActivity(playVideo);
         }
-
+        finish();
     }
 }

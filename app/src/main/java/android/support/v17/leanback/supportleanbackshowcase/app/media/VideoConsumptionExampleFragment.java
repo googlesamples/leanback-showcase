@@ -1,15 +1,17 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright (C) 2017 The Android Open Source Project
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package android.support.v17.leanback.supportleanbackshowcase.app.media;
@@ -27,9 +29,16 @@ import android.support.v17.leanback.supportleanbackshowcase.app.rows.VideoConten
 import android.support.v17.leanback.widget.PlaybackControlsRow;
 import android.util.Log;
 
-
+/**
+ * Video playback fragment
+ *
+ * Use static method newInstance to create the fragment with specified video resource
+ */
 public class VideoConsumptionExampleFragment extends VideoFragment {
 
+    /**
+     * Default video to play when this fragment cannot load valid video resource
+     */
     private static final String URL = "https://storage.googleapis.com/android-tv/Sample videos/"
             + "April Fool's 2013/Explore Treasure Mode with Google Maps.mp4";
     public static final String TAG = "VideoConsumption";
@@ -52,10 +61,10 @@ public class VideoConsumptionExampleFragment extends VideoFragment {
         }
     }
 
-    public static VideoConsumptionExampleFragment newInstance(VideoContent selectedClip) {
+    public static VideoConsumptionExampleFragment newInstance(VideoContent selectedVideo) {
         VideoConsumptionExampleFragment playbackFragment = new VideoConsumptionExampleFragment();
         Bundle args = new Bundle(1);
-        args.putParcelable(VideoPlaybackActivity.VIDEO_CONTENT, selectedClip);
+        args.putParcelable(VideoPlaybackActivity.VIDEO_CONTENT, selectedVideo);
         playbackFragment.setArguments(args);
         return playbackFragment;
     }
@@ -81,15 +90,15 @@ public class VideoConsumptionExampleFragment extends VideoFragment {
             Log.w(TAG, "video player cannot obtain audio focus!");
         }
 
-        mMediaPlayerGlue.setMode(PlaybackControlsRow.RepeatAction.NONE);
-        MediaMetaData intentMetaData = getActivity().getIntent().getParcelableExtra(
-                VideoExampleActivity.TAG);
-        if (intentMetaData != null) {
-            mMediaPlayerGlue.setTitle(intentMetaData.getMediaTitle());
-            mMediaPlayerGlue.setSubtitle(intentMetaData.getMediaArtistName());
+        Bundle args = getArguments();
+        VideoContent video = args.getParcelable(VideoPlaybackActivity.VIDEO_CONTENT);
+        if (video != null) {
+            mMediaPlayerGlue.setTitle(video.getTitle());
+            mMediaPlayerGlue.setSubtitle(video.getDescription());
             mMediaPlayerGlue.getPlayerAdapter().setDataSource(
-                    Uri.parse(intentMetaData.getMediaSourcePath()));
+                    Uri.parse(video.getVideoUrl()));
         } else {
+            // when videoContent has not been set, play the default video
             mMediaPlayerGlue.setTitle("Diving with Sharks");
             mMediaPlayerGlue.setSubtitle("A Googler");
             mMediaPlayerGlue.getPlayerAdapter().setDataSource(Uri.parse(URL));

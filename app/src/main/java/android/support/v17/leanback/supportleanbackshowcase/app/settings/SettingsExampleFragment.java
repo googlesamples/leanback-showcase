@@ -30,9 +30,10 @@ import android.widget.Toast;
 import java.util.Arrays;
 import java.util.Stack;
 
-public class SettingsExampleFragment extends LeanbackSettingsFragment implements DialogPreference.TargetFragment {
+public class SettingsExampleFragment extends LeanbackSettingsFragment
+        implements DialogPreference.TargetFragment {
 
-    private final Stack<Fragment> fragments = new Stack<Fragment>();
+    private static final Stack<Fragment> fragments = new Stack<Fragment>();
 
     @Override
     public void onPreferenceStartInitialScreen() {
@@ -67,7 +68,10 @@ public class SettingsExampleFragment extends LeanbackSettingsFragment implements
         return fragment;
     }
 
-    private class PrefFragment extends LeanbackPreferenceFragment {
+    /**
+     * To instantiate preference fragment, this class should be public static
+     */
+    public static class PrefFragment extends LeanbackPreferenceFragment {
 
         @Override
         public void onCreatePreferences(Bundle bundle, String s) {

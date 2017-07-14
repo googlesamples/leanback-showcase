@@ -91,6 +91,10 @@ public final class ChannelContents {
         mChannelId = id;
     }
 
+    /* package */void setChannelUnPublished() {
+        mChannelPublished = false;
+    }
+
     /* package */long getChannelId() {
         return mChannelId;
     }
