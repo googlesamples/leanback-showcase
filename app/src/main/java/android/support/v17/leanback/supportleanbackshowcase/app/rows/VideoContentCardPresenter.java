@@ -29,11 +29,11 @@ import android.widget.PopupMenu;
 import com.bumptech.glide.Glide;
 
 /**
- * A specialized CardPresenter to generate Views and bind Objects to them on demand.
+ * A specialized VideoContentCardPresenter to generate Views and bind Objects to them on demand.
  *
  * It will change background color/ card image accordingly
  */
-public class CardPresenter extends Presenter {
+public class VideoContentCardPresenter extends Presenter {
     private static int sSelectedBackgroundColor;
     private static int sDefaultBackgroundColor;
 

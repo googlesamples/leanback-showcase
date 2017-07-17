@@ -16,30 +16,13 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.rows;
 
-import android.app.Activity;
-import android.content.ActivityNotFoundException;
-import android.content.ComponentName;
-import android.content.ContentUris;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.media.tv.TvContract;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.DrawableRes;
-import android.support.media.tv.Channel;
-import android.support.media.tv.ChannelLogoUtils;
-import android.support.media.tv.PreviewProgram;
-import android.support.media.tv.TvContractCompat;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
-import android.support.v17.leanback.supportleanbackshowcase.cards.presenters.CardPresenterSelector;
 import android.support.v17.leanback.supportleanbackshowcase.cards.presenters.IconCardInChannelPublishPresenter;
 import android.support.v17.leanback.supportleanbackshowcase.models.Card;
 import android.support.v17.leanback.supportleanbackshowcase.models.CardRow;
@@ -52,11 +35,9 @@ import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.OnItemViewClickedListener;
 import android.support.v17.leanback.widget.OnItemViewSelectedListener;
 import android.support.v17.leanback.widget.Presenter;
-import android.support.v17.leanback.widget.PresenterSelector;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -66,8 +47,6 @@ import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -151,7 +130,7 @@ public class DynamicRowsFragment extends BrowseFragment {
         for (int i = 0; i < mChannelContents.size(); i++) {
             ChannelContents playlist = mChannelContents.get(i);
             List<VideoContent> clips = playlist.getVideos();
-            ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new CardPresenter());
+            ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new VideoContentCardPresenter());
             for (int j = 0; j < clips.size(); ++j) {
                 listRowAdapter.add(clips.get(j));
             }

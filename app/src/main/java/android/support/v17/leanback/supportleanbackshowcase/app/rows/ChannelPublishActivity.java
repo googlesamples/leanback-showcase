@@ -1,4 +1,3 @@
-package android.support.v17.leanback.supportleanbackshowcase.app.rows;
 /*
  * Copyright (c) 2017 The Android Open Source Project
  *
@@ -15,6 +14,7 @@ package android.support.v17.leanback.supportleanbackshowcase.app.rows;
  * limitations under the License.
  */
 
+package android.support.v17.leanback.supportleanbackshowcase.app.rows;
 
 import android.app.Activity;
 import android.os.Bundle;
