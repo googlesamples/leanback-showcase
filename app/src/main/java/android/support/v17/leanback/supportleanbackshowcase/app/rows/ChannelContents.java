@@ -143,6 +143,9 @@ public final class ChannelContents {
     public static final class RemoveChannelInMainScreen extends AsyncTask<ChannelContents, Void, Void> {
         private static final String TAG = "RemoveChannelInMainScreen";
 
+        /**
+         * Executor must provide context and Listener so to execute LoadAddedChannels task
+         */
         private Context mContext;
         private LoadAddedChannels.Listener mListener;
 
@@ -184,8 +187,8 @@ public final class ChannelContents {
         public static final String CONTENT_ANDROID_MEDIA_TV_PREVIEW_PROGRAM
                 = "content://android.media.tv/preview_program";
 
+        // this object is used ot call startActivityForResult method from this Async Task
         private Activity mActivity;
-        private LoadAddedChannels.Listener mListener;
 
         private static final int ADD_CHANNEL_REQUEST = 1;
 

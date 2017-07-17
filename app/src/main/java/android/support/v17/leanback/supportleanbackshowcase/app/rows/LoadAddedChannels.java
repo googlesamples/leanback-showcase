@@ -34,21 +34,32 @@ import java.util.List;
 public class LoadAddedChannels extends AsyncTask<Void, Void, Void> {
 
     /**
-     * ContentProvider projection scheme
+     * ContentProvider projection scheme and related column ID
      */
     private static final String[] CHANNELS_MAP_PROJECTION =
             {TvContractCompat.Channels._ID, TvContractCompat.Channels.COLUMN_INTERNAL_PROVIDER_ID};
     private static final int CHANNELS_COLUMN_ID_INDEX = 0;
     private static final int CHANNELS_COLUMN_INTERNAL_PROVIDER_ID_INDEX = 1;
 
+    /**
+     * All published channel using ChannelPlaylistId to represent
+     */
     private List<ChannelPlaylistId> mPublishedChannelContents = new ArrayList<>();
+
+    /**
+     * To execute this async task properly (dealing with content resolver) executor must provide
+     * the context
+     */
     Context mContext;
+
+    /**
+     * Registered Listener for this aysnc task
+     */
+    private Listener mListener;
 
     interface Listener {
         void onPublishedChannelsLoaded(List<ChannelPlaylistId> publishedChannels);
     }
-
-    private Listener mListener;
 
     LoadAddedChannels(Context context, Listener listener) {
         mListener = listener;
