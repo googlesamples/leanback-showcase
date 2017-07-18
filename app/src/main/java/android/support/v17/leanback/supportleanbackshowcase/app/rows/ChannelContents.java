@@ -140,18 +140,16 @@ public final class ChannelContents {
     /**
      * Async Task to remove channel from home screen
      */
-    public static final class RemoveChannelInMainScreen extends AsyncTask<ChannelContents, Void, Void> {
+    public final class RemoveChannelInMainScreen extends AsyncTask<ChannelContents, Void, Void> {
         private static final String TAG = "RemoveChannelInMainScreen";
 
         /**
          * Executor must provide context and Listener so to execute LoadAddedChannels task
          */
         private Context mContext;
-        private LoadAddedChannels.Listener mListener;
 
-        public RemoveChannelInMainScreen(Context context, LoadAddedChannels.Listener listener) {
+        public RemoveChannelInMainScreen(Context context) {
             mContext = context;
-            mListener = listener;
         }
 
         private void deleteChannel(Context context, long channelId) {
@@ -166,7 +164,7 @@ public final class ChannelContents {
         protected Void doInBackground(ChannelContents... params) {
             ChannelContents playlist = params[0];
             deleteChannel(mContext, playlist.getChannelId());
-            new LoadAddedChannels(mContext, mListener);
+            new LoadAddedChannels(mContext);
             return null;
         }
     }
@@ -176,7 +174,7 @@ public final class ChannelContents {
      * Async Task to add channel to main screen/ remove channel from main screen
      */
 
-    public static final class CreateChannelInMainScreen extends AsyncTask<ChannelContents, Void, Long> {
+    public final class CreateChannelInMainScreen extends AsyncTask<ChannelContents, Void, Long> {
         private static final String TAG = "CreateChannelInMainScreen";
 
         private static final String SCHEME = "rowsnewapi";
@@ -295,6 +293,90 @@ public final class ChannelContents {
                 mActivity.startActivityForResult(intent, ADD_CHANNEL_REQUEST);
             } catch (ActivityNotFoundException e) {
                 Log.e(TAG, "could not start add channel approval UI", e);
+            }
+        }
+    }
+    /**
+     * ContentProvider projection scheme and related column ID
+     */
+    private static final String[] CHANNELS_MAP_PROJECTION =
+            {TvContractCompat.Channels._ID, TvContractCompat.Channels.COLUMN_INTERNAL_PROVIDER_ID};
+    private static final int CHANNELS_COLUMN_ID_INDEX = 0;
+    private static final int CHANNELS_COLUMN_INTERNAL_PROVIDER_ID_INDEX = 1;
+
+    interface Listener {
+        void onPublishedChannelsLoaded(List<ChannelPlaylistId> publishedChannels);
+    }
+
+    /**
+     * Registered Listener for this aysnc task
+     */
+    private Listener mListener;
+
+    /**
+     * For each ChannelContents, it will have a listener associate with.
+     *
+     * After published ChannelContents are loaded, listener's onPublishedChannelsLoaded function
+     * will be executed to customize this ChannelContents' related UI
+     */
+    public void registerListener(Listener listener) {
+        mListener = listener;
+    }
+
+    public class LoadAddedChannels extends AsyncTask<Void, Void, Void> {
+
+
+        /**
+         * All published channel using ChannelPlaylistId to represent
+         */
+        private List<ChannelPlaylistId> mPublishedChannelContents = new ArrayList<>();
+
+        /**
+         * To execute this async task properly (dealing with content resolver) executor must provide
+         * the context
+         */
+        Context mContext;
+
+
+
+        LoadAddedChannels(Context context) {
+            mContext = context;
+            this.execute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            loadChannels();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+//            onPublishedChannelsLoaded(mPublishedChannelContents);
+            mListener.onPublishedChannelsLoaded(mPublishedChannelContents);
+        }
+
+
+        private void loadChannels() {
+
+            /**
+             * every time when the async task loadChannels is executed, the published channel list
+             * will be updated accordingly
+             */
+            mPublishedChannelContents.clear();
+            try (Cursor cursor = mContext.getContentResolver().query(TvContract.Channels.CONTENT_URI,
+                    CHANNELS_MAP_PROJECTION, null, null, null)) {
+                if (cursor != null) {
+                    while (cursor.moveToNext()) {
+                        if (!cursor.isNull(
+                                CHANNELS_COLUMN_INTERNAL_PROVIDER_ID_INDEX)) {
+                            // Found a row that contains a non-null provider id.
+                            String id = cursor.getString(CHANNELS_COLUMN_INTERNAL_PROVIDER_ID_INDEX);
+                            long channelId = cursor.getLong(CHANNELS_COLUMN_ID_INDEX);
+                            mPublishedChannelContents.add(new ChannelPlaylistId(id, channelId));
+                        }
+                    }
+                }
             }
         }
     }

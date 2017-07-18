@@ -39,8 +39,9 @@ import java.util.List;
  * It extends the GuidedStepFragment to share the similar UI as GuidedStepFragment
  */
 public class PublishChannelFragment extends GuidedStepFragment
-        implements LoadAddedChannels.Listener {
+        implements ChannelContents.Listener{
 
+    private ChannelContents mSelectedChannelContents;
     private static final String TAG = "PublishChannelFragment";
     private static final boolean DEBUG = true;
 
@@ -120,7 +121,7 @@ public class PublishChannelFragment extends GuidedStepFragment
                  * Every time when add channel activity is finished, the LoadAddedChannels async task
                  * will be executed to fetch channels' publish status
                  */
-                new LoadAddedChannels(getActivity(), this);
+                mSelectedChannelContents.new LoadAddedChannels(getActivity());
                 Toast.makeText(this.getActivity(), "Channel Added!", Toast.LENGTH_SHORT).show();
             } else {
                 Log.e(TAG, "could not add channel");
@@ -146,7 +147,20 @@ public class PublishChannelFragment extends GuidedStepFragment
          * executed to fetch channels' publish status
          * And create the guide list accordingly
          */
-        new LoadAddedChannels(getActivity(), this);
+        if (mSelectedChannelContents == null) {
+            /**
+             * In the first run, mSelectedChannelContents has not been initialized.
+             * To update channel's publish status, a "fake" ChannelContents object with
+             * properly set listener is created.
+             *
+             * So LoadAddedChannels task can still be executed
+             */
+            ChannelContents channelContentsWithListener = new ChannelContents();
+            channelContentsWithListener.registerListener(this);
+            channelContentsWithListener.new LoadAddedChannels(getActivity());
+        } else {
+            mSelectedChannelContents.new LoadAddedChannels(getActivity());
+        }
         return new GuidanceStylist.Guidance(title, description, breadcrumb, icon);
     }
 
@@ -169,7 +183,7 @@ public class PublishChannelFragment extends GuidedStepFragment
         /**
          * The id of check box was set to the index of current channel
          */
-        for (int i = 0; i < ChannelContents.sChannelContents.size(); i++) {
+        for (int i = 0; i < mChannelContents.size(); i++) {
             addCheckedAction(actions,
                     OPTION_DRAWABLE,
                     getActivity(),
@@ -177,6 +191,7 @@ public class PublishChannelFragment extends GuidedStepFragment
                     mChannelContents.get(i).getDescription(),
                     i,
                     mChannelContents.get(i).isChannelPublished());
+            mChannelContents.get(i).registerListener(this);
         }
     }
 
@@ -186,29 +201,46 @@ public class PublishChannelFragment extends GuidedStepFragment
          * Find channel through action ID
          */
         int currentId = (int) action.getId();
-        ChannelContents selectedChannelContents = mChannelContents.get(currentId);
+        mSelectedChannelContents = mChannelContents.get(currentId);
+
+        /**
+         * When the action cannot select valid mediaItem, just return from from this function
+         */
+        if (mSelectedChannelContents == null) {
+            return;
+        }
 
         /**
          * Add/ Remove channel from Home Screen using Async task
          * to make sure the UI thread will not be blocked
          */
         if (action.isChecked()) {
-            new ChannelContents.CreateChannelInMainScreen(getActivity())
-                    .execute(selectedChannelContents);
+            /**
+             * Create and execute the async task to add channel on home screen
+             * Always update publish status through LoadAddedChannels task
+             */
+            mSelectedChannelContents.new CreateChannelInMainScreen(getActivity())
+                    .execute(mSelectedChannelContents);
+            mSelectedChannelContents.new LoadAddedChannels(getActivity());
         } else {
             Toast.makeText(this.getActivity(),
                     getResources().getString(R.string.channel_removed_from_home_screen),
                     Toast.LENGTH_SHORT).show();
-            new ChannelContents.RemoveChannelInMainScreen(getActivity(), this)
-                    .execute(selectedChannelContents);
+            /**
+             * Create and execute the async task to remove channel on home screen
+             * Always update publish status through LoadAddedChannels task
+             */
+            mSelectedChannelContents.new RemoveChannelInMainScreen(getActivity())
+                    .execute(mSelectedChannelContents);
+            mSelectedChannelContents.new LoadAddedChannels(getActivity());
         }
     }
 
     /**
-     * Implement the method in LoadAddedChannels.Listener
-     *
+     * Implement the method in ChannelContents.Listener
+     * <p>
      * when the async task is finished, this function will be executed to assign channel's publish
-     * status based on if this channel is published or not
+     * status based on if this channel is added to the main screen or not
      */
     @Override
     public void onPublishedChannelsLoaded(List<ChannelPlaylistId>
