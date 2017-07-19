@@ -23,6 +23,7 @@ import android.os.Handler;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
+import android.support.v17.leanback.supportleanbackshowcase.app.media.VideoExampleActivity;
 import android.support.v17.leanback.supportleanbackshowcase.cards.presenters.IconCardInChannelPublishPresenter;
 import android.support.v17.leanback.supportleanbackshowcase.models.Card;
 import android.support.v17.leanback.supportleanbackshowcase.models.CardRow;
@@ -99,7 +100,7 @@ public class DynamicRowsFragment extends BrowseFragment {
         super.onActivityCreated(savedInstanceState);
 
         setupUi();
-        ChannelContents.createPlaylists(this.getActivity());
+        ChannelContents.initializePlaylists(this.getActivity());
 
         mChannelContents = ChannelContents.sChannelContents;
         loadRows();
@@ -170,7 +171,7 @@ public class DynamicRowsFragment extends BrowseFragment {
                 if (item instanceof VideoContent) {
                     VideoContent clip = (VideoContent) item;
                     Intent intent = new Intent(getActivity(), VideoPlaybackActivity.class);
-                    intent.putExtra(VideoPlaybackActivity.VIDEO_CONTENT, clip);
+                    intent.putExtra(VideoExampleActivity.TAG, clip);
                     startActivity(intent);
                 } else {
                     Intent intent = new Intent(getActivity(), ChannelPublishActivity.class);

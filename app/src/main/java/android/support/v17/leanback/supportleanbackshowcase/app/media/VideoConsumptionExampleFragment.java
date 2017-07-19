@@ -20,6 +20,8 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.provider.MediaStore;
 import android.support.v17.leanback.app.VideoFragment;
 import android.support.v17.leanback.app.VideoFragmentGlueHost;
 import android.support.v17.leanback.media.MediaPlayerAdapter;
@@ -61,14 +63,6 @@ public class VideoConsumptionExampleFragment extends VideoFragment {
         }
     }
 
-    public static VideoConsumptionExampleFragment newInstance(VideoContent selectedVideo) {
-        VideoConsumptionExampleFragment playbackFragment = new VideoConsumptionExampleFragment();
-        Bundle args = new Bundle(1);
-        args.putParcelable(VideoPlaybackActivity.VIDEO_CONTENT, selectedVideo);
-        playbackFragment.setArguments(args);
-        return playbackFragment;
-    }
-
     AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener
             = new AudioManager.OnAudioFocusChangeListener() {
         @Override
@@ -90,19 +84,52 @@ public class VideoConsumptionExampleFragment extends VideoFragment {
             Log.w(TAG, "video player cannot obtain audio focus!");
         }
 
-        Bundle args = getArguments();
-        VideoContent video = args.getParcelable(VideoPlaybackActivity.VIDEO_CONTENT);
-        if (video != null) {
-            mMediaPlayerGlue.setTitle(video.getTitle());
-            mMediaPlayerGlue.setSubtitle(video.getDescription());
-            mMediaPlayerGlue.getPlayerAdapter().setDataSource(
-                    Uri.parse(video.getVideoUrl()));
-        } else {
-            // when videoContent has not been set, play the default video
+        mMediaPlayerGlue.setMode(PlaybackControlsRow.RepeatAction.INDEX_NONE);
+
+//        Parcelable intentData = getArguments().getParcelable(VideoConsumptionExampleFragment.TAG);
+
+        Parcelable intentData = getActivity().getIntent().getParcelableExtra(VideoExampleActivity.TAG);
+        MediaMetaData intentMetaData;
+        /**
+         * If there is no intent data just play the default video
+         */
+        if (intentData == null) {
+
+            /**
+             * When there is no intent data, just playing the default video clip
+             */
             mMediaPlayerGlue.setTitle("Diving with Sharks");
             mMediaPlayerGlue.setSubtitle("A Googler");
             mMediaPlayerGlue.getPlayerAdapter().setDataSource(Uri.parse(URL));
+        } else{
+            /**
+             * If the intent data is an instance of VideoContent
+             * key fields will be extracted to create a new object from MediaMetaData class
+             */
+            if (intentData instanceof VideoContent) {
+                VideoContent intentVideoData = (VideoContent) intentData;
+                intentMetaData = new MediaMetaData();
+                intentMetaData.setMediaSourcePath(intentVideoData.getVideoUrl());
+                intentMetaData.setMediaArtistName(intentVideoData.getDescription());
+                intentMetaData.setMediaTitle(intentVideoData.getTitle());
+            } else {
+                /**
+                 * If the intent data is an instance of MediaMetaData,
+                 * it will be converted to MediaMetaData directly
+                 */
+                intentMetaData = (MediaMetaData)intentData;
+            }
+
+            /**
+             * Set media meta information through media player glue
+             */
+            mMediaPlayerGlue.setTitle(intentMetaData.getMediaTitle());
+            mMediaPlayerGlue.setSubtitle(intentMetaData.getMediaArtistName());
+            mMediaPlayerGlue.getPlayerAdapter().setDataSource(
+                    Uri.parse(intentMetaData.getMediaSourcePath()));
+
         }
+
         PlaybackSeekDiskDataProvider.setDemoSeekProvider(mMediaPlayerGlue);
         playWhenReady(mMediaPlayerGlue);
         setBackgroundType(BG_LIGHT);
@@ -115,5 +142,4 @@ public class VideoConsumptionExampleFragment extends VideoFragment {
         }
         super.onPause();
     }
-
 }

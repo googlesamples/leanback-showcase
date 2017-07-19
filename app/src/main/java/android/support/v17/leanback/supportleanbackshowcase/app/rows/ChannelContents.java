@@ -43,6 +43,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class is mainly used for the channel which has been added to the main-screen
@@ -84,6 +85,15 @@ public final class ChannelContents {
      */
     private long mChannelId;
 
+    /**
+     * This HashMap will keep the mapping relationship between
+     * channel's publish ID (will be changed in different transaction) and
+     * channel's actual content
+     *
+     * It is designed to toggle channel content's publish status
+     */
+    private static final Map<Long, ChannelContents> sLookupTable = new HashMap<>();
+
     /* package */ String getName() {
         return mName;
     }
@@ -120,7 +130,7 @@ public final class ChannelContents {
 
     /* package */ static List<ChannelContents> sChannelContents;
 
-    /* package */ static void createPlaylists(Context context) {
+    /* package */ static void initializePlaylists(Context context) {
         if (sChannelContents == null) {
 
             sChannelContents = new ArrayList<>();
@@ -140,7 +150,7 @@ public final class ChannelContents {
     /**
      * Async Task to remove channel from home screen
      */
-    public final class RemoveChannelInMainScreen extends AsyncTask<ChannelContents, Void, Void> {
+    public static final class RemoveChannelInMainScreen extends AsyncTask<ChannelContents, Void, Void> {
         private static final String TAG = "RemoveChannelInMainScreen";
 
         /**
@@ -152,7 +162,17 @@ public final class ChannelContents {
             mContext = context;
         }
 
+        /**
+         * Helper function to remove the channel from content provider, so it will
+         * not be shown in home screen
+         *
+         * @param context   used to resolve content provider
+         * @param channelId the publish ID which is assigned by last adding transaction
+         */
         private void deleteChannel(Context context, long channelId) {
+            Log.e(TAG, "deleteChannel: " + channelId );
+            sLookupTable.get(channelId).setChannelUnPublished();
+
             int rowsDeleted = context.getContentResolver().delete(
                     TvContractCompat.buildChannelUri(channelId), null, null);
             if (rowsDeleted < 1) {
@@ -164,7 +184,6 @@ public final class ChannelContents {
         protected Void doInBackground(ChannelContents... params) {
             ChannelContents playlist = params[0];
             deleteChannel(mContext, playlist.getChannelId());
-            new LoadAddedChannels(mContext);
             return null;
         }
     }
@@ -174,7 +193,7 @@ public final class ChannelContents {
      * Async Task to add channel to main screen/ remove channel from main screen
      */
 
-    public final class CreateChannelInMainScreen extends AsyncTask<ChannelContents, Void, Long> {
+    public static final class CreateChannelInMainScreen extends AsyncTask<ChannelContents, Void, Long> {
         private static final String TAG = "CreateChannelInMainScreen";
 
         private static final String SCHEME = "rowsnewapi";
@@ -215,7 +234,7 @@ public final class ChannelContents {
         /**
          * A transaction id will be assigned to the added channel
          */
-        private long addChannel(Context context, ChannelContents channelContents) {
+        private Long addChannel(Context context, ChannelContents channelContents) {
             // This ID is associated with current context
             String channelInputId = createInputId(context);
             Channel channel = new Channel.Builder()
@@ -236,9 +255,13 @@ public final class ChannelContents {
                     channel.toContentValues());
             if (channelUri == null || channelUri.equals(Uri.EMPTY)) {
                 Log.e(TAG, "Insert channel failed");
-                return 0;
+                /**
+                 * If the task is failed return null as a signal for error handling
+                 */
+                return null;
             }
             long channelId = ContentUris.parseId(channelUri);
+            sLookupTable.put(channelId, channelContents);
             channelContents.setChannelPublishedId(channelId);
 
             createChannelLogo(context, channelId, R.drawable.row_app_icon);
@@ -287,96 +310,16 @@ public final class ChannelContents {
 
         @Override
         protected void onPostExecute(Long channelId) {
+            if (channelId == null) {
+                Log.e(TAG, "Failed to add channel on home screen");
+                return;
+            }
             Intent intent = new Intent(TvContract.ACTION_REQUEST_CHANNEL_BROWSABLE);
             intent.putExtra(TvContractCompat.EXTRA_CHANNEL_ID, channelId);
             try {
                 mActivity.startActivityForResult(intent, ADD_CHANNEL_REQUEST);
             } catch (ActivityNotFoundException e) {
                 Log.e(TAG, "could not start add channel approval UI", e);
-            }
-        }
-    }
-    /**
-     * ContentProvider projection scheme and related column ID
-     */
-    private static final String[] CHANNELS_MAP_PROJECTION =
-            {TvContractCompat.Channels._ID, TvContractCompat.Channels.COLUMN_INTERNAL_PROVIDER_ID};
-    private static final int CHANNELS_COLUMN_ID_INDEX = 0;
-    private static final int CHANNELS_COLUMN_INTERNAL_PROVIDER_ID_INDEX = 1;
-
-    interface Listener {
-        void onPublishedChannelsLoaded(List<ChannelPlaylistId> publishedChannels);
-    }
-
-    /**
-     * Registered Listener for this aysnc task
-     */
-    private Listener mListener;
-
-    /**
-     * For each ChannelContents, it will have a listener associate with.
-     *
-     * After published ChannelContents are loaded, listener's onPublishedChannelsLoaded function
-     * will be executed to customize this ChannelContents' related UI
-     */
-    public void registerListener(Listener listener) {
-        mListener = listener;
-    }
-
-    public class LoadAddedChannels extends AsyncTask<Void, Void, Void> {
-
-
-        /**
-         * All published channel using ChannelPlaylistId to represent
-         */
-        private List<ChannelPlaylistId> mPublishedChannelContents = new ArrayList<>();
-
-        /**
-         * To execute this async task properly (dealing with content resolver) executor must provide
-         * the context
-         */
-        Context mContext;
-
-
-
-        LoadAddedChannels(Context context) {
-            mContext = context;
-            this.execute();
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            loadChannels();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-//            onPublishedChannelsLoaded(mPublishedChannelContents);
-            mListener.onPublishedChannelsLoaded(mPublishedChannelContents);
-        }
-
-
-        private void loadChannels() {
-
-            /**
-             * every time when the async task loadChannels is executed, the published channel list
-             * will be updated accordingly
-             */
-            mPublishedChannelContents.clear();
-            try (Cursor cursor = mContext.getContentResolver().query(TvContract.Channels.CONTENT_URI,
-                    CHANNELS_MAP_PROJECTION, null, null, null)) {
-                if (cursor != null) {
-                    while (cursor.moveToNext()) {
-                        if (!cursor.isNull(
-                                CHANNELS_COLUMN_INTERNAL_PROVIDER_ID_INDEX)) {
-                            // Found a row that contains a non-null provider id.
-                            String id = cursor.getString(CHANNELS_COLUMN_INTERNAL_PROVIDER_ID_INDEX);
-                            long channelId = cursor.getLong(CHANNELS_COLUMN_ID_INDEX);
-                            mPublishedChannelContents.add(new ChannelPlaylistId(id, channelId));
-                        }
-                    }
-                }
             }
         }
     }
