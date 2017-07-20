@@ -21,6 +21,7 @@ import android.app.FragmentTransaction;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v17.leanback.supportleanbackshowcase.R;
+import android.support.v17.leanback.supportleanbackshowcase.app.media.MediaMetaData;
 import android.support.v17.leanback.supportleanbackshowcase.app.media.VideoConsumptionExampleFragment;
 import android.support.v17.leanback.supportleanbackshowcase.app.media.VideoExampleActivity;
 import android.text.TextUtils;
@@ -59,6 +60,25 @@ public class VideoPlaybackActivity extends Activity {
         return null;
     }
 
+    /**
+     * This is a helper function which can extract key fields from VideoContent (a data
+     * structure designed specific for the video clip which can be added to home screen) to
+     * MediaMetaData (a data structure which is used by VideoConsumptionExampleFragment.java
+     * to play and extract video meta data)
+     * So we can have unified data transmission interface without type casting on the fragment
+     * side
+     *
+     * @param  videoContent The video content you want to convert to MediaMetaData.
+     * @return MediaMetaData The conversion result.
+     */
+    private MediaMetaData videoContentToMediaMetaData(VideoContent videoContent) {
+        MediaMetaData mediaMetaData = new MediaMetaData();
+        mediaMetaData.setMediaSourcePath(videoContent.getVideoUrl());
+        mediaMetaData.setMediaArtistName(videoContent.getDescription());
+        mediaMetaData.setMediaTitle(videoContent.getTitle());
+        return mediaMetaData;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,9 +114,22 @@ public class VideoPlaybackActivity extends Activity {
                     }
                 }
             }
-
-            getIntent().putExtra(VideoExampleActivity.TAG, videoContent);
+        } else {
+            /**
+             * If this activity is started from clicking the video content
+             * from DynamicRowFragment
+             */
+            videoContent
+                    = (VideoContent)getIntent().getParcelableExtra(VideoExampleActivity.TAG);
         }
+
+        /**
+         * Firstly convert VideoContent to MediaMetaData,
+         * then put MediaMetaData as an extra for this intent
+         */
+        getIntent().putExtra(VideoExampleActivity.TAG,
+                videoContentToMediaMetaData(videoContent));
+
 
         VideoConsumptionExampleFragment videoPlaybackFragment = new VideoConsumptionExampleFragment();
 
