@@ -175,7 +175,11 @@ public class DynamicRowsFragment extends BrowseFragment {
                     intent.putExtra(VideoExampleActivity.TAG, clip);
                     startActivity(intent);
                 } else {
-                    if (Build.VERSION.SDK_INT < 26) {
+                    /**
+                     * Add to home screen feature is not allowed in the system less than android O
+                     * a toast will be popped up as notification
+                     */
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                         Toast.makeText(getActivity(), "Add to home screen not supported", Toast.LENGTH_SHORT)
                                 .show();
                         return;

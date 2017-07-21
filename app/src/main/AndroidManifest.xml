@@ -1,8 +1,12 @@
 <manifest
     package="android.support.v17.leanback.supportleanbackshowcase"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-sdk android:minSdkVersion="17" android:targetSdkVersion="23" />
+    <uses-sdk
+        tools:overrideLibrary="android.support.media.tv"
+        android:minSdkVersion="17"
+        android:targetSdkVersion="23"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
