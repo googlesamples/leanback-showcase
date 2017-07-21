@@ -18,6 +18,7 @@ package android.support.v17.leanback.supportleanbackshowcase.app.rows;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v17.leanback.app.BackgroundManager;
@@ -174,6 +175,11 @@ public class DynamicRowsFragment extends BrowseFragment {
                     intent.putExtra(VideoExampleActivity.TAG, clip);
                     startActivity(intent);
                 } else {
+                    if (Build.VERSION.SDK_INT < 26) {
+                        Toast.makeText(getActivity(), "Add to home screen not supported", Toast.LENGTH_SHORT)
+                                .show();
+                        return;
+                    }
                     Intent intent = new Intent(getActivity(), ChannelPublishActivity.class);
                     startActivity(intent);
                 }
