@@ -20,8 +20,8 @@ import android.support.v17.leanback.widget.ObjectAdapter;
 import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.PresenterSelector;
 import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
-import android.view.ViewGroup;
+import android.support.v7.util.ListUpdateCallback;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,87 +29,36 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class LiveDataListViewAdapter<T> extends ObjectAdapter {
+public class ListAdapter<T> extends ObjectAdapter {
 
-    private RecyclerView.AdapterDataObserver observer = new RecyclerView.AdapterDataObserver() {
-        @Override
-        public void onChanged() {
-            super.onChanged();
-        }
-
-        @Override
-        public void onItemRangeChanged(int positionStart, int itemCount) {
-            super.onItemRangeChanged(positionStart, itemCount);
-            notifyItemRangeChanged(positionStart, itemCount);
-        }
-
-        @Override
-        public void onItemRangeChanged(int positionStart, int itemCount, Object payload) {
-            super.onItemRangeChanged(positionStart, itemCount, payload);
-            notifyItemRangeChanged(positionStart, itemCount);
-        }
-
-        @Override
-        public void onItemRangeInserted(int positionStart, int itemCount) {
-            super.onItemRangeInserted(positionStart, itemCount);
-            notifyItemRangeInserted(positionStart, itemCount);
-        }
-
-        @Override
-        public void onItemRangeRemoved(int positionStart, int itemCount) {
-            super.onItemRangeRemoved(positionStart, itemCount);
-            notifyItemRangeRemoved(positionStart, itemCount);
-        }
-
-        @Override
-        public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
-            super.onItemRangeMoved(fromPosition, toPosition, itemCount);
-            notifyItemRangeRemoved(fromPosition, itemCount);
-        }
-    };
-
-    private RecyclerView.Adapter<RecyclerView.ViewHolder> recyclerViewAdapter
-            = new RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-        @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return null;
-        }
-
-        @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        }
-
-        @Override
-        public int getItemCount() {
-            return mItems.size();
-        }
-    };
+    // For debugging purpose
+    private final static String TAG =  "ListAdapter";
+    private final static Boolean DEBUG = false;
 
     private List<T> mItems = new ArrayList<>();
+
+    // Un modifiable version of mItems
+    private List<T> mUnmodifiableItems;
 
     /**
      * Constructs an adapter with the given {@link PresenterSelector}.
      */
-    public LiveDataListViewAdapter(PresenterSelector presenterSelector) {
+    public ListAdapter(PresenterSelector presenterSelector) {
         super(presenterSelector);
-        recyclerViewAdapter.registerAdapterDataObserver(observer);
     }
 
     /**
      * Constructs an adapter that uses the given {@link Presenter} for all items.
      */
-    public LiveDataListViewAdapter(Presenter presenter) {
+    public ListAdapter(Presenter presenter) {
         super(presenter);
-        recyclerViewAdapter.registerAdapterDataObserver(observer);
     }
 
     /**
      * Constructs an adapter.
      */
-    public LiveDataListViewAdapter() {
+    public ListAdapter() {
         super();
-        recyclerViewAdapter.registerAdapterDataObserver(observer);
     }
 
 
@@ -132,17 +81,6 @@ public class LiveDataListViewAdapter<T> extends ObjectAdapter {
      */
     public int indexOf(T item) {
         return mItems.indexOf(item);
-    }
-
-    /**
-     * Notify that the content of a range of items changed. Note that this is
-     * not same as items being added or removed.
-     *
-     * @param positionStart The position of first item that has changed.
-     * @param itemCount     The count of how many items have changed.
-     */
-    public void notifyArrayItemRangeChanged(int positionStart, int itemCount) {
-        notifyItemRangeChanged(positionStart, itemCount);
     }
 
     /**
@@ -247,8 +185,11 @@ public class LiveDataListViewAdapter<T> extends ObjectAdapter {
     /**
      * Gets a read-only view of the list of object of this ArrayObjectAdapter.
      */
-    public <E> List<E> unmodifiableList() {
-        return Collections.unmodifiableList((List<E>) mItems);
+    public <E extends T> List<T> unmodifiableList() {
+        if (mUnmodifiableItems == null) {
+            mUnmodifiableItems = Collections.unmodifiableList(mItems);
+        }
+        return mUnmodifiableItems;
     }
 
     @Override
@@ -266,6 +207,10 @@ public class LiveDataListViewAdapter<T> extends ObjectAdapter {
      */
     public void setItems(final List<T> itemList, final Comparator<T> sameItemComparator,
                          final Comparator<T> sameContentComparator) {
+        if (DEBUG) {
+            Log.e(TAG, "new items: " + itemList);
+            Log.e(TAG, "old items: " + mItems);
+        }
 
         DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
             @Override
@@ -290,8 +235,42 @@ public class LiveDataListViewAdapter<T> extends ObjectAdapter {
                         itemList.get(newItemPosition)) == 0;
             }
         });
+
+        result.dispatchUpdatesTo(new ListUpdateCallback() {
+
+            @Override
+            public void onInserted(int position, int count) {
+                if (DEBUG) {
+                    Log.e(TAG, "onInserted: ");
+                }
+                notifyItemRangeInserted(position, count);
+            }
+
+            @Override
+            public void onRemoved(int position, int count) {
+                if (DEBUG) {
+                    Log.e(TAG, "onRemoed: ");
+                }
+                notifyItemRangeRemoved(position, count);
+            }
+
+            @Override
+            public void onMoved(int fromPosition, int toPosition) {
+                if (DEBUG){
+                    Log.e(TAG, "onMoved: ");
+                }
+            }
+
+            @Override
+            public void onChanged(int position, int count, Object payload) {
+                if (DEBUG) {
+                    Log.e(TAG, "onChanged: ");
+                }
+                notifyItemRangeChanged(position, count);
+            }
+        });
+
         mItems = itemList;
-        result.dispatchUpdatesTo(recyclerViewAdapter);
     }
 
     @Override
@@ -304,19 +283,14 @@ public class LiveDataListViewAdapter<T> extends ObjectAdapter {
             return false;
         }
 
-        LiveDataListViewAdapter<?> that = (LiveDataListViewAdapter<?>) o;
+        ListAdapter<?> that = (ListAdapter<?>) o;
 
-        /**
-         * Only compare the mItems list
-         */
         return mItems != null ? mItems.equals(that.mItems) : that.mItems == null;
     }
 
+
     @Override
     public int hashCode() {
-        int result = observer != null ? observer.hashCode() : 0;
-        result = 31 * result + (recyclerViewAdapter != null ? recyclerViewAdapter.hashCode() : 0);
-        result = 31 * result + (mItems != null ? mItems.hashCode() : 0);
-        return result;
+        return mItems != null ? mItems.hashCode() : 0;
     }
 }

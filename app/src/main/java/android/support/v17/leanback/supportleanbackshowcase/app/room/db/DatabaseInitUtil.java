@@ -14,9 +14,14 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.room.db;
 
+import android.content.Context;
+import android.support.v17.leanback.supportleanbackshowcase.R;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.SampleApplication;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.config.AppConfiguration;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.constant.GsonContract;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.CategoryEntity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
+import android.support.v17.leanback.supportleanbackshowcase.utils.Utils;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -33,9 +38,25 @@ public class DatabaseInitUtil {
     private static final boolean DEBUG = false;
     private static final String TAG = "VideoDbBuilder";
 
-    static void initializeDb(AppDatabase db, String url) throws IOException{
-        String jsonContent = fetchJsonStringFromUrl(url);
-        buildDatabase(jsonContent, db);
+    public void initializeDb(AppDatabase db, String url) throws IOException{
+
+        // json data
+        String json;
+
+        if (AppConfiguration.IS_DEBUGGING_VERSION) {
+
+            // when use debugging version, we won't fetch data from network but using local
+            // json file (only contain 4 video entities in 2 categories.)
+            json = Utils.inputStreamToString(SampleApplication
+                    .getInstance()
+                    .getApplicationContext()
+                    .getResources()
+                    .openRawResource(R.raw.live_movie_debug));
+        } else {
+            // Fetch json data from network
+            json = fetchJsonStringFromUrl(url);
+        }
+        buildDatabase(json, db);
     }
 
     /**
@@ -101,7 +122,9 @@ public class DatabaseInitUtil {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    Log.e(TAG, "JSON feed closed", e);
+                    if (DEBUG) {
+                        Log.e(TAG, "JSON feed closed", e);
+                    }
                 }
             }
         }

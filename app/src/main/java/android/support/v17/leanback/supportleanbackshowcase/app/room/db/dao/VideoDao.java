@@ -32,9 +32,6 @@ public interface VideoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAllVideos(List<VideoEntity> videos);
 
-    @Query("SELECT * FROM " + DatabaseContract.VideoEntry.TABLE_NAME)
-    LiveData<List<VideoEntity>> loadAllVideos();
-
     @Query("SELECT * FROM " + DatabaseContract.VideoEntry.TABLE_NAME
             + " WHERE " + DatabaseContract.VideoEntry.COLUMN_AUTO_GENERATE_ID
             + " = :videoId")
@@ -49,7 +46,7 @@ public interface VideoDao {
     @Query("SELECT * FROM " + DatabaseContract.VideoEntry.TABLE_NAME
             + " WHERE "+ DatabaseContract.VideoEntry.COLUMN_NAME
             + " LIKE " + ":queryMessage"
-            + " OR " + DatabaseContract.VideoEntry.COLUMN_NAME
+            + " OR " + DatabaseContract.VideoEntry.COLUMN_CATEGORY
             +" LIKE " + ":queryMessage")
     LiveData<List<VideoEntity>> searchVideos(String queryMessage);
 

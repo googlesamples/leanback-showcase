@@ -25,7 +25,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v17.leanback.supportleanbackshowcase.R;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.adapter.LiveDataListViewAdapter;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.adapter.ListAdapter;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.network.NetworkLiveData;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.ui.VideoCardPresenter;
@@ -62,7 +62,7 @@ public class SearchFragment extends android.support.v17.leanback.app.SearchSuppo
     // set up lifecycle registry
     private LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
 
-    private LiveDataListViewAdapter<VideoEntity> mRelatedAdapter;
+    private ListAdapter<VideoEntity> mRelatedAdapter;
     private VideosViewModel mViewModel;
 
     @Override
@@ -116,7 +116,7 @@ public class SearchFragment extends android.support.v17.leanback.app.SearchSuppo
          */
         mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
         mRowsAdapter.clear();
-        mRelatedAdapter = new LiveDataListViewAdapter<>(new VideoCardPresenter());
+        mRelatedAdapter = new ListAdapter<>(new VideoCardPresenter());
         HeaderItem header = new HeaderItem(0, "results");
         mRowsAdapter.add(new ListRow(header, mRelatedAdapter));
     }
@@ -152,9 +152,9 @@ public class SearchFragment extends android.support.v17.leanback.app.SearchSuppo
         if (DEBUG) {
             Log.i(TAG, String.format("Search Query Text Change %s", newQuery));
         }
-        getActivity().findViewById(R.id.search_progressbar).setVisibility(View.VISIBLE);
 
         if (!TextUtils.isEmpty(newQuery) && !newQuery.equals("nil")) {
+            getActivity().findViewById(R.id.search_progressbar).setVisibility(View.VISIBLE);
             newQuery = "%" + newQuery + "%";
             mViewModel.setQueryMessage(newQuery);
         }
@@ -167,9 +167,9 @@ public class SearchFragment extends android.support.v17.leanback.app.SearchSuppo
         if (DEBUG) {
             Log.i(TAG, String.format("Search Query Text Submit %s", query));
         }
-        getActivity().findViewById(R.id.search_progressbar).setVisibility(View.VISIBLE);
 
         if (!TextUtils.isEmpty(query) && !query.equals("nil")) {
+            getActivity().findViewById(R.id.search_progressbar).setVisibility(View.VISIBLE);
             query = "%" + query + "%";
             mViewModel.setQueryMessage(query);
         }
@@ -180,6 +180,10 @@ public class SearchFragment extends android.support.v17.leanback.app.SearchSuppo
         viewModel.getSearchResult().observe(this, new Observer<List<VideoEntity>>() {
             @Override
             public void onChanged(@Nullable List<VideoEntity> videoEntities) {
+
+                if (DEBUG) {
+                    Log.e(TAG, "onChanged: " + videoEntities );
+                }
                 if (videoEntities != null) {
                     getActivity().findViewById(R.id.search_progressbar).setVisibility(View.GONE);
                     mRelatedAdapter.setItems(videoEntities, new Comparator<VideoEntity>() {

@@ -322,12 +322,17 @@ public class VideoEntity implements  Parcelable {
         mVideoLocalStorageUrl = in.readString();
         mStatus = in.readString();
         mTrailerVideoUrl = in.readString();
+
+        // Rented information (boolean) will be passed as a byte type
+        mRented = in.readByte() != 0;
     }
 
     /**
      * Required by parcelable interface
      */
-    public static final Parcelable.Creator<VideoEntity> CREATOR = new Parcelable.Creator<VideoEntity>() {
+    public static final Parcelable.Creator<VideoEntity> CREATOR =
+            new Parcelable.Creator<VideoEntity>() {
+
         @Override
         public VideoEntity createFromParcel(Parcel in) {
             return new VideoEntity(in);
@@ -361,6 +366,9 @@ public class VideoEntity implements  Parcelable {
         dest.writeString(mVideoCardImageLocalStorageUrl);
         dest.writeString(mStatus);
         dest.writeString(mTrailerVideoUrl);
+
+        // Rented information (boolean) will be passed as a byte type
+        dest.writeByte((byte) (mRented ? 1:0));
     }
 
     /**
@@ -403,30 +411,46 @@ public class VideoEntity implements  Parcelable {
         VideoEntity that = (VideoEntity) o;
 
         if (mId != that.mId) return false;
+
         if (mRented != that.mRented) return false;
-        if (mDescription != null ? !mDescription.equals(that.mDescription) : that.mDescription != null)
+
+        if (mDescription != null ? !mDescription.equals(that.mDescription) :
+                that.mDescription != null)
             return false;
+
         if (mVideoUrls != null ? !mVideoUrls.equals(that.mVideoUrls) : that.mVideoUrls != null)
             return false;
-        if (mCardImageUrl != null ? !mCardImageUrl.equals(that.mCardImageUrl) : that.mCardImageUrl != null)
+
+        if (mCardImageUrl != null ? !mCardImageUrl.equals(that.mCardImageUrl) :
+                that.mCardImageUrl != null)
             return false;
+
         if (mBgImageUrl != null ? !mBgImageUrl.equals(that.mBgImageUrl) : that.mBgImageUrl != null)
             return false;
+
         if (mTitle != null ? !mTitle.equals(that.mTitle) : that.mTitle != null) return false;
+
         if (mStudio != null ? !mStudio.equals(that.mStudio) : that.mStudio != null) return false;
-        if (mVideoLocalStorageUrl != null ? !mVideoLocalStorageUrl.equals(that.mVideoLocalStorageUrl)
+
+        if (mVideoLocalStorageUrl != null ? !mVideoLocalStorageUrl.equals(
+                that.mVideoLocalStorageUrl)
                 : that.mVideoLocalStorageUrl != null)
             return false;
+
         if (mVideoBgImageLocalStorageUrl != null ? !mVideoBgImageLocalStorageUrl.equals(
                 that.mVideoBgImageLocalStorageUrl) : that.mVideoBgImageLocalStorageUrl != null)
             return false;
+
         if (mVideoCardImageLocalStorageUrl != null ? !mVideoCardImageLocalStorageUrl.equals(
                 that.mVideoCardImageLocalStorageUrl) : that.mVideoCardImageLocalStorageUrl != null)
             return false;
+
         if (mCategory != null ? !mCategory.equals(that.mCategory) : that.mCategory != null)
             return false;
+
         if (mVideoUrl != null ? !mVideoUrl.equals(that.mVideoUrl) : that.mVideoUrl != null)
             return false;
+
         return mStatus != null ? mStatus.equals(that.mStatus) : that.mStatus == null;
     }
 

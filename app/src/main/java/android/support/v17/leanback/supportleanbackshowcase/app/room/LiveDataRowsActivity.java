@@ -18,6 +18,7 @@ package android.support.v17.leanback.supportleanbackshowcase.app.room;
 
 import android.Manifest;
 import android.app.DownloadManager;
+import android.arch.lifecycle.LifecycleActivity;
 import android.arch.lifecycle.LifecycleRegistry;
 import android.arch.lifecycle.LifecycleRegistryOwner;
 import android.arch.lifecycle.OnLifecycleEvent;
@@ -28,23 +29,20 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.network.DownloadCompleteBroadcastReceiver;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.util.SharedPreferenceUtil;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.network.PermissionLiveData;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
-
-public class LiveDataRowsActivity extends FragmentActivity implements LifecycleRegistryOwner{
+/**
+ * Extend from LifecycleActivity so this activity can be used as the owner of lifecycle event
+ */
+public class LiveDataRowsActivity extends LifecycleActivity {
 
     private static final int WRITE_PERMISSION = 0;
 
     private DownloadCompleteBroadcastReceiver mReceiver;
-    LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
-
-    @Override
-    public LifecycleRegistry getLifecycle() {
-        return lifecycleRegistry;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,11 +79,12 @@ public class LiveDataRowsActivity extends FragmentActivity implements LifecycleR
             case WRITE_PERMISSION:
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.e("######", "onRequestPermissionsResult: " + " permission debug: " );
 
                     // If the WRITE_EXTERNAL_STORAGE is authorized, we will update the value in
                     // shared preference so other component (VideoCardPresenter) can access this
                     // information.
-                    SharedPreferenceUtil.updateWritingExternalPermission();
+                    PermissionLiveData.get().setValue(true);
                 }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

@@ -25,199 +25,220 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.Transformations;
 import android.support.annotation.Nullable;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.DatabaseCreator;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.config.AppConfiguration;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.db.DatabaseHelper;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.CategoryEntity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
 
 import java.util.List;
 
 public class VideosViewModel extends AndroidViewModel {
-
     private static final MutableLiveData ABSENT = new MutableLiveData();
-    {
-        ABSENT.setValue(null);
-    }
-
-    private DatabaseCreator mDatabaseCreator;
-
     // live data connect to database
     private final LiveData<List<CategoryEntity>> mAllCategories;
     private final LiveData<List<VideoEntity>> mSearchResults;
     private final LiveData<VideoEntity> mVideoById;
     private final LiveData<List<VideoEntity>> mAllVideosByCategory;
-
     // mutable live data can be changed by ui controllers through setter
     private final MutableLiveData<String> mQuery = new MutableLiveData<>();
     private final MutableLiveData<Long> mVideoId = new MutableLiveData<>();
     private final MutableLiveData<String> mVideoCategory = new MutableLiveData<>();
+    private DatabaseHelper mDatabaseHelper;
 
+    {
+        ABSENT.setValue(null);
+    }
 
     public VideosViewModel(Application application) {
         super(application);
 
-        mDatabaseCreator = DatabaseCreator.getInstance();
+        mDatabaseHelper = DatabaseHelper.getInstance();
 
-        final LiveData<Boolean> databaseCreated = mDatabaseCreator.isDatabaseCreated();
+        final LiveData<Boolean> databaseCreated = mDatabaseHelper.isDatabaseCreated();
+
+        final LiveData<Boolean> databaseUpdated = mDatabaseHelper.getDatabaseUpdatedSignal();
 
         /**
          * Always check if database is created firstly
          */
-        mAllCategories = Transformations.switchMap(databaseCreated,
-                new Function<Boolean, LiveData<List<CategoryEntity>>>() {
+        mAllCategories = Transformations.switchMap(
+                databaseCreated, new Function<Boolean, LiveData<List<CategoryEntity>>>() {
                     @Override
                     public LiveData<List<CategoryEntity>> apply(Boolean isDatabaseCreated) {
                         if (!Boolean.TRUE.equals(isDatabaseCreated)) {
                             return ABSENT;
                         } else {
-                            LiveData<List<CategoryEntity>> source =
-                                    mDatabaseCreator.getDatabase().categoryDao().loadAllCategories();
+                            return Transformations.switchMap(
+                                    mDatabaseHelper.isDatabaseCreated(),
 
-                            final MediatorLiveData<List<CategoryEntity>> mediator =
-                                    new MediatorLiveData<>();
-
-                            mediator.addSource(source, new Observer<List<CategoryEntity>>() {
-                                @Override
-                                public void onChanged(@Nullable final List<CategoryEntity> categoryEntities) {
-                                    new Thread(new Runnable() {
+                                    new Function<Boolean, LiveData<List<CategoryEntity>>>() {
                                         @Override
-                                        public void run() {
-
-                                            try {
-                                                Thread.sleep(1000);
-                                                mediator.postValue(categoryEntities);
-                                            } catch (InterruptedException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    }).start();
-                                }
-                            });
-                            return mediator;
-                        }
-                    }
-                });
-
-        mAllVideosByCategory = Transformations.switchMap(databaseCreated,
-                new Function<Boolean, LiveData<List<VideoEntity>>>() {
-                    @Override
-                    public LiveData<List<VideoEntity>> apply(Boolean isDatabaseCreated) {
-                        if (!Boolean.TRUE.equals(isDatabaseCreated)) {
-                            return ABSENT;
-                        } else {
-                            return Transformations.switchMap(mVideoCategory,
-                                    new Function<String, LiveData<List<VideoEntity>>>() {
-                                        @Override
-                                        public LiveData<List<VideoEntity>> apply(String category) {
-                                            final LiveData<List<VideoEntity>> source =
-                                                    mDatabaseCreator.getDatabase().videoDao()
-                                                            .loadVideoInSameCateogry(category);
-                                            final MediatorLiveData<List<VideoEntity>> mediator =
-                                                    new MediatorLiveData<>();
+                                        public LiveData<List<CategoryEntity>> apply(Boolean input) {
 
                                             /**
-                                             * Emit the result using specified delay
+                                             * Fetching LiveData from database
                                              */
-                                            mediator.addSource(source, new Observer<List<VideoEntity>>() {
-                                                @Override
-                                                public void onChanged(
-                                                        @Nullable final List<VideoEntity> videoEntities) {
-                                                    new Thread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
+                                            LiveData<List<CategoryEntity>> source =
+                                                    mDatabaseHelper
+                                                            .getDatabase()
+                                                            .categoryDao()
+                                                            .loadAllCategories();
 
-                                                            try {
-                                                                Thread.sleep(2000);
-                                                                mediator.postValue(videoEntities);
-                                                            } catch (InterruptedException e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                        }
-                                                    }).start();
-                                                }
-                                            });
-                                            return mediator;
+                                            if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED) {
+
+                                                /**
+                                                 * Emit the result using specified delay
+                                                 */
+                                                return sendThroughMediatorLiveData(source, 1000L);
+                                            }
+                                            return source;
                                         }
                                     });
                         }
                     }
                 });
 
-        mSearchResults = Transformations.switchMap(databaseCreated, new Function<Boolean,
-                LiveData<List<VideoEntity>>>() {
-            @Override
-            public LiveData<List<VideoEntity>> apply(Boolean isDatabaseCreated) {
-                if (!Boolean.TRUE.equals(isDatabaseCreated)) {
-                    return ABSENT;
-                } else {
-                    return Transformations.switchMap(mQuery, new Function<String, LiveData<List<VideoEntity>>>() {
-                        @Override
-                        public LiveData<List<VideoEntity>> apply(String queryMessage) {
-                            final LiveData<List<VideoEntity>> source =
-                                    mDatabaseCreator.getDatabase().videoDao().searchVideos(queryMessage);
-                            final MediatorLiveData<List<VideoEntity>> mediator = new MediatorLiveData<>();
-
-                            mediator.addSource(source, new Observer<List<VideoEntity>>() {
-                                @Override
-                                public void onChanged(@Nullable final List<VideoEntity> videoEntities) {
-                                    new Thread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            try {
-                                                Thread.sleep(3000);
-                                                mediator.postValue(videoEntities);
-                                            } catch (InterruptedException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    }).start();
-                                }
-                            });
-                            return mediator;
+        /**
+         * Using switch map function to react to the change of observed variable, the benefits of
+         * this mapping method is we don't have to re-create the live data every time.
+         */
+        mAllVideosByCategory = Transformations.switchMap(
+                databaseCreated, new Function<Boolean, LiveData<List<VideoEntity>>>() {
+                    @Override
+                    public LiveData<List<VideoEntity>> apply(Boolean isDatabaseCreated) {
+                        if (!Boolean.TRUE.equals(isDatabaseCreated)) {
+                            return ABSENT;
                         }
-                    });
-                }
-            }
-        });
+                        return Transformations.switchMap(
+                                mVideoCategory, new Function<String, LiveData<List<VideoEntity>>>() {
+                                    @Override
+                                    public LiveData<List<VideoEntity>> apply(final String category) {
+                                        return Transformations.switchMap(databaseUpdated,
+
+                                                new Function<Boolean, LiveData<List<VideoEntity>>>() {
+
+                                                    @Override
+                                                    public LiveData<List<VideoEntity>> apply(Boolean input) {
+
+                                                        /**
+                                                         * Fetching live data from database
+                                                         */
+                                                        final LiveData<List<VideoEntity>> source =
+                                                                mDatabaseHelper
+                                                                        .getDatabase()
+                                                                        .videoDao()
+                                                                        .loadVideoInSameCateogry(
+                                                                                category);
+                                                        if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED) {
+
+                                                            /**
+                                                             * Emit the result using specified delay
+                                                             */
+                                                            return sendThroughMediatorLiveData(source, 2000L);
+
+                                                        }
+                                                        return source;
+                                                    }
+                                                });
+                                    }
+                                });
+
+                    }
+                });
+
+        mSearchResults = Transformations.switchMap(
+                databaseCreated, new Function<Boolean, LiveData<List<VideoEntity>>>() {
+                    @Override
+                    public LiveData<List<VideoEntity>> apply(Boolean isDatabaseCreated) {
+                        if (!Boolean.TRUE.equals(isDatabaseCreated)) {
+                            return ABSENT;
+                        }
+                        return Transformations.switchMap(
+                                mQuery, new Function<String, LiveData<List<VideoEntity>>>() {
+                                    @Override
+                                    public LiveData<List<VideoEntity>> apply(final String queryMessage) {
+                                        return Transformations.switchMap(databaseUpdated,
+
+                                                new Function<Boolean, LiveData<List<VideoEntity>>>() {
+
+                                                    @Override
+                                                    public LiveData<List<VideoEntity>> apply(Boolean input) {
+
+                                                        /**
+                                                         * Fetching live data from database
+                                                         */
+                                                        final LiveData<List<VideoEntity>> source =
+                                                                mDatabaseHelper
+                                                                        .getDatabase()
+                                                                        .videoDao()
+                                                                        .searchVideos(queryMessage);
+                                                        if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED
+                                                                || AppConfiguration.IS_SEARCH_LATENCY_ENABLED) {
+
+                                                            /**
+                                                             * Emit the result using specified delay
+                                                             */
+                                                            return sendThroughMediatorLiveData(source, 3000L);
+                                                        } else {
+                                                            return source;
+                                                        }
+                                                    }
+                                                });
+                                    }
+                                });
+
+                    }
+                });
 
         mVideoById = Transformations.switchMap(databaseCreated, new Function<Boolean, LiveData<VideoEntity>>() {
             @Override
             public LiveData<VideoEntity> apply(Boolean isDatabaseCreated) {
-                if (!Boolean.TRUE.equals(isDatabaseCreated)) {
+
+                /**
+                 * If database has not been created, return a live data wrapped null value
+                 */
+                if (!isDatabaseCreated) {
                     return ABSENT;
-                } else {
-                    return Transformations.switchMap(mVideoId, new Function<Long, LiveData<VideoEntity>>() {
-                        @Override
-                        public LiveData<VideoEntity> apply(Long input) {
-                            final LiveData<VideoEntity> source =
-                                    mDatabaseCreator.getDatabase().videoDao().loadVideoById(input);
-                            final MediatorLiveData<VideoEntity> mediator = new MediatorLiveData<>();
-
-                            mediator.addSource(source, new Observer<VideoEntity>() {
-                                @Override
-                                public void onChanged(@Nullable final VideoEntity videoEntity) {
-                                    new Thread(new Runnable() {
-                                        @Override
-                                        public void run() {
-
-                                            try {
-                                                Thread.sleep(2000);
-                                                mediator.postValue(videoEntity);
-                                            } catch (InterruptedException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    }).start();
-                                }
-                            });
-                            return mediator;
-                        }
-                    });
                 }
+                return Transformations.switchMap(
+                        mVideoId, new Function<Long, LiveData<VideoEntity>>() {
+                            @Override
+                            public LiveData<VideoEntity> apply(final Long videoId) {
+                                return Transformations.switchMap(databaseUpdated,
+
+                                        new Function<Boolean, LiveData<VideoEntity>>() {
+
+                                            @Override
+                                            public LiveData<VideoEntity> apply(Boolean input) {
+
+                                                /**
+                                                 * Fetching live data from database
+                                                 */
+                                                final LiveData<VideoEntity> source =
+                                                        mDatabaseHelper
+                                                                .getDatabase()
+                                                                .videoDao()
+                                                                .loadVideoById(videoId);
+
+                                                /**
+                                                 * If latency is enabled, we will return the data using the mediator
+                                                 * live data
+                                                 */
+                                                if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED) {
+                                                    return sendThroughMediatorLiveData(source, 2000L);
+                                                }
+                                                return source;
+                                            }
+                                        });
+                            }
+                        });
             }
         });
 
-        // try to create database
-        mDatabaseCreator.createDb(this.getApplication());
+        /**
+         * When we create the view model it will always try to initialize and create the database
+         */
+        mDatabaseHelper.createDb(this.getApplication());
     }
 
     public LiveData<List<VideoEntity>> getSearchResult() {
@@ -248,4 +269,34 @@ public class VideosViewModel extends AndroidViewModel {
         mVideoCategory.setValue(category);
     }
 
+    /**
+     * Helper function to use mediator live data to emit the live data using specified delay
+     *
+     * @param source source live data
+     * @param ms     for delay
+     * @param <T>    The type of data you want to emit in the live data
+     * @return The mediator live data
+     */
+    private <T> MediatorLiveData<T> sendThroughMediatorLiveData(LiveData<T> source, final Long ms) {
+        final MediatorLiveData<T> mediator =
+                new MediatorLiveData<>();
+
+        mediator.addSource(source, new Observer<T>() {
+            @Override
+            public void onChanged(@Nullable final T sourceEntity) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(ms);
+                            mediator.postValue(sourceEntity);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+        });
+        return mediator;
+    }
 }

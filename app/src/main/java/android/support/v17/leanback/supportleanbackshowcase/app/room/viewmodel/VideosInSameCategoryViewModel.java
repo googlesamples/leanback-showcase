@@ -28,74 +28,114 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.DatabaseCreator;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.config.AppConfiguration;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.db.DatabaseHelper;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
 
 import java.util.List;
 
-public class VideosInSameCategoryViewModel extends AndroidViewModel{
+public class VideosInSameCategoryViewModel extends AndroidViewModel {
 
     private static final MutableLiveData ABSENT = new MutableLiveData();
-    {
-        ABSENT.setValue(null);
-    }
 
+    // The parameter used to create view model
     private final String mCategory;
+
+    private DatabaseHelper mDatabaseHelper;
 
     /**
      * List of VideoEntities in same category
      */
     private final LiveData<List<VideoEntity>> mVideosInSameCategory;
 
+    {
+        ABSENT.setValue(null);
+    }
+
     public VideosInSameCategoryViewModel(@NonNull Application application, final String category) {
         super(application);
         this.mCategory = category;
 
-        final DatabaseCreator databaseCreator = DatabaseCreator.getInstance();
+        mDatabaseHelper = DatabaseHelper.getInstance();
 
-        mVideosInSameCategory = Transformations.switchMap(databaseCreator.isDatabaseCreated(),
+        final LiveData<Boolean> databaseUpdated = mDatabaseHelper.getDatabaseUpdatedSignal();
+
+        mVideosInSameCategory = Transformations.switchMap(mDatabaseHelper.isDatabaseCreated(),
                 new Function<Boolean, LiveData<List<VideoEntity>>>() {
-            @Override
-            public LiveData<List<VideoEntity>> apply(Boolean input) {
-                if (!input){
-                    return ABSENT;
-                }else {
-                    LiveData<List<VideoEntity>> source =
-                            databaseCreator.getDatabase().videoDao().loadVideoInSameCateogry(
-                                    mCategory);
+                    @Override
+                    public LiveData<List<VideoEntity>> apply(Boolean isDatabaseCreated) {
 
-                    final MediatorLiveData<List<VideoEntity>> mediator = new MediatorLiveData<>();
-
-                    /**
-                     * Emit the result with specified delay using mediator livedata
-                     */
-                    mediator.addSource(source, new Observer<List<VideoEntity>>() {
-                        @Override
-                        public void onChanged(@Nullable final List<VideoEntity> videoEntities) {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try{
-                                        Thread.sleep(2000);
-                                        mediator.postValue(videoEntities);
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }).start();
+                        // If the database has not been created, return a null value wrapped in the
+                        // live data
+                        if (!isDatabaseCreated) {
+                            return ABSENT;
                         }
-                    });
 
-                    return mediator;
-                }
-            }
-        });
+                        return Transformations.switchMap(databaseUpdated,
 
-        databaseCreator.createDb(this.getApplication());
+                                new Function<Boolean, LiveData<List<VideoEntity>>>() {
+                            @Override
+                            public LiveData<List<VideoEntity>> apply(Boolean isDatabaseChanged) {
+                                LiveData<List<VideoEntity>> source =
+                                        mDatabaseHelper
+                                                .getDatabase()
+                                                .videoDao()
+                                                .loadVideoInSameCateogry(mCategory);
+
+                                if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED) {
+
+                                    /**
+                                     * Emit the result with specified delay using mediator live data
+                                     */
+                                    return sendThroughMediatorLiveData(source, 2000L);
+                                }
+                                return source;
+                            }
+                        });
+                    }
+                });
+
+        mDatabaseHelper.createDb(this.getApplication());
     }
 
+    /**
+     * Return the video entity list in same category using live data
+     *
+     * @return live data
+     */
     public LiveData<List<VideoEntity>> getVideosInSameCategory() {
         return mVideosInSameCategory;
+    }
+
+    /**
+     * Helper function to use mediator live data to emit the live data using specified delay
+     *
+     * @param source source live data
+     * @param ms     for delay
+     * @param <T>    The type of data you want to emit in the live data
+     * @return The mediator live data
+     */
+    private <T> MediatorLiveData<T> sendThroughMediatorLiveData(LiveData<T> source, final Long ms) {
+        final MediatorLiveData<T> mediator =
+                new MediatorLiveData<>();
+
+        mediator.addSource(source, new Observer<T>() {
+            @Override
+            public void onChanged(@Nullable final T sourceEntity) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(ms);
+                            mediator.postValue(sourceEntity);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+        });
+        return mediator;
     }
 
     /**
@@ -114,7 +154,7 @@ public class VideosInSameCategoryViewModel extends AndroidViewModel{
 
         @Override
         public <T extends ViewModel> T create(Class<T> modelClass) {
-            return (T)new VideosInSameCategoryViewModel(mApplication, mCategory);
+            return (T) new VideosInSameCategoryViewModel(mApplication, mCategory);
         }
     }
 }

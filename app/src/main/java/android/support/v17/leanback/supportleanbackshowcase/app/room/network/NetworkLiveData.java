@@ -26,6 +26,11 @@ import android.support.annotation.MainThread;
 import android.util.Log;
 
 public class NetworkLiveData extends LiveData<Boolean> {
+
+    // For debugging purpose
+    private static final boolean DEBUG = false;
+    private static final String TAG = "NetworkLiveData";
+
     private static NetworkLiveData sNetworLivekData;
 
     private ConnectivityManager connectivityManager;
@@ -79,9 +84,18 @@ public class NetworkLiveData extends LiveData<Boolean> {
         }
     };
 
+    /**
+     * When there is an active observer observing the network live data, our network live data
+     * will register a callback to the ConnectivityManager to listen to the change of network
+     *
+     * Also at first time, it will fetch the connectivity information through network info
+     */
     @Override
     protected void onActive() {
         super.onActive();
+        if (DEBUG) {
+            Log.e(TAG, "onActive: ", new Exception());
+        }
         connectivityManager.registerDefaultNetworkCallback(callback);
         if (connectivityManager.getActiveNetworkInfo() != null) {
             setValue(connectivityManager.getActiveNetworkInfo().isConnectedOrConnecting());
@@ -90,8 +104,15 @@ public class NetworkLiveData extends LiveData<Boolean> {
         }
     }
 
+    /**
+     * When there is no active observer observing our network live data. Our network live data
+     * will unregister the callback to make sure there is no memory leakage.
+     */
     @Override
     protected void onInactive() {
+        if (DEBUG) {
+            Log.e(TAG, "onActive: ", new Exception());
+        }
         super.onInactive();
         connectivityManager.unregisterNetworkCallback(callback);
     }

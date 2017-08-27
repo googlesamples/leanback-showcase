@@ -18,22 +18,26 @@ package android.support.v17.leanback.supportleanbackshowcase.app.room.ui;
 
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v17.leanback.supportleanbackshowcase.R;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.DatabaseCreator;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.dao.VideoDao;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.config.AppConfiguration;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.db.DatabaseHelper;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.network.NetworkLiveData;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.network.NetworkManagerUtil;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.util.SharedPreferenceUtil;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.network.PermissionLiveData;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.viewmodel.VideosViewModel;
 import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.Presenter;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.PopupMenu;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,311 +56,27 @@ import java.io.File;
 public class VideoCardPresenter extends Presenter {
 
     // For debugging purpose
-    private static final boolean DEBUG = false;
-    private static final String TAG = "VideoCardPresenter";
+    private static final boolean DEBUG = true;
+    private static final String TAG =  "VideoCardPresenter";
 
+    // String constant
     private static final String VIDEO = "video";
     private static final String BACKGROUND = "background";
     private static final String CARD = "card";
+    private static final String STATUS = "status";
+    private static final String DOWNLOADING = "downloading";
+    private static final String REMOVING = "removing";
+    private static final String REMOVE_LOCAL_VIDEO = "Remove Local Video";
+    private static final String DOWNLOADED = " (Downloaded)";
+    private static final String RENTED = " (rented)";
+    private static final String DOWNLOAD_VIDEO = "Download Video";
+    private static final String DOWNLOAD_VIDEO_NO_PERMISSION = "Download Video (No Permission)";
+    private static final String DOWNLOAD_VIDEO_NO_NETWORK = "Download Video (No Network)";
 
     // The default resource when the network or local content are not available.
     private static int sSelectedBackgroundColor = -1;
     private static int sDefaultBackgroundColor = -1;
     private static Drawable sDefaultCardImage;
-
-
-    /**
-     * The view holder which will encapsulate all the information related to currently bond video.
-     */
-    private final class CardViewHolder extends ViewHolder implements
-            View.OnLongClickListener, PopupMenu.OnMenuItemClickListener {
-        private VideoEntity mVideo;
-        private Context mContext;
-        private PopupMenu mPopupMenu;
-        private LifecycleOwner mOwner;
-
-        // This dao is required to update the video information in database
-        private VideoDao mVideoDao;
-
-        // when glide library cannot fetch data from internet, and there is no local content, it
-        // will be used as place holder
-        private RequestOptions mDefaultPlaceHolder;
-        private Drawable mDefaultBackground;
-
-        private ImageCardView mCardView;
-
-
-        CardViewHolder(ImageCardView view, Context context) {
-            super(view);
-            mContext = context;
-            Context wrapper = new ContextThemeWrapper(mContext, R.style.MyPopupMenu);
-            mPopupMenu = new PopupMenu(wrapper, view);
-            mPopupMenu.inflate(R.menu.popup_menu);
-
-            mPopupMenu.setOnMenuItemClickListener(this);
-            view.setOnLongClickListener(this);
-
-            mOwner = (LifecycleOwner)  mContext;
-            mVideoDao = DatabaseCreator.getInstance().getDatabase().videoDao();
-
-            mDefaultBackground = mContext.getResources().getDrawable(R.drawable.no_cache_no_internet, null);
-            mDefaultPlaceHolder = new RequestOptions().
-                    placeholder(mDefaultBackground);
-
-            mCardView = (ImageCardView) CardViewHolder.this.view;
-            Resources resources = mCardView.getContext().getResources();
-            mCardView.setMainImageDimensions(Math.round(
-                    resources.getDimensionPixelSize(R.dimen.card_width)),
-                    resources.getDimensionPixelSize(R.dimen.card_height));
-        }
-
-        @Override
-        public boolean onLongClick(View v) {
-            mPopupMenu.show();
-            return true;
-        }
-
-        @Override
-        public boolean onMenuItemClick(MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.download_video_related_resource:
-                    mVideo.setStatus("downloading");
-                    new AsyncTask<Void, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(Void... voids) {
-                            mVideoDao.updateVideo(mVideo);
-                            return null;
-                        }
-                    }.execute();
-                    NetworkManagerUtil.download(mVideo);
-                    return true;
-                case R.id.remove_video_related_resource:
-                    mVideo.setStatus("removing");
-                    new AsyncTask<Void, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(Void... voids) {
-                            mVideoDao.updateVideo(mVideo);
-                            return null;
-                        }
-                    }.execute();
-                    RemoveFile();
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-
-        private void bind(VideoEntity video) {
-            mVideo = video;
-
-            mVideoDao.loadVideoById(video.getId()).observe(mOwner, new Observer<VideoEntity>() {
-                @Override
-                public void onChanged(@Nullable final VideoEntity videoEntity) {
-                    if (videoEntity != null) {
-
-                        mCardView.setTitleText(videoEntity.getTitle());
-                        if (isRemovable()) {
-                            mCardView.setContentText(videoEntity.getStudio() + " (Downloaded)");
-                        } else if (!videoEntity.getStatus().isEmpty() && !isDownloadable()){
-                            mCardView.setContentText(videoEntity.getStudio() + " (" + videoEntity.getStatus() +")");
-                        } else {
-                            mCardView.setContentText(videoEntity.getStudio());
-                        }
-
-                        String loadedUri;
-                        if (!videoEntity.getVideoCardImageLocalStorageUrl().isEmpty()) {
-                            loadedUri = videoEntity.getVideoCardImageLocalStorageUrl();
-                        } else {
-                            loadedUri = videoEntity.getCardImageUrl();
-                        }
-                        if (videoEntity.getCardImageUrl() != null) {
-                            Glide.with(mCardView.getContext())
-                                    .load(loadedUri)
-                                    .apply(mDefaultPlaceHolder)
-                                    .into(mCardView.getMainImageView());
-                        }
-
-                        updatePopMenu(videoEntity);
-                    }
-                }
-            });
-
-        }
-
-        /**
-         * Helper function to update pop up menu's item based on network environment and video
-         * entity's status
-         *
-         * @param videoEntity
-         */
-        private void updatePopMenu(final VideoEntity videoEntity) {
-            if (isDownloadable()) {
-                setInvisible(R.id.remove_video_related_resource);
-                if (!SharedPreferenceUtil.isPermitted()) {
-                    updatePopupMenuItem(R.id.download_video_related_resource, false,
-                            "Download Video (No Permission)");
-                } else {
-                    NetworkLiveData.get(mContext).observe(mOwner, new Observer<Boolean>() {
-                        @Override
-                        public void onChanged(@Nullable Boolean isNetworkAvailable) {
-                            if (isNetworkAvailable) {
-                                updatePopupMenuItem(R.id.download_video_related_resource, true,
-                                        "Download Video");
-                            } else {
-                                updatePopupMenuItem(R.id.download_video_related_resource, false,
-                                        "Download Video (No Network)");
-                            }
-                        }
-                    });
-                }
-            } else if (isRemovable()) {
-                updatePopupMenuItem(R.id.remove_video_related_resource,  true, "Remove Local Video");
-                setInvisible(R.id.download_video_related_resource);
-            } else {
-                updatePopupMenuItem(R.id.download_video_related_resource,  false,
-                        videoEntity.getStatus());
-                setInvisible(R.id.remove_video_related_resource);
-            }
-        }
-
-        private void updatePopupMenuItem(int id,  boolean enabled, String title) {
-            mPopupMenu.getMenu().findItem(id).setVisible(true).setTitle(title).setEnabled(enabled);
-        }
-
-        private void setInvisible(int id) {
-            mPopupMenu.getMenu().findItem(id).setVisible(false);
-        }
-
-
-        private void RemoveFile() {
-            new FileRemoving().execute(new VideoWithCategory(VIDEO, mVideo));
-            new FileRemoving().execute(new VideoWithCategory(CARD, mVideo));
-            new FileRemoving().execute(new VideoWithCategory(BACKGROUND, mVideo));
-        }
-
-        private class VideoWithCategory {
-            private String mCategory;
-            private VideoEntity mVideo;
-
-            public VideoWithCategory(String category, VideoEntity video) {
-                this.mCategory = category;
-                this.mVideo = video;
-            }
-
-            public String getCategory() {
-                return mCategory;
-            }
-
-
-            public VideoEntity getVideo() {
-                return mVideo;
-            }
-
-        }
-
-        private class FileRemoving extends AsyncTask<VideoWithCategory, Void, Void> {
-            private static final int VIDEO_PATH_START_INDEX = 6;
-            private String cat;
-            private String url;
-            private long id;
-            @Override
-            protected Void doInBackground(VideoWithCategory... videos) {
-                VideoWithCategory par = videos[0];
-                cat = par.getCategory();
-                id = par.getVideo().getId();
-                switch (cat) {
-                    case BACKGROUND:
-                        url = par.getVideo().getVideoBgImageLocalStorageUrl().substring(VIDEO_PATH_START_INDEX);
-                        break;
-                    case CARD:
-                        url = par.getVideo().getVideoCardImageLocalStorageUrl().substring(VIDEO_PATH_START_INDEX);
-                        break;
-                    case VIDEO:
-                        url = par.getVideo().getVideoLocalStorageUrl().substring(VIDEO_PATH_START_INDEX);
-                        break;
-                }
-                File fileToDelete = new File(url);
-                if (fileToDelete.exists()) {
-                    try {
-                        switch (cat) {
-                            case BACKGROUND:
-                                Thread.sleep(1000);
-                                break;
-                            case CARD:
-                                Thread.sleep(2000);
-                                break;
-                            case VIDEO:
-                                Thread.sleep(3000);
-                                break;
-                        }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    fileToDelete.delete();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-
-                switch (cat) {
-                    case BACKGROUND:
-                        mVideo.setVideoBgImageLocalStorageUrl("");
-                        Toast.makeText(mContext, "bg " + id + " removed", Toast.LENGTH_SHORT).show();
-                        break;
-                    case CARD:
-                        mVideo.setVideoCardImageLocalStorageUrl("");
-                        Toast.makeText(mContext, "card " + id + " removed", Toast.LENGTH_SHORT).show();
-                        break;
-                    case VIDEO:
-                        mVideo.setVideoLocalStorageUrl("");
-                        Toast.makeText(mContext, "video " + id + " removed", Toast.LENGTH_SHORT).show();
-                        break;
-                }
-
-                new AsyncTask<Void, Void, Void>() {
-                    @Override
-                    protected Void doInBackground(Void... voids) {
-                        mVideoDao.updateVideo(mVideo);
-                        return null;
-                    }
-                }.execute();
-            }
-        }
-
-
-        /**
-         * When all the local storage paths (including video content, background and card image )
-         * for the video entity is empty, and current working status is not downloading. It means
-         * user can perform download video entity operation at this point
-         *
-         * @return If user can perform download video operation or not.
-         */
-        private boolean isDownloadable() {
-         return mVideo.getVideoCardImageLocalStorageUrl().isEmpty()
-                 && mVideo.getVideoBgImageLocalStorageUrl().isEmpty()
-                 && mVideo.getVideoLocalStorageUrl().isEmpty()
-                 && !mVideo.getStatus().equals("downloading") ;
-        }
-
-        /**
-         * When all the local storage paths (including video content, background and card image )
-         * for the video entity is not empty, and current working status is not removing. It means
-         * user can perform remove video entity operation at this point
-         *
-         * @return If user can perform remove video operation or not.
-         */
-        private boolean isRemovable() {
-            return !mVideo.getVideoCardImageLocalStorageUrl().isEmpty()
-                    && !mVideo.getVideoBgImageLocalStorageUrl().isEmpty()
-                    && !mVideo.getVideoLocalStorageUrl().isEmpty()
-                    && !mVideo.getStatus().equals("removing");
-        }
-    }
-
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
@@ -407,5 +127,314 @@ public class VideoCardPresenter extends Presenter {
 
         view.setBackgroundColor(color);
         view.findViewById(R.id.info_field).setBackgroundColor(color);
+    }
+
+    /**
+     * The view holder which will encapsulate all the information related to currently bond video.
+     */
+    private final class CardViewHolder extends ViewHolder implements
+            View.OnLongClickListener, PopupMenu.OnMenuItemClickListener {
+        private VideoEntity mVideo;
+        private Context mContext;
+        private PopupMenu mPopupMenu;
+        private FragmentActivity mFragmentActivity;
+        private LifecycleOwner mOwner;
+
+
+        // when glide library cannot fetch data from internet, and there is no local content, it
+        // will be used as place holder
+        private RequestOptions mDefaultPlaceHolder;
+        private Drawable mDefaultBackground;
+
+        private ImageCardView mCardView;
+
+        private VideosViewModel mViewModel;
+
+
+        CardViewHolder(ImageCardView view, Context context) {
+            super(view);
+            mContext = context;
+            Context wrapper = new ContextThemeWrapper(mContext, R.style.MyPopupMenu);
+            mPopupMenu = new PopupMenu(wrapper, view);
+            mPopupMenu.inflate(R.menu.popup_menu);
+
+            mPopupMenu.setOnMenuItemClickListener(this);
+            view.setOnLongClickListener(this);
+
+            mOwner = (LifecycleOwner) mContext;
+
+            mDefaultBackground = mContext.getResources().getDrawable(R.drawable.no_cache_no_internet, null);
+            mDefaultPlaceHolder = new RequestOptions().
+                    placeholder(mDefaultBackground);
+
+            mCardView = (ImageCardView) CardViewHolder.this.view;
+            Resources resources = mCardView.getContext().getResources();
+            mCardView.setMainImageDimensions(Math.round(
+                    resources.getDimensionPixelSize(R.dimen.card_width)),
+                    resources.getDimensionPixelSize(R.dimen.card_height));
+
+            mFragmentActivity = (FragmentActivity) context;
+            mViewModel = ViewModelProviders.of(mFragmentActivity).get(VideosViewModel.class);
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            mPopupMenu.show();
+            return true;
+        }
+
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.download_video_related_resource:
+                    new AsyncTask<VideoEntity, Void, Void>() {
+                        VideoEntity mVideoEntity;
+
+                        @Override
+                        protected Void doInBackground(VideoEntity... videos) {
+                            mVideoEntity = videos[0];
+                            DatabaseHelper.getInstance().updateDatabase(mVideoEntity, STATUS, DOWNLOADING);
+                            return null;
+                        }
+                    }.execute(mVideo);
+                    NetworkManagerUtil.download(mVideo);
+                    return true;
+                case R.id.remove_video_related_resource:
+                    new AsyncTask<VideoEntity, Void, Void>() {
+                        VideoEntity mVideoEntity;
+
+                        @Override
+                        protected Void doInBackground(VideoEntity... videos) {
+                            mVideoEntity = videos[0];
+                            DatabaseHelper.getInstance().updateDatabase(mVideoEntity, STATUS, REMOVING);
+                            return null;
+                        }
+                    }.execute(mVideo);
+                    RemoveFile();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+
+        private void bind(VideoEntity video) {
+            if (DEBUG) {
+                Log.e(TAG, "bind: " + video);
+            }
+            mVideo = video;
+
+            if (!video.isRented()) {
+                mCardView.setTitleText(video.getTitle());
+            } else {
+                mCardView.setTitleText(video.getTitle() + RENTED);
+            }
+
+            if (isRemovable()) {
+                mCardView.setContentText(video.getStudio() + DOWNLOADED);
+            } else if (!video.getStatus().isEmpty() && !isDownloadable()) {
+                mCardView.setContentText(video.getStudio() + " (" + video.getStatus() + ")");
+            } else {
+                mCardView.setContentText(video.getStudio());
+            }
+
+            String loadedUri;
+            if (!video.getVideoCardImageLocalStorageUrl().isEmpty()) {
+                loadedUri = video.getVideoCardImageLocalStorageUrl();
+            } else {
+                loadedUri = video.getCardImageUrl();
+            }
+            if (video.getCardImageUrl() != null) {
+                Glide.with(mCardView.getContext())
+                        .load(loadedUri)
+                        .apply(mDefaultPlaceHolder)
+                        .into(mCardView.getMainImageView());
+            }
+
+            updatePopMenu(video);
+        }
+
+        /**
+         * Helper function to update pop up menu's item based on network environment and video
+         * entity's status
+         *
+         * @param videoEntity
+         */
+        private void updatePopMenu(final VideoEntity videoEntity) {
+            if (isDownloadable()) {
+                setInvisible(R.id.remove_video_related_resource);
+
+                PermissionLiveData.get().observe(mOwner, new Observer<Boolean>() {
+                    @Override
+                    public void onChanged(@Nullable Boolean aBoolean) {
+                        if (!aBoolean) {
+                            updatePopupMenuItem(R.id.download_video_related_resource, false,
+                                    DOWNLOAD_VIDEO_NO_PERMISSION);
+                            return;
+                        }
+                    }
+                });
+
+                NetworkLiveData.get(mContext).observe(mOwner, new Observer<Boolean>() {
+                    @Override
+                    public void onChanged(@Nullable Boolean isNetworkAvailable) {
+                        if (isNetworkAvailable) {
+                            updatePopupMenuItem(R.id.download_video_related_resource, true,
+                                    DOWNLOAD_VIDEO);
+                        } else {
+                            updatePopupMenuItem(R.id.download_video_related_resource, false,
+                                    DOWNLOAD_VIDEO_NO_NETWORK);
+                        }
+                    }
+                });
+            } else if (isRemovable()) {
+                updatePopupMenuItem(R.id.remove_video_related_resource, true, REMOVE_LOCAL_VIDEO);
+                setInvisible(R.id.download_video_related_resource);
+            } else {
+                updatePopupMenuItem(R.id.download_video_related_resource, false,
+                        videoEntity.getStatus());
+                setInvisible(R.id.remove_video_related_resource);
+            }
+        }
+
+        private void updatePopupMenuItem(int id, boolean enabled, String title) {
+            mPopupMenu.getMenu().findItem(id).setVisible(true).setTitle(title).setEnabled(enabled);
+        }
+
+        private void setInvisible(int id) {
+            mPopupMenu.getMenu().findItem(id).setVisible(false);
+        }
+
+
+        private void RemoveFile() {
+            new FileRemoving().execute(new VideoWithCategory(VIDEO, mVideo));
+            new FileRemoving().execute(new VideoWithCategory(CARD, mVideo));
+            new FileRemoving().execute(new VideoWithCategory(BACKGROUND, mVideo));
+        }
+
+        /**
+         * When all the local storage paths (including video content, background and card image )
+         * for the video entity is empty, and current working status is not downloading. It means
+         * user can perform download video entity operation at this point
+         *
+         * @return If user can perform download video operation or not.
+         */
+        private boolean isDownloadable() {
+            return mVideo.getVideoCardImageLocalStorageUrl().isEmpty()
+                    && mVideo.getVideoBgImageLocalStorageUrl().isEmpty()
+                    && mVideo.getVideoLocalStorageUrl().isEmpty()
+                    && !mVideo.getStatus().equals(DOWNLOADING);
+        }
+
+        /**
+         * When all the local storage paths (including video content, background and card image )
+         * for the video entity is not empty, and current working status is not removing. It means
+         * user can perform remove video entity operation at this point
+         *
+         * @return If user can perform remove video operation or not.
+         */
+        private boolean isRemovable() {
+            return !mVideo.getVideoCardImageLocalStorageUrl().isEmpty()
+                    && !mVideo.getVideoBgImageLocalStorageUrl().isEmpty()
+                    && !mVideo.getVideoLocalStorageUrl().isEmpty()
+                    && !mVideo.getStatus().equals(REMOVING);
+        }
+
+        private class VideoWithCategory {
+            private String mCategory;
+            private VideoEntity mVideo;
+
+            public VideoWithCategory(String category, VideoEntity video) {
+                this.mCategory = category;
+                this.mVideo = video;
+            }
+
+            public String getCategory() {
+                return mCategory;
+            }
+
+
+            public VideoEntity getVideo() {
+                return mVideo;
+            }
+
+        }
+
+        private class FileRemoving extends AsyncTask<VideoWithCategory, Void, Void> {
+            private static final int VIDEO_PATH_START_INDEX = 6;
+            private String cat;
+            private String url;
+            private long id;
+
+            @Override
+            protected Void doInBackground(VideoWithCategory... videos) {
+                VideoWithCategory par = videos[0];
+                cat = par.getCategory();
+                id = par.getVideo().getId();
+                switch (cat) {
+                    case BACKGROUND:
+                        url = par.getVideo().getVideoBgImageLocalStorageUrl().substring(VIDEO_PATH_START_INDEX);
+                        break;
+                    case CARD:
+                        url = par.getVideo().getVideoCardImageLocalStorageUrl().substring(VIDEO_PATH_START_INDEX);
+                        break;
+                    case VIDEO:
+                        url = par.getVideo().getVideoLocalStorageUrl().substring(VIDEO_PATH_START_INDEX);
+                        break;
+                }
+                File fileToDelete = new File(url);
+                if (fileToDelete.exists()) {
+                    fileToDelete.delete();
+                    if (AppConfiguration.IS_FILE_OPERATION_LATENCY_ENABLED) {
+                        switch (cat) {
+                            case BACKGROUND:
+                                addLatency(1000L);
+                                break;
+                            case CARD:
+                                addLatency(2000L);
+                                break;
+                            case VIDEO:
+                                addLatency(3000L);
+                                break;
+                        }
+                    }
+                    DatabaseHelper.getInstance().updateDatabase(par.getVideo(), cat, "");
+                } else {
+                    if (DEBUG) {
+                        Log.e(TAG, "doInBackground (delete file): " + url + " cannot find file");
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+
+                switch (cat) {
+                    case BACKGROUND:
+                        Toast.makeText(mContext, "bg " + id + " removed", Toast.LENGTH_SHORT).show();
+                        break;
+                    case CARD:
+                        Toast.makeText(mContext, "card " + id + " removed", Toast.LENGTH_SHORT).show();
+                        break;
+                    case VIDEO:
+                        Toast.makeText(mContext, "video " + id + " removed", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+
+            private void addLatency(Long ms) {
+                try {
+                    // add 1s latency for video downloading, when network latency option
+                    // is enabled.
+                    Thread.sleep(ms);
+                } catch (InterruptedException e) {
+                    if (DEBUG) {
+                        Log.e(TAG, "doInBackground (add latency): ", e);
+                    }
+                }
+            }
+        }
     }
 }

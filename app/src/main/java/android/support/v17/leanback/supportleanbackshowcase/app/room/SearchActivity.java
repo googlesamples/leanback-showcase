@@ -14,6 +14,7 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.room;
 
+import android.arch.lifecycle.LifecycleActivity;
 import android.arch.lifecycle.LifecycleRegistry;
 import android.arch.lifecycle.LifecycleRegistryOwner;
 import android.content.Intent;
@@ -24,9 +25,14 @@ import android.support.v17.leanback.widget.SpeechRecognitionCallback;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
-public class SearchActivity extends FragmentActivity implements LifecycleRegistryOwner {
+/**
+ * Extend from LifecycleActivity so this activity can be used as the owner of lifecycle event
+ */
+public class SearchActivity extends LifecycleActivity {
+
+    // For debugging purpose
     private static final String TAG = "SearchActivity";
-    private static boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     /**
      * If using internal speech recognizer, you must have RECORD_AUDIO permission
@@ -35,14 +41,6 @@ public class SearchActivity extends FragmentActivity implements LifecycleRegistr
     private static final int REQUEST_SPEECH = 1;
     private SearchFragment mFragment;
     private SpeechRecognitionCallback mSpeechRecognitionCallback;
-
-    // set up lifecycle registry
-    private LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
-
-    @Override
-    public LifecycleRegistry getLifecycle() {
-        return lifecycleRegistry;
-    }
 
     /**
      * Called when the activity is first created.
@@ -68,6 +66,7 @@ public class SearchActivity extends FragmentActivity implements LifecycleRegistr
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         if (DEBUG){
             Log.v(TAG, "onActivityResult requestCode="
                     + requestCode +

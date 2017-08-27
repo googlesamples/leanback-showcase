@@ -14,6 +14,7 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.room;
 
+import android.arch.lifecycle.LifecycleActivity;
 import android.arch.lifecycle.LifecycleRegistry;
 import android.arch.lifecycle.LifecycleRegistryOwner;
 import android.os.Bundle;
@@ -22,7 +23,10 @@ import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v4.app.FragmentActivity;
 
 
-public class LiveDataDetailActivity extends FragmentActivity implements LifecycleRegistryOwner{
+/**
+ * Extend from LifecycleActivity so this activity can be used as the owner of lifecycle event
+ */
+public class LiveDataDetailActivity extends LifecycleActivity {
     public static final String SHARED_ELEMENT_NAME = "hero";
     public static final String VIDEO_ID = "video_id";
     public static final String CACHED_CONTENT = "video_cached";
@@ -31,12 +35,5 @@ public class LiveDataDetailActivity extends FragmentActivity implements Lifecycl
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_fragment_with_video_background);
-    }
-
-    LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
-
-    @Override
-    public LifecycleRegistry getLifecycle() {
-        return lifecycleRegistry;
     }
 }

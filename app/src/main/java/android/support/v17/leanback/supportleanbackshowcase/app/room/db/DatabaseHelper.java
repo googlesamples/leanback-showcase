@@ -22,29 +22,42 @@ import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
-import android.util.Log;
+import android.support.annotation.WorkerThread;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static android.support.v17.leanback.supportleanbackshowcase.app.room.db.AppDatabase.DATABASE_NAME;
 
-public class DatabaseCreator {
-    private static DatabaseCreator sInstance;
+/**
+ * Helper class to create/ update the database
+ */
+public class DatabaseHelper {
+
+    private static final String RENTED = "rented";
+    private static final String STATUS = "status";
+    private static final String CARD = "card";
+    private static final String BACKGROUND = "background";
+    private static final String VIDEO = "video";
+
+    private static DatabaseHelper sInstance;
 
     private final MutableLiveData<Boolean> mIsDatabaseCreated = new MutableLiveData<>();
+
+    private final MutableLiveData<Boolean> mDatabaseUpdatedSignal = new MutableLiveData<>();
 
     private AppDatabase mDb;
 
     /**
      * use atomic boolean for synchronization
      */
-    private final AtomicBoolean mInitializing = new AtomicBoolean(false);
+    private final AtomicBoolean mInitialized = new AtomicBoolean(false);
 
 
-    public synchronized static DatabaseCreator getInstance() {
+    public synchronized static DatabaseHelper getInstance() {
         if (sInstance == null) {
-            sInstance = new DatabaseCreator();
+            sInstance = new DatabaseHelper();
         }
         return sInstance;
     }
@@ -52,6 +65,11 @@ public class DatabaseCreator {
     public LiveData<Boolean> isDatabaseCreated() {
         return mIsDatabaseCreated;
     }
+
+    public LiveData<Boolean> getDatabaseUpdatedSignal() {
+        return mDatabaseUpdatedSignal;
+    }
+
 
     @Nullable
     public AppDatabase getDatabase() {
@@ -64,7 +82,7 @@ public class DatabaseCreator {
          * When we create a new view model, it will try to create a new database. This is why
          * we use compareAndSet for synchronization
          */
-        if (!mInitializing.compareAndSet(false, true)) {
+        if (!mInitialized.compareAndSet(false, true)) {
             // Already initializing
             return;
         }
@@ -91,7 +109,8 @@ public class DatabaseCreator {
                     try {
                         String url =
                                 "https://storage.googleapis.com/android-tv/android_tv_videos_new.json";
-                        DatabaseInitUtil.initializeDb( db, url);
+                        DatabaseInitUtil init = new DatabaseInitUtil();
+                        init.initializeDb(db, url);
                     } catch (IOException e) {
                         e.printStackTrace();
                         return false;
@@ -109,10 +128,52 @@ public class DatabaseCreator {
                  * next time
                  */
                 if (!res) {
-                    mInitializing.compareAndSet(true, false);
+                    //
+                    // make sure there is no database crash happen
+                    //
+                    if (mInitialized.compareAndSet(true, false)) {
+                        mIsDatabaseCreated.setValue(res);
+                    }
                 }
                 mIsDatabaseCreated.setValue(res);
+                mDatabaseUpdatedSignal.setValue(true);
             }
         }.execute(context.getApplicationContext());
+    }
+
+    /**
+     * Helper function to access the database and update the video information in the database.
+     *
+     * @param video    video entity
+     * @param category which fields to update
+     * @param value    updated value
+     */
+    @WorkerThread
+    public synchronized void updateDatabase(VideoEntity video, String category, String value) {
+        try {
+            getDatabase().beginTransaction();
+            switch (category) {
+                case VIDEO:
+                    video.setVideoLocalStorageUrl(value);
+                    break;
+                case BACKGROUND:
+                    video.setVideoBgImageLocalStorageUrl(value);
+                    break;
+                case CARD:
+                    video.setVideoCardImageLocalStorageUrl(value);
+                    break;
+                case STATUS:
+                    video.setStatus(value);
+                    break;
+                case RENTED:
+                    video.setRented(true);
+                    break;
+            }
+            getDatabase().videoDao().updateVideo(video);
+            mDatabaseUpdatedSignal.postValue(!mDatabaseUpdatedSignal.getValue());
+            getDatabase().setTransactionSuccessful();
+        } finally {
+            getDatabase().endTransaction();
+        }
     }
 }

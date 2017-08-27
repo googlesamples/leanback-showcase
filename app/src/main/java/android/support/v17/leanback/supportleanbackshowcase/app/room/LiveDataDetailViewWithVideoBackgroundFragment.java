@@ -23,19 +23,17 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.DetailsSupportFragment;
 import android.support.v17.leanback.app.DetailsSupportFragmentBackgroundController;
-import android.support.v17.leanback.media.MediaPlayerAdapter;
 import android.support.v17.leanback.media.MediaPlayerGlue;
 import android.support.v17.leanback.supportleanbackshowcase.R;
-import android.support.v17.leanback.supportleanbackshowcase.app.media.VideoMediaPlayerGlue;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.adapter.LiveDataListViewAdapter;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.DatabaseCreator;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.dao.VideoDao;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.adapter.ListAdapter;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.config.AppConfiguration;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.db.DatabaseHelper;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.network.NetworkLiveData;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.ui.DetailsDescriptionPresenter;
@@ -76,7 +74,7 @@ import java.util.List;
 public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSupportFragment {
 
     // For debugging purpose.
-    private static final Boolean DEBUG = false;
+    private static final Boolean DEBUG = true;
     private static final String TAG = "leanback.DetailsFrag";
 
     private static final int ACTION_PLAY = 1;
@@ -89,6 +87,15 @@ public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSuppor
     private static final String CARD = "card";
     private static final String VIDEO = "video";
     private static final String TRAILER = "trailer";
+    private static final String PRICE = "$4.54";
+    private static final String RENT_ACTION = "Rent";
+    private static final String LOADING_ACTION = "Loading";
+    private static final String PREVIEW_ACTION = "Preview";
+    private static final String PLAY_ACTION = "Play";
+    private static final String RELATED_ROW = "Related Row";
+    private static final String TRAILER_VIDEO = " (Trailer)";
+    private static final String RENTED_VIDEO = " (Rented)";
+    private static final String RENTED = "rented";
 
     private DetailsSupportFragmentBackgroundController mDetailsBackground;
     private Action mActionPlay;
@@ -102,10 +109,8 @@ public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSuppor
     // available
     private Drawable mDefaultBackground;
     private DetailsOverviewRow mDescriptionOverviewRow;
-    private MediaPlayerGlue mTrailerGlue;
-    private VideoMediaPlayerGlue<MediaPlayerAdapter> mRentedTrailerGlue;
+    private MediaPlayerGlue mVideoGlue;
     private ArrayObjectAdapter mActionAdapter;
-    private VideosViewModel mViewModel;
     private long mSelectedVideoId;
     private BackgroundManager mBackgroundManager;
     private FullWidthDetailsOverviewSharedElementHelper mHelper;
@@ -113,10 +118,11 @@ public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSuppor
     private FullWidthDetailsOverviewRowPresenter mDorPresenter;
     private ListRow mRelatedRow;
     private HeaderItem mRelatedRowHeaderItem;
-    private LiveDataListViewAdapter<VideoEntity> mRelatedRowAdapter;
+    private ListAdapter<VideoEntity> mRelatedRowAdapter;
     private RequestOptions mDefaultPlaceHolder;
     private FragmentActivity mFragmentActivity;
     private LifecycleOwner mLifecycleOwner;
+    private VideosViewModel mViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -124,20 +130,21 @@ public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSuppor
 
         mSelectedVideoId = getActivity().getIntent().getLongExtra(
                 LiveDataDetailActivity.VIDEO_ID, -1L);
+
+        // The observed video will always be updated to the video entity passed through
+        // parcelable extra through the intent
         mObservedVideo = getActivity().getIntent().getParcelableExtra(
                 LiveDataDetailActivity.CACHED_CONTENT);
 
-        mActionPlay = new Action(ACTION_PLAY, "Play");
-        mActionPreview = new Action(ACTION_PREVIEW, "Preview");
-        mActionLoading = new Action(ACTION_LOADING, "Loading");
-        mActionRent = new Action(ACTION_RENT, "Rent", "$4.54", ResourcesCompat.getDrawable(
+        mActionPlay = new Action(ACTION_PLAY, PLAY_ACTION);
+        mActionPreview = new Action(ACTION_PREVIEW, PREVIEW_ACTION);
+        mActionLoading = new Action(ACTION_LOADING, LOADING_ACTION);
+        mActionRent = new Action(ACTION_RENT, RENT_ACTION, PRICE, ResourcesCompat.getDrawable(
                 getActivity().getResources(), R.drawable.ic_favorite_border_white_24dp,
                 getActivity().getTheme()));
         mActionAdapter = new ArrayObjectAdapter();
 
-        mTrailerGlue = new MediaPlayerGlue(getActivity());
-        mRentedTrailerGlue = new VideoMediaPlayerGlue<>(getActivity(),
-                new MediaPlayerAdapter(getActivity()));
+        mVideoGlue = new MediaPlayerGlue(getActivity());
 
         // set up details background controller to attach video glue
         mDetailsBackground =
@@ -158,10 +165,10 @@ public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSuppor
         mDescriptionOverviewRow.setActionsAdapter(mActionAdapter);
         setSelectedPosition(0, false);
 
-        mRelatedRowHeaderItem = new HeaderItem("Related Row");
+        mRelatedRowHeaderItem = new HeaderItem(RELATED_ROW);
 
         // simulate mDescriptionOverviewRow
-        mRelatedRowAdapter = new LiveDataListViewAdapter<>(new VideoCardPresenter());
+        mRelatedRowAdapter = new ListAdapter<>(new VideoCardPresenter());
         mRelatedRow = new ListRow(mRelatedRowHeaderItem, mRelatedRowAdapter);
 
         mRowsAdapter = new ArrayObjectAdapter(ps);
@@ -187,8 +194,10 @@ public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSuppor
         setOnItemViewClickedListener(new VideoItemViewClickedListener());
         mDorPresenter.setOnActionClickedListener(new ActionClickedListener());
 
+        // Lifecycle related variables
         mFragmentActivity = this.getActivity();
         mLifecycleOwner = (LifecycleOwner) mFragmentActivity;
+        mViewModel = ViewModelProviders.of(mFragmentActivity).get(VideosViewModel.class);
     }
 
 
@@ -229,7 +238,9 @@ public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSuppor
             @Override
             public void onChanged(@Nullable VideoEntity videoEntity) {
                 if (videoEntity != null) {
+
                     mObservedVideo = videoEntity;
+                    mDetailsBackground.setupVideoPlayback(mVideoGlue);
 
                     // different loading strategy based on whether the video is rented or not
                     if (!videoEntity.isRented()) {
@@ -237,9 +248,8 @@ public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSuppor
                         mActionAdapter.add(mActionRent);
                         mActionAdapter.add(mActionPreview);
 
-                        mDetailsBackground.setupVideoPlayback(mTrailerGlue);
-                        mTrailerGlue.setTitle(mObservedVideo.getTitle().concat(" (Trailer)"));
-                        mTrailerGlue.setVideoUrl(findLocalContentUriOrNetworkUrl(TRAILER));
+                        mVideoGlue.setTitle(mObservedVideo.getTitle().concat(TRAILER_VIDEO));
+                        mVideoGlue.setVideoUrl(findLocalContentUriOrNetworkUrl(TRAILER));
                     } else {
 
                         // Once the video is rented, always remove the spinner and text view in
@@ -250,13 +260,16 @@ public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSuppor
                         mActionAdapter.clear();
                         mActionAdapter.add(mActionPlay);
 
-                        mDetailsBackground.setupVideoPlayback(mRentedTrailerGlue);
-                        mRentedTrailerGlue.setTitle(mObservedVideo.getTitle().concat(" (Rented)"));
-                        mRentedTrailerGlue.getPlayerAdapter().setDataSource(Uri.parse(
-                                findLocalContentUriOrNetworkUrl(VIDEO)));
+                        mVideoGlue.setTitle(mObservedVideo.getTitle().concat(RENTED_VIDEO));
+                        mVideoGlue.setVideoUrl(findLocalContentUriOrNetworkUrl(VIDEO));
                     }
+
                     mDescriptionOverviewRow.setItem(mObservedVideo);
                     loadAndSetVideoCardImage();
+
+                    if (DEBUG) {
+                        Log.e(TAG, "Tracing Function: " + "setCategory" );
+                    }
                     model.setCategory(mObservedVideo.getCategory());
                 }
             }
@@ -269,6 +282,10 @@ public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSuppor
             @Override
             public void onChanged(@Nullable List<VideoEntity> videoEntities) {
                 if (videoEntities != null) {
+
+                    if (DEBUG) {
+                        Log.e(TAG, "Tracing Function: " + "Related Row Data Source Change" );
+                    }
 
                     /**
                      * The diff util will compare two lists and dispatch the difference to correct
@@ -312,14 +329,19 @@ public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSuppor
         @Override
         public void onActionClicked(Action action) {
             if (action.getId() == ACTION_RENT) {
-                new Thread(new Runnable() {
+
+                new AsyncTask<Void, Void,Void>() {
                     @Override
-                    public void run() {
-                        mObservedVideo.setRented(true);
-                        VideoDao dao = DatabaseCreator.getInstance().getDatabase().videoDao();
-                        dao.updateVideo(mObservedVideo);
+                    protected Void doInBackground(Void... voids) {
+                        if (AppConfiguration.IS_RENTING_OPERATION_DELAY_ENABLED) {
+                            addDelay(2000L);
+                        }
+
+                        // update the database with rented field
+                        DatabaseHelper.getInstance().updateDatabase(mObservedVideo, RENTED, "");
+                        return null;
                     }
-                }).start();
+                }.execute();
 
                 // when user click rent action, there will be a spinner show up indicating the
                 // transaction is being processed.
@@ -430,5 +452,15 @@ public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSuppor
                 return "";
         }
         return loadedUri;
+    }
+
+    private void addDelay(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch(InterruptedException e) {
+            if (DEBUG) {
+                Log.e(TAG, "addDelay: ",e );
+            }
+        }
     }
 }

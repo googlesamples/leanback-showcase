@@ -16,7 +16,6 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.room.db.constant;
 
-import android.app.SearchManager;
 
 public class DatabaseContract {
 
@@ -35,10 +34,10 @@ public class DatabaseContract {
         public static final String COLUMN_CATEGORY = "category";
 
         // Name of the video.
-        public static final String COLUMN_NAME = SearchManager.SUGGEST_COLUMN_TEXT_1;
+        public static final String COLUMN_NAME = "video_name";
 
         // Description of the video.
-        public static final String COLUMN_DESC = SearchManager.SUGGEST_COLUMN_TEXT_2;
+        public static final String COLUMN_DESC = "video_description";
 
         // The url to the video content.
         public static final String COLUMN_VIDEO_URL = "video_url";
