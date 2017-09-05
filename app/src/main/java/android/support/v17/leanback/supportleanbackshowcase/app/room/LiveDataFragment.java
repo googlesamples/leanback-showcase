@@ -246,7 +246,7 @@ public class LiveDataFragment extends BrowseSupportFragment
      * Helper function to observe network status
      */
     private void subscribeNetworkInfo() {
-        NetworkLiveData.get(mFragmentActivity).observe(mLifecycleOwner, new Observer<Boolean>() {
+        NetworkLiveData.sync(mFragmentActivity).observe(mLifecycleOwner, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
                 if (aBoolean) {

@@ -22,14 +22,14 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.constant.DatabaseContract;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.db.constant.DatabaseColumnConstant;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.CategoryEntity;
 
 import java.util.List;
 
 @Dao
 public interface CategoryDao {
-    @Query("SELECT * FROM " + DatabaseContract.CategoryEntry.TABLE_NAME)
+    @Query("SELECT * FROM " + DatabaseColumnConstant.CategoryEntry.TABLE_NAME)
     LiveData<List<CategoryEntity>> loadAllCategories();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

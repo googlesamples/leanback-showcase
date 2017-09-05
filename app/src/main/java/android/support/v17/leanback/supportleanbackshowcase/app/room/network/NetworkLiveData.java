@@ -22,6 +22,7 @@ import android.net.ConnectivityManager;
 import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkCapabilities;
+import android.os.AsyncTask;
 import android.support.annotation.MainThread;
 import android.util.Log;
 
@@ -36,7 +37,7 @@ public class NetworkLiveData extends LiveData<Boolean> {
     private ConnectivityManager connectivityManager;
 
     @MainThread
-    public static NetworkLiveData get(Context context) {
+    public static NetworkLiveData sync(Context context) {
         if (sNetworLivekData == null) {
             sNetworLivekData = new NetworkLiveData(context.getApplicationContext());
         }
@@ -46,6 +47,7 @@ public class NetworkLiveData extends LiveData<Boolean> {
     private NetworkLiveData(Context context) {
         connectivityManager = (ConnectivityManager) context.getSystemService(
                         Context.CONNECTIVITY_SERVICE);
+        connectivityManager.registerDefaultNetworkCallback(callback);
     }
 
     private ConnectivityManager.NetworkCallback callback = new ConnectivityManager.NetworkCallback() {
@@ -96,13 +98,20 @@ public class NetworkLiveData extends LiveData<Boolean> {
         if (DEBUG) {
             Log.e(TAG, "onActive: ", new Exception());
         }
-        connectivityManager.registerDefaultNetworkCallback(callback);
-        if (connectivityManager.getActiveNetworkInfo() != null) {
-            setValue(connectivityManager.getActiveNetworkInfo().isConnectedOrConnecting());
-        } else {
-            setValue(false);
-        }
+        postConnectivityStatus.execute();
     }
+
+    private AsyncTask<Void, Void, Void>  postConnectivityStatus= new AsyncTask<Void, Void, Void>() {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            if (connectivityManager.getActiveNetworkInfo() != null) {
+                postValue(connectivityManager.getActiveNetworkInfo().isConnectedOrConnecting());
+            } else {
+                postValue(false);
+            }
+            return null;
+        }
+    };
 
     /**
      * When there is no active observer observing our network live data. Our network live data

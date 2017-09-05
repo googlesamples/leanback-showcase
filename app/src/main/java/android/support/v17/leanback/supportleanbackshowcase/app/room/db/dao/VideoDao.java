@@ -22,7 +22,7 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.constant.DatabaseContract;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.db.constant.DatabaseColumnConstant;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
 
 import java.util.List;
@@ -32,21 +32,21 @@ public interface VideoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAllVideos(List<VideoEntity> videos);
 
-    @Query("SELECT * FROM " + DatabaseContract.VideoEntry.TABLE_NAME
-            + " WHERE " + DatabaseContract.VideoEntry.COLUMN_AUTO_GENERATE_ID
+    @Query("SELECT * FROM " + DatabaseColumnConstant.VideoEntry.TABLE_NAME
+            + " WHERE " + DatabaseColumnConstant.VideoEntry.COLUMN_AUTO_GENERATE_ID
             + " = :videoId")
     LiveData<VideoEntity> loadVideoById(long videoId);
 
 
-    @Query("SELECT * FROM " + DatabaseContract.VideoEntry.TABLE_NAME
-            + " WHERE " + DatabaseContract.VideoEntry.COLUMN_CATEGORY
+    @Query("SELECT * FROM " + DatabaseColumnConstant.VideoEntry.TABLE_NAME
+            + " WHERE " + DatabaseColumnConstant.VideoEntry.COLUMN_CATEGORY
             + " = :category")
     LiveData<List<VideoEntity>> loadVideoInSameCateogry(String category);
 
-    @Query("SELECT * FROM " + DatabaseContract.VideoEntry.TABLE_NAME
-            + " WHERE "+ DatabaseContract.VideoEntry.COLUMN_NAME
+    @Query("SELECT * FROM " + DatabaseColumnConstant.VideoEntry.TABLE_NAME
+            + " WHERE "+ DatabaseColumnConstant.VideoEntry.COLUMN_NAME
             + " LIKE " + ":queryMessage"
-            + " OR " + DatabaseContract.VideoEntry.COLUMN_CATEGORY
+            + " OR " + DatabaseColumnConstant.VideoEntry.COLUMN_CATEGORY
             +" LIKE " + ":queryMessage")
     LiveData<List<VideoEntity>> searchVideos(String queryMessage);
 

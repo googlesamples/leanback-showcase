@@ -14,31 +14,34 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.room.db;
 
-import android.content.Context;
+import android.os.AsyncTask;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.SampleApplication;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.api.VideoDownloadingService;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.api.VideosWithGoogleTag;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.config.AppConfiguration;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.constant.GsonContract;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.CategoryEntity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
 import android.support.v17.leanback.supportleanbackshowcase.utils.Utils;
 import android.util.Log;
+import android.widget.PopupMenu;
 
 import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class DatabaseInitUtil {
     // For debugging purpose
     private static final boolean DEBUG = false;
     private static final String TAG = "VideoDbBuilder";
 
-    public void initializeDb(AppDatabase db, String url) throws IOException{
+    public void initializeDb(AppDatabase db, String url) throws IOException {
 
         // json data
         String json;
@@ -52,40 +55,82 @@ public class DatabaseInitUtil {
                     .getApplicationContext()
                     .getResources()
                     .openRawResource(R.raw.live_movie_debug));
+            Gson gson = new Gson();
+            VideosWithGoogleTag videosWithGoogleTag = gson.fromJson(json,
+                VideosWithGoogleTag.class);
+            populateDatabase(videosWithGoogleTag,db);
         } else {
-            // Fetch json data from network
-            json = fetchJsonStringFromUrl(url);
+            buildDatabase(db, url);
         }
-        buildDatabase(json, db);
     }
 
     /**
      * Takes the contents of a JSON object and populates the database
      *
-     * @param jsonString The JSON String of all videos' information
+     * @param db Room database.
      */
-    public static void buildDatabase(String jsonString, AppDatabase db) throws IOException {
-        Gson gson = new Gson();
-        VideosWithGoogleTag videosWithGoogleTag = gson.fromJson(jsonString,
-                VideosWithGoogleTag.class);
-        for (VideosGroupByCategory videosGroupByCategory: videosWithGoogleTag.getAllResources()) {
+    public static void buildDatabase(final AppDatabase db, String url) throws IOException {
+        Retrofit retrofit = new Retrofit
+                .Builder()
+                .baseUrl(url)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        VideoDownloadingService service = retrofit.create(VideoDownloadingService.class);
+
+        Call<VideosWithGoogleTag> videosWithGoogleTagCall = service.getVideosList();
+        videosWithGoogleTagCall.enqueue(new Callback<VideosWithGoogleTag>() {
+            @Override
+            public void onResponse(Call<VideosWithGoogleTag> call, Response<VideosWithGoogleTag> response) {
+                VideosWithGoogleTag videosWithGoogleTag = response.body();
+                if (videosWithGoogleTag == null) {
+                    Log.d(TAG, "onResponse: result is null");
+                    return;
+                }
+                populateDatabase(videosWithGoogleTag, db);
+            }
+
+            @Override
+            public void onFailure(Call<VideosWithGoogleTag> call, Throwable t) {
+                Log.d(TAG, "Fail to download the content");
+            }
+        });
+
+    }
+
+    private static void populateDatabase(VideosWithGoogleTag videosWithGoogleTag, final AppDatabase db) {
+        for (final VideosWithGoogleTag.VideosGroupByCategory videosGroupByCategory :
+                videosWithGoogleTag.getAllResources()) {
 
             // create category table
-            CategoryEntity categoryEntity = new CategoryEntity();
+            final CategoryEntity categoryEntity = new CategoryEntity();
             categoryEntity.setCategoryName(videosGroupByCategory.getCategory());
-            db.categoryDao().insertCategory(categoryEntity);
 
-            // create video table
+            // create video table with customization
             postProcessing(videosGroupByCategory);
-            db.videoDao().insertAllVideos(videosGroupByCategory.getVideos());
+
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    try {
+                        db.beginTransaction();
+                        db.categoryDao().insertCategory(categoryEntity);
+                        db.videoDao().insertAllVideos(videosGroupByCategory.getVideos());
+                        db.setTransactionSuccessful();
+                    } finally {
+                        db.endTransaction();
+                    }
+                    return null;
+                }
+            }.execute();
+
         }
     }
 
     /**
      * Helper function to make some customization on raw data
      */
-    private static void postProcessing(VideosGroupByCategory videosGroupByCategory) {
-        for (VideoEntity each: videosGroupByCategory.getVideos()) {
+    private static void postProcessing(VideosWithGoogleTag.VideosGroupByCategory videosGroupByCategory) {
+        for (VideoEntity each : videosGroupByCategory.getVideos()) {
             each.setCategory(videosGroupByCategory.getCategory());
             each.setVideoLocalStorageUrl("");
             each.setVideoBgImageLocalStorageUrl("");
@@ -94,92 +139,6 @@ public class DatabaseInitUtil {
             each.setRented(false);
             each.setStatus("");
             each.setTrailerVideoUrl("https://storage.googleapis.com/android-tv/Sample%20videos/Google%2B/Google%2B_%20Say%20more%20with%20Hangouts.mp4");
-        }
-    }
-
-    /**
-     * Fetch JSON string from a given URL.
-     *
-     * @return the JSONObject representation of the response
-     * @throws IOException The BufferedReader operation may throw an IOException.
-     */
-    private static String fetchJsonStringFromUrl(String urlString) throws IOException {
-        BufferedReader reader = null;
-        java.net.URL url = new java.net.URL(urlString);
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        try {
-            reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(),
-                    "utf-8"));
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-            return sb.toString();
-        } finally {
-            urlConnection.disconnect();
-            if (null != reader) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    if (DEBUG) {
-                        Log.e(TAG, "JSON feed closed", e);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * The structure of the json file is
-     * {
-     *   "googlevideos": [{
-     *     "category": "Google+",
-     *     "videos": [{
-     *       "description": "",
-     *          ...
-     *     }]
-     *   }]
-     * }
-     *
-     * So this class is used as a helper class for Gson library to reconstruct the object.
-     */
-    private static class VideosWithGoogleTag {
-        @SerializedName(GsonContract.GOOGLE_VIDEO_TAG)
-        private List<VideosGroupByCategory> mAllResources;
-
-        public List<VideosGroupByCategory> getAllResources() {
-            return mAllResources;
-        }
-    }
-
-    /**
-     * The structure of the json file is
-     * {
-     *   "googlevideos": [{
-     *     "category": "Google+",
-     *     "videos": [{
-     *       "description": "",
-     *          ...
-     *     }]
-     *   }]
-     * }
-     *
-     * So this class is another helper class for Gson library to reconstruct the object.
-     */
-    private static class VideosGroupByCategory {
-        @SerializedName("category")
-        private String mCategory;
-
-        @SerializedName("videos")
-        private List<VideoEntity> mVideos;
-
-        public String getCategory() {
-            return mCategory;
-        }
-
-        public List<VideoEntity> getVideos() {
-            return mVideos;
         }
     }
 }

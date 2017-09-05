@@ -56,8 +56,6 @@ public class VideosViewModel extends AndroidViewModel {
 
         final LiveData<Boolean> databaseCreated = mDatabaseHelper.isDatabaseCreated();
 
-        final LiveData<Boolean> databaseUpdated = mDatabaseHelper.getDatabaseUpdatedSignal();
-
         /**
          * Always check if database is created firstly
          */
@@ -113,33 +111,25 @@ public class VideosViewModel extends AndroidViewModel {
                                 mVideoCategory, new Function<String, LiveData<List<VideoEntity>>>() {
                                     @Override
                                     public LiveData<List<VideoEntity>> apply(final String category) {
-                                        return Transformations.switchMap(databaseUpdated,
 
-                                                new Function<Boolean, LiveData<List<VideoEntity>>>() {
+                                        /**
+                                         * Fetching live data from database
+                                         */
+                                        final LiveData<List<VideoEntity>> source =
+                                                mDatabaseHelper
+                                                        .getDatabase()
+                                                        .videoDao()
+                                                        .loadVideoInSameCateogry(
+                                                                category);
+                                        if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED) {
 
-                                                    @Override
-                                                    public LiveData<List<VideoEntity>> apply(Boolean input) {
+                                            /**
+                                             * Emit the result using specified delay
+                                             */
+                                            return sendThroughMediatorLiveData(source, 2000L);
 
-                                                        /**
-                                                         * Fetching live data from database
-                                                         */
-                                                        final LiveData<List<VideoEntity>> source =
-                                                                mDatabaseHelper
-                                                                        .getDatabase()
-                                                                        .videoDao()
-                                                                        .loadVideoInSameCateogry(
-                                                                                category);
-                                                        if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED) {
-
-                                                            /**
-                                                             * Emit the result using specified delay
-                                                             */
-                                                            return sendThroughMediatorLiveData(source, 2000L);
-
-                                                        }
-                                                        return source;
-                                                    }
-                                                });
+                                        }
+                                        return source;
                                     }
                                 });
 
@@ -157,33 +147,25 @@ public class VideosViewModel extends AndroidViewModel {
                                 mQuery, new Function<String, LiveData<List<VideoEntity>>>() {
                                     @Override
                                     public LiveData<List<VideoEntity>> apply(final String queryMessage) {
-                                        return Transformations.switchMap(databaseUpdated,
 
-                                                new Function<Boolean, LiveData<List<VideoEntity>>>() {
+                                        /**
+                                         * Fetching live data from database
+                                         */
+                                        final LiveData<List<VideoEntity>> source =
+                                                mDatabaseHelper
+                                                        .getDatabase()
+                                                        .videoDao()
+                                                        .searchVideos(queryMessage);
+                                        if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED
+                                                || AppConfiguration.IS_SEARCH_LATENCY_ENABLED) {
 
-                                                    @Override
-                                                    public LiveData<List<VideoEntity>> apply(Boolean input) {
-
-                                                        /**
-                                                         * Fetching live data from database
-                                                         */
-                                                        final LiveData<List<VideoEntity>> source =
-                                                                mDatabaseHelper
-                                                                        .getDatabase()
-                                                                        .videoDao()
-                                                                        .searchVideos(queryMessage);
-                                                        if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED
-                                                                || AppConfiguration.IS_SEARCH_LATENCY_ENABLED) {
-
-                                                            /**
-                                                             * Emit the result using specified delay
-                                                             */
-                                                            return sendThroughMediatorLiveData(source, 3000L);
-                                                        } else {
-                                                            return source;
-                                                        }
-                                                    }
-                                                });
+                                            /**
+                                             * Emit the result using specified delay
+                                             */
+                                            return sendThroughMediatorLiveData(source, 3000L);
+                                        } else {
+                                            return source;
+                                        }
                                     }
                                 });
 
@@ -204,32 +186,24 @@ public class VideosViewModel extends AndroidViewModel {
                         mVideoId, new Function<Long, LiveData<VideoEntity>>() {
                             @Override
                             public LiveData<VideoEntity> apply(final Long videoId) {
-                                return Transformations.switchMap(databaseUpdated,
 
-                                        new Function<Boolean, LiveData<VideoEntity>>() {
+                                /**
+                                 * Fetching live data from database
+                                 */
+                                final LiveData<VideoEntity> source =
+                                        mDatabaseHelper
+                                                .getDatabase()
+                                                .videoDao()
+                                                .loadVideoById(videoId);
 
-                                            @Override
-                                            public LiveData<VideoEntity> apply(Boolean input) {
-
-                                                /**
-                                                 * Fetching live data from database
-                                                 */
-                                                final LiveData<VideoEntity> source =
-                                                        mDatabaseHelper
-                                                                .getDatabase()
-                                                                .videoDao()
-                                                                .loadVideoById(videoId);
-
-                                                /**
-                                                 * If latency is enabled, we will return the data using the mediator
-                                                 * live data
-                                                 */
-                                                if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED) {
-                                                    return sendThroughMediatorLiveData(source, 2000L);
-                                                }
-                                                return source;
-                                            }
-                                        });
+                                /**
+                                 * If latency is enabled, we will return the data using the mediator
+                                 * live data
+                                 */
+                                if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED) {
+                                    return sendThroughMediatorLiveData(source, 2000L);
+                                }
+                                return source;
                             }
                         });
             }

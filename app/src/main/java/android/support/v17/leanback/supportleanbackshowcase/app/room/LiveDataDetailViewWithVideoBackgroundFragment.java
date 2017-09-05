@@ -302,7 +302,7 @@ public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSuppor
      * Subscribe network live data and react with the change of network's status
      */
     private void subscribeToNetworkLiveData() {
-        NetworkLiveData.get(mFragmentActivity).observe(mLifecycleOwner, new Observer<Boolean>() {
+        NetworkLiveData.sync(mFragmentActivity).observe(mLifecycleOwner, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
                 if (aBoolean) {

@@ -36,6 +36,20 @@
 
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/no_search_result"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:layout_marginBottom="20dip"
+        android:background="#AA000000"
+        android:padding="12dip"
+
+        android:text="No Search Result"
+        android:textColor="#ffffffff"
+
+        android:visibility="gone" />
+
     <ProgressBar
         android:id="@+id/search_progressbar"
         style="?android:attr/progressBarStyleLarge"

@@ -22,38 +22,38 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.constant.DatabaseContract;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.constant.GsonContract;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.db.constant.DatabaseColumnConstant;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.db.constant.GsonConstant;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-@Entity(tableName = DatabaseContract.VideoEntry.TABLE_NAME)
+@Entity(tableName = DatabaseColumnConstant.VideoEntry.TABLE_NAME)
 public class VideoEntity implements  Parcelable {
 
-    @SerializedName(GsonContract.DESCRIPTION)
-    @ColumnInfo(name = DatabaseContract.VideoEntry.COLUMN_DESC)
+    @SerializedName(GsonConstant.DESCRIPTION)
+    @ColumnInfo(name = DatabaseColumnConstant.VideoEntry.COLUMN_DESC)
     private String mDescription;
 
-    @SerializedName(GsonContract.VIDEO_URLS)
+    @SerializedName(GsonConstant.VIDEO_URLS)
     @Ignore
     private List<String> mVideoUrls;
 
-    @SerializedName(GsonContract.CARD_IMAGE_URL)
-    @ColumnInfo(name = DatabaseContract.VideoEntry.COLUMN_CARD_IMAGE_URL)
+    @SerializedName(GsonConstant.CARD_IMAGE_URL)
+    @ColumnInfo(name = DatabaseColumnConstant.VideoEntry.COLUMN_CARD_IMAGE_URL)
     private String mCardImageUrl;
 
-    @SerializedName(GsonContract.BACKGROUND_IMAGE_URL)
-    @ColumnInfo(name = DatabaseContract.VideoEntry.COLUMN_BG_IMAGE_URL)
+    @SerializedName(GsonConstant.BACKGROUND_IMAGE_URL)
+    @ColumnInfo(name = DatabaseColumnConstant.VideoEntry.COLUMN_BG_IMAGE_URL)
     private String mBgImageUrl;
 
-    @SerializedName(GsonContract.TITLE)
-    @ColumnInfo(name = DatabaseContract.VideoEntry.COLUMN_NAME)
+    @SerializedName(GsonConstant.TITLE)
+    @ColumnInfo(name = DatabaseColumnConstant.VideoEntry.COLUMN_NAME)
     private String mTitle;
 
-    @SerializedName(GsonContract.STUDIO)
-    @ColumnInfo(name = DatabaseContract.VideoEntry.COLUMN_STUDIO)
+    @SerializedName(GsonConstant.STUDIO)
+    @ColumnInfo(name = DatabaseColumnConstant.VideoEntry.COLUMN_STUDIO)
     private String mStudio;
 
     /**
@@ -61,28 +61,28 @@ public class VideoEntity implements  Parcelable {
      */
     // Primary key to store the video item.
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = DatabaseContract.VideoEntry.COLUMN_AUTO_GENERATE_ID)
+    @ColumnInfo(name = DatabaseColumnConstant.VideoEntry.COLUMN_AUTO_GENERATE_ID)
     private long mId;
 
     // The url points to the local storage of the video content.
-    @ColumnInfo(name = DatabaseContract.VideoEntry.COLUMN_VIDEO_CACHE)
+    @ColumnInfo(name = DatabaseColumnConstant.VideoEntry.COLUMN_VIDEO_CACHE)
     private String mVideoLocalStorageUrl;
 
     // The url points to the local storage of the video background image.
-    @ColumnInfo(name = DatabaseContract.VideoEntry.COLUMN_BG_IMAGE_CACHE)
+    @ColumnInfo(name = DatabaseColumnConstant.VideoEntry.COLUMN_BG_IMAGE_CACHE)
     private String mVideoBgImageLocalStorageUrl;
 
     // The url points to the local storage of the video card image.
-    @ColumnInfo(name = DatabaseContract.VideoEntry.COLUMN_CARD_IMG_CACHE)
+    @ColumnInfo(name = DatabaseColumnConstant.VideoEntry.COLUMN_CARD_IMG_CACHE)
     private String mVideoCardImageLocalStorageUrl;
 
     // The mCategory of current video
     // A single mCategory may contain many different videos
-    @ColumnInfo(name = DatabaseContract.VideoEntry.COLUMN_CATEGORY)
+    @ColumnInfo(name = DatabaseColumnConstant.VideoEntry.COLUMN_CATEGORY)
     private String mCategory;
 
     // The first url in urls array
-    @ColumnInfo(name = DatabaseContract.VideoEntry.COLUMN_VIDEO_URL)
+    @ColumnInfo(name = DatabaseColumnConstant.VideoEntry.COLUMN_VIDEO_URL)
     private String mVideoUrl;
 
     public String getTrailerVideoUrl() {
@@ -94,13 +94,13 @@ public class VideoEntity implements  Parcelable {
     }
 
     // The first url in urls array
-    @ColumnInfo(name = DatabaseContract.VideoEntry.COLUMN_VIDEO_TRAILER_URL)
+    @ColumnInfo(name = DatabaseColumnConstant.VideoEntry.COLUMN_VIDEO_TRAILER_URL)
     private String mTrailerVideoUrl;
 
-    @ColumnInfo(name = DatabaseContract.VideoEntry.COLUMN_VIDEO_IS_RENTED)
+    @ColumnInfo(name = DatabaseColumnConstant.VideoEntry.COLUMN_VIDEO_IS_RENTED)
     private boolean mRented;
 
-    @ColumnInfo(name = DatabaseContract.VideoEntry.COLUMN_VIDEO_STATUS)
+    @ColumnInfo(name = DatabaseColumnConstant.VideoEntry.COLUMN_VIDEO_STATUS)
     private String mStatus;
 
     /**

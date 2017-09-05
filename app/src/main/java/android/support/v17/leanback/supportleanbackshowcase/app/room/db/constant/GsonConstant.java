@@ -19,7 +19,7 @@ package android.support.v17.leanback.supportleanbackshowcase.app.room.db.constan
 /**
  * Constant required to process json data
  */
-public class GsonContract {
+public class GsonConstant {
     public static final String GOOGLE_VIDEO_TAG = "googlevideos";
     public static final String DESCRIPTION = "description";
     public static final String VIDEO_URLS = "sources";

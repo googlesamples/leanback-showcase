@@ -179,6 +179,7 @@ public class VideoCardPresenter extends Presenter {
 
         @Override
         public boolean onLongClick(View v) {
+            bind(mVideo);
             mPopupMenu.show();
             return true;
         }
@@ -275,7 +276,7 @@ public class VideoCardPresenter extends Presenter {
                     }
                 });
 
-                NetworkLiveData.get(mContext).observe(mOwner, new Observer<Boolean>() {
+                NetworkLiveData.sync(mContext).observe(mOwner, new Observer<Boolean>() {
                     @Override
                     public void onChanged(@Nullable Boolean isNetworkAvailable) {
                         if (isNetworkAvailable) {

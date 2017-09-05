@@ -19,17 +19,17 @@ package android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.constant.DatabaseContract;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.db.constant.DatabaseColumnConstant;
 
 
-@Entity(tableName = DatabaseContract.CategoryEntry.TABLE_NAME)
+@Entity(tableName = DatabaseColumnConstant.CategoryEntry.TABLE_NAME)
 public class CategoryEntity {
     @PrimaryKey(autoGenerate = true)
 
-    @ColumnInfo(name = DatabaseContract.CategoryEntry.COLUMN_AUTOGENERATE_ID)
+    @ColumnInfo(name = DatabaseColumnConstant.CategoryEntry.COLUMN_AUTOGENERATE_ID)
     private int mId;
 
-    @ColumnInfo(name = DatabaseContract.CategoryEntry.COLUMN_CATEGORY_NAME)
+    @ColumnInfo(name = DatabaseColumnConstant.CategoryEntry.COLUMN_CATEGORY_NAME)
     private String mCategoryName;
 
     public int getId() {
@@ -46,12 +46,5 @@ public class CategoryEntity {
 
     public void setCategoryName(String categoryName) {
         this.mCategoryName = categoryName;
-    }
-
-    /**
-     * The constructor is requried by room database
-     */
-    public CategoryEntity() {
-        // no op
     }
 }

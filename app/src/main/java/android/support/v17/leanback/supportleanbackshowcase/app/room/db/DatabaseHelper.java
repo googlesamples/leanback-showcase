@@ -45,7 +45,6 @@ public class DatabaseHelper {
 
     private final MutableLiveData<Boolean> mIsDatabaseCreated = new MutableLiveData<>();
 
-    private final MutableLiveData<Boolean> mDatabaseUpdatedSignal = new MutableLiveData<>();
 
     private AppDatabase mDb;
 
@@ -65,11 +64,6 @@ public class DatabaseHelper {
     public LiveData<Boolean> isDatabaseCreated() {
         return mIsDatabaseCreated;
     }
-
-    public LiveData<Boolean> getDatabaseUpdatedSignal() {
-        return mDatabaseUpdatedSignal;
-    }
-
 
     @Nullable
     public AppDatabase getDatabase() {
@@ -108,7 +102,7 @@ public class DatabaseHelper {
                 if (!context.getDatabasePath(DATABASE_NAME).exists()) {
                     try {
                         String url =
-                                "https://storage.googleapis.com/android-tv/android_tv_videos_new.json";
+                                "https://storage.googleapis.com/android-tv/";
                         DatabaseInitUtil init = new DatabaseInitUtil();
                         init.initializeDb(db, url);
                     } catch (IOException e) {
@@ -124,19 +118,18 @@ public class DatabaseHelper {
             @Override
             protected void onPostExecute(Boolean res) {
                 /**
-                 * If database is created unsuccessfully, database will be reinitialized
+                 * If database had not been created successfully, database will be reinitialized
                  * next time
                  */
                 if (!res) {
-                    //
-                    // make sure there is no database crash happen
-                    //
+
+                    // synchronize the state when multiple threads are trying to access this
+                    // database
                     if (mInitialized.compareAndSet(true, false)) {
                         mIsDatabaseCreated.setValue(res);
                     }
                 }
                 mIsDatabaseCreated.setValue(res);
-                mDatabaseUpdatedSignal.setValue(true);
             }
         }.execute(context.getApplicationContext());
     }
@@ -170,7 +163,6 @@ public class DatabaseHelper {
                     break;
             }
             getDatabase().videoDao().updateVideo(video);
-            mDatabaseUpdatedSignal.postValue(!mDatabaseUpdatedSignal.getValue());
             getDatabase().setTransactionSuccessful();
         } finally {
             getDatabase().endTransaction();

@@ -79,7 +79,6 @@ public class LiveDataRowsActivity extends LifecycleActivity {
             case WRITE_PERMISSION:
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.e("######", "onRequestPermissionsResult: " + " permission debug: " );
 
                     // If the WRITE_EXTERNAL_STORAGE is authorized, we will update the value in
                     // shared preference so other component (VideoCardPresenter) can access this

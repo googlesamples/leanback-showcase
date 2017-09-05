@@ -129,7 +129,7 @@ public class SearchFragment extends android.support.v17.leanback.app.SearchSuppo
         mViewModel = ViewModelProviders.of(this).get(VideosViewModel.class);
         subscribeUi(mViewModel);
 
-        NetworkLiveData.get(this.getActivity()).observe(this, new Observer<Boolean>() {
+        NetworkLiveData.sync(this.getActivity()).observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean isNetworkAvailable) {
                 if (isNetworkAvailable) {
@@ -184,7 +184,9 @@ public class SearchFragment extends android.support.v17.leanback.app.SearchSuppo
                 if (DEBUG) {
                     Log.e(TAG, "onChanged: " + videoEntities );
                 }
-                if (videoEntities != null) {
+
+                if (videoEntities != null && !videoEntities.isEmpty()) {
+                    getActivity().findViewById(R.id.no_search_result).setVisibility(View.GONE);
                     getActivity().findViewById(R.id.search_progressbar).setVisibility(View.GONE);
                     mRelatedAdapter.setItems(videoEntities, new Comparator<VideoEntity>() {
                         @Override
@@ -197,6 +199,11 @@ public class SearchFragment extends android.support.v17.leanback.app.SearchSuppo
                             return o1.equals(o2)? 0:-1;
                         }
                     });
+                } else {
+                    // When the search result is null (when data base has not been created) or
+                    // empty, the text view field will be visible and telling user that no search
+                    // result is available
+                    getActivity().findViewById(R.id.no_search_result).setVisibility(View.VISIBLE);
                 }
             }
         });

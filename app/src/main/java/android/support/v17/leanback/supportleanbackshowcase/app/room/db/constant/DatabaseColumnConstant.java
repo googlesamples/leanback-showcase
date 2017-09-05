@@ -17,7 +17,7 @@
 package android.support.v17.leanback.supportleanbackshowcase.app.room.db.constant;
 
 
-public class DatabaseContract {
+public class DatabaseColumnConstant {
 
     /**
      * Define the name of column in video entry

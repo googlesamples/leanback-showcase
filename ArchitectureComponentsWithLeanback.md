@@ -4,7 +4,7 @@
 
 This app is used to demonstrate how to persist data to local database or sd card (based on the data type). To make the tv app ready for offline usage.
 
-In our sample app, we use [Room Database](https://developer.android.com/topic/libraries/architecture/room.html) as the backend storage and ui controller will observe database's status leveraging [LiveData](https://developer.android.com/topic/libraries/architecture/livedata.html) and [ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel.html) to update the ui automatically and reactively once the content in the database has been modified or updated.
+In our sample app, we use [Room Database](https://developer.android.com/topic/libraries/architecture/room.html) as the database and ui controller will observe database's status leveraging [LiveData](https://developer.android.com/topic/libraries/architecture/livedata.html) and [ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel.html) to update the ui automatically and reactively once the content in the database has been modifed or updated.
 
 
 To be more specific, when the app is firstly launched under network available environment, it will fetch and persist the json data (including video's title, video's URL) to room database. So under the circumstance where network is unavailable, those basic information will still be presented to user instead of leaving a blank page which will impair the user experience.
@@ -12,15 +12,15 @@ To be more specific, when the app is firstly launched under network available en
 To enable full offline access, in our app user can long click the video item and choose to download that video including video content, background and card image through the pop up menu. Once it is downloaded, the paths point to those local contents will be updated to database accordingly.
 
 ## Technical Details
-Firstly, regarding the interaction with database, the query result from [Room Database](https://developer.android.com/topic/libraries/architecture/room.html) is represented as [LiveData](https://developer.android.com/topic/libraries/architecture/livedata.html) and is encapsulated inside of a [ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel.html). So the data can survive though the configuration changes without refetching the data from database as long as the Life Cycle owner has not been destroyed yet.
+Firstly, regarding the interaction with database, the query result from [Room Database](https://developer.android.com/topic/libraries/architecture/room.html) is represented as [LiveData](https://developer.android.com/topic/libraries/architecture/livedata.html) and is encapsulated inside of a [ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel.html). So the data can survive though the configuration changes as long as the Life cycle owner is not destroyed.
 
-Also through leveraging [MediatorLiveData](https://developer.android.com/reference/android/arch/lifecycle/MediatorLiveData.html) we can return the query result from database with artificial delay. The delay is disabled on default, but developer can enable it easily by modifying the flag in [AppConfiguration.java](./app/src/main/java/android/support/v17/leanback/supportleanbackshowcase/app/room/config/AppConfiguration.java) file.
+Also through leveraging [MediatorLiveData](https://developer.android.com/reference/android/arch/lifecycle/MediatorLiveData.html) we can return the query result from database with specified delay. The artificial delay is disabled on default, but user can enable it easily by modifying the flag in AppConfiguration.java file.
 
 The delay is designed to simulate several scenarios including: 
 
 1. Fetching data from Internet with high network latency. 
 
-    Network's bandwidth can easily becomes a bottleneck for almost every application which needs to sync with internet resource periodically. It is always a good practice to consider it beforehand. Through [MediatorLiveData](https://developer.android.com/reference/android/arch/lifecycle/MediatorLiveData.html), the artificial delay can be enabled easily and for developer to observe and think about the solution to handle this situation.
+    Network's bandwidth can easily becomes a bottleneck for almost every application which needs to sync with internet resource frequently. It is always a good practice to consider it before hand. Through [MediatorLiveData](https://developer.android.com/reference/android/arch/lifecycle/MediatorLiveData.html), the artificial delay can be enabled easily and for developer to observe and think about the solution to handle this situation.
 
 2. Accessing Massive database. 
 

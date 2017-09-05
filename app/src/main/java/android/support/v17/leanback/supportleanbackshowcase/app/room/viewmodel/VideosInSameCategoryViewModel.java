@@ -58,8 +58,6 @@ public class VideosInSameCategoryViewModel extends AndroidViewModel {
 
         mDatabaseHelper = DatabaseHelper.getInstance();
 
-        final LiveData<Boolean> databaseUpdated = mDatabaseHelper.getDatabaseUpdatedSignal();
-
         mVideosInSameCategory = Transformations.switchMap(mDatabaseHelper.isDatabaseCreated(),
                 new Function<Boolean, LiveData<List<VideoEntity>>>() {
                     @Override
@@ -71,27 +69,20 @@ public class VideosInSameCategoryViewModel extends AndroidViewModel {
                             return ABSENT;
                         }
 
-                        return Transformations.switchMap(databaseUpdated,
+                        LiveData<List<VideoEntity>> source =
+                                mDatabaseHelper
+                                        .getDatabase()
+                                        .videoDao()
+                                        .loadVideoInSameCateogry(mCategory);
 
-                                new Function<Boolean, LiveData<List<VideoEntity>>>() {
-                            @Override
-                            public LiveData<List<VideoEntity>> apply(Boolean isDatabaseChanged) {
-                                LiveData<List<VideoEntity>> source =
-                                        mDatabaseHelper
-                                                .getDatabase()
-                                                .videoDao()
-                                                .loadVideoInSameCateogry(mCategory);
+                        if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED) {
 
-                                if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED) {
-
-                                    /**
-                                     * Emit the result with specified delay using mediator live data
-                                     */
-                                    return sendThroughMediatorLiveData(source, 2000L);
-                                }
-                                return source;
-                            }
-                        });
+                            /**
+                             * Emit the result with specified delay using mediator live data
+                             */
+                            return sendThroughMediatorLiveData(source, 2000L);
+                        }
+                        return source;
                     }
                 });
 
