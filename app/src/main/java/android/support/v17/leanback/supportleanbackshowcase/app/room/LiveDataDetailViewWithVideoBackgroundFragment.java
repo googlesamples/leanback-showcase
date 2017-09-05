@@ -217,16 +217,7 @@ public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSuppor
 
         mViewModel = ViewModelProviders.of(mFragmentActivity).get(VideosViewModel.class);
         subscribeToModel(mViewModel);
-        NetworkLiveData.get(mFragmentActivity).observe(mLifecycleOwner, new Observer<Boolean>() {
-            @Override
-            public void onChanged(@Nullable Boolean aBoolean) {
-                if (aBoolean) {
-                    getActivity().findViewById(R.id.no_internet_detail).setVisibility(View.GONE);
-                } else {
-                    getActivity().findViewById(R.id.no_internet_detail).setVisibility(View.VISIBLE);
-                }
-            }
-        });
+        subscribeToNetworkLiveData();
     }
 
     private void subscribeToModel(final VideosViewModel model) {
@@ -302,6 +293,22 @@ public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSuppor
                             return o1.equals(o2) ? 0 : -1;
                         }
                     });
+                }
+            }
+        });
+    }
+
+    /**
+     * Subscribe network live data and react with the change of network's status
+     */
+    private void subscribeToNetworkLiveData() {
+        NetworkLiveData.get(mFragmentActivity).observe(mLifecycleOwner, new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean aBoolean) {
+                if (aBoolean) {
+                    getActivity().findViewById(R.id.no_internet_detail).setVisibility(View.GONE);
+                } else {
+                    getActivity().findViewById(R.id.no_internet_detail).setVisibility(View.VISIBLE);
                 }
             }
         });

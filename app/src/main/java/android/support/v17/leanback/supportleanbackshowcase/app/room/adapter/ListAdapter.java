@@ -236,6 +236,9 @@ public class ListAdapter<T> extends ObjectAdapter {
             }
         });
 
+        mItems.clear();
+        mItems.addAll(itemList);
+
         result.dispatchUpdatesTo(new ListUpdateCallback() {
 
             @Override
@@ -254,11 +257,18 @@ public class ListAdapter<T> extends ObjectAdapter {
                 notifyItemRangeRemoved(position, count);
             }
 
+            /**
+             * Currently Leanback support library doesn't support move operation, use item range
+             * changed method to replace it as a temporal solution.
+             * @param fromPosition from position.
+             * @param toPosition to position.
+             */
             @Override
             public void onMoved(int fromPosition, int toPosition) {
                 if (DEBUG){
                     Log.e(TAG, "onMoved: ");
                 }
+                notifyItemRangeChanged(fromPosition, toPosition - fromPosition + 1);
             }
 
             @Override
@@ -266,11 +276,12 @@ public class ListAdapter<T> extends ObjectAdapter {
                 if (DEBUG) {
                     Log.e(TAG, "onChanged: ");
                 }
+
+                // the support for payload has not been added to leanback support library, just
+                // ignore it currently.
                 notifyItemRangeChanged(position, count);
             }
         });
-
-        mItems = itemList;
     }
 
     @Override
