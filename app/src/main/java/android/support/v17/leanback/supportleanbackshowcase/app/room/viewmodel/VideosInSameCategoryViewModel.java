@@ -41,7 +41,7 @@ public class VideosInSameCategoryViewModel extends AndroidViewModel {
     /**
      * List of VideoEntities in same category
      */
-    private LiveData<List<VideoEntity>> mVideosInSameCategory;
+    private final LiveData<List<VideoEntity>> mVideosInSameCategory;
 
 
     public VideosInSameCategoryViewModel(@NonNull Application application, final String category) {
@@ -50,21 +50,10 @@ public class VideosInSameCategoryViewModel extends AndroidViewModel {
 
         mDatabaseHelper = DatabaseHelper.getInstance();
 
-        // create database in main thread
-        mDatabaseHelper.createDb(this.getApplication());
-
         mVideosInSameCategory = mDatabaseHelper
-                .getDatabase()
+                .getDatabase(this.getApplication())
                 .videoDao()
                 .loadVideoInSameCateogry(mCategory);
-
-        if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED) {
-
-            /**
-             * Emit the result with specified delay using mediator live data
-             */
-            mVideosInSameCategory = sendThroughMediatorLiveData(mVideosInSameCategory, 2000L);
-        }
     }
 
     /**
@@ -74,37 +63,6 @@ public class VideosInSameCategoryViewModel extends AndroidViewModel {
      */
     public LiveData<List<VideoEntity>> getVideosInSameCategory() {
         return mVideosInSameCategory;
-    }
-
-    /**
-     * Helper function to use mediator live data to emit the live data using specified delay
-     *
-     * @param source source live data
-     * @param ms     for delay
-     * @param <T>    The type of data you want to emit in the live data
-     * @return The mediator live data
-     */
-    private <T> MediatorLiveData<T> sendThroughMediatorLiveData(LiveData<T> source, final Long ms) {
-        final MediatorLiveData<T> mediator =
-                new MediatorLiveData<>();
-
-        mediator.addSource(source, new Observer<T>() {
-            @Override
-            public void onChanged(@Nullable final T sourceEntity) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(ms);
-                            mediator.postValue(sourceEntity);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }).start();
-            }
-        });
-        return mediator;
     }
 
     /**

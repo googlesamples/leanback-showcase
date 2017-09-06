@@ -38,7 +38,6 @@ public class DatabaseHelper {
     private static final String VIDEO = "video";
 
     private static DatabaseHelper sInstance;
-    private boolean mIsCreated = false;
 
     private AppDatabase mDb;
 
@@ -50,25 +49,22 @@ public class DatabaseHelper {
     }
 
     @Nullable
-    public AppDatabase getDatabase() {
+    public AppDatabase getDatabase(Context context) {
+        if (mDb == null) {
+            createAndPopulateDatabase(context);
+        }
         return mDb;
     }
 
-    public void createDb(Context context) {
-        if (!mIsCreated) {
-            mIsCreated = true;
-        }
-
-        AppDatabase db = Room.databaseBuilder(context.getApplicationContext(),
+    private void createAndPopulateDatabase(Context context) {
+        mDb = Room.databaseBuilder(context.getApplicationContext(),
                 AppDatabase.class, DATABASE_NAME).build();
-        mDb = db;
-
         // insert contents into database
         try {
             String url =
                     "https://storage.googleapis.com/android-tv/";
             DatabaseInitUtil init = new DatabaseInitUtil();
-            init.initializeDb(db, url);
+            init.initializeDb(mDb, url);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -84,7 +80,7 @@ public class DatabaseHelper {
     @WorkerThread
     public synchronized void updateDatabase(VideoEntity video, String category, String value) {
         try {
-            getDatabase().beginTransaction();
+            mDb.beginTransaction();
             switch (category) {
                 case VIDEO:
                     video.setVideoLocalStorageUrl(value);
@@ -102,10 +98,10 @@ public class DatabaseHelper {
                     video.setRented(true);
                     break;
             }
-            getDatabase().videoDao().updateVideo(video);
-            getDatabase().setTransactionSuccessful();
+            mDb.videoDao().updateVideo(video);
+            mDb.setTransactionSuccessful();
         } finally {
-            getDatabase().endTransaction();
+            mDb.endTransaction();
         }
     }
 }

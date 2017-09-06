@@ -20,12 +20,8 @@ import android.app.Application;
 import android.arch.core.util.Function;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.Transformations;
-import android.support.annotation.Nullable;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.config.AppConfiguration;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.DatabaseHelper;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.CategoryEntity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
@@ -34,10 +30,11 @@ import java.util.List;
 
 public class VideosViewModel extends AndroidViewModel {
     // live data connect to database
-    private LiveData<List<CategoryEntity>> mAllCategories;
-    private LiveData<List<VideoEntity>> mSearchResults;
-    private LiveData<VideoEntity> mVideoById;
-    private LiveData<List<VideoEntity>> mAllVideosByCategory;
+    private final LiveData<List<CategoryEntity>> mAllCategories;
+    private final LiveData<List<VideoEntity>> mSearchResults;
+    private final LiveData<VideoEntity> mVideoById;
+    private final LiveData<List<VideoEntity>> mAllVideosByCategory;
+
     // mutable live data can be changed by ui controllers through setter
     private final MutableLiveData<String> mQuery = new MutableLiveData<>();
     private final MutableLiveData<Long> mVideoId = new MutableLiveData<>();
@@ -49,22 +46,10 @@ public class VideosViewModel extends AndroidViewModel {
 
         mDatabaseHelper = DatabaseHelper.getInstance();
 
-        // create database in main thread
-        mDatabaseHelper.createDb(this.getApplication());
-
-        mAllCategories =
-                mDatabaseHelper
-                        .getDatabase()
-                        .categoryDao()
-                        .loadAllCategories();
-
-        if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED) {
-
-            /**
-             * Emit the result using specified delay
-             */
-            mAllCategories = sendThroughMediatorLiveData(mAllCategories, 1000L);
-        }
+        mAllCategories = mDatabaseHelper
+                .getDatabase(this.getApplication())
+                .categoryDao()
+                .loadAllCategories();
 
         /**
          * Using switch map function to react to the change of observed variable, the benefits of
@@ -78,21 +63,10 @@ public class VideosViewModel extends AndroidViewModel {
                         /**
                          * Fetching live data from database
                          */
-                        final LiveData<List<VideoEntity>> source =
-                                mDatabaseHelper
-                                        .getDatabase()
-                                        .videoDao()
-                                        .loadVideoInSameCateogry(
-                                                category);
-                        if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED) {
-
-                            /**
-                             * Emit the result using specified delay
-                             */
-                            return sendThroughMediatorLiveData(source, 2000L);
-
-                        }
-                        return source;
+                        return mDatabaseHelper
+                                .getDatabase(getApplication())
+                                .videoDao()
+                                .loadVideoInSameCateogry(category);
                     }
                 });
 
@@ -104,21 +78,10 @@ public class VideosViewModel extends AndroidViewModel {
                         /**
                          * Fetching live data from database
                          */
-                        final LiveData<List<VideoEntity>> source =
-                                mDatabaseHelper
-                                        .getDatabase()
-                                        .videoDao()
-                                        .searchVideos(queryMessage);
-                        if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED
-                                || AppConfiguration.IS_SEARCH_LATENCY_ENABLED) {
-
-                            /**
-                             * Emit the result using specified delay
-                             */
-                            return sendThroughMediatorLiveData(source, 3000L);
-                        } else {
-                            return source;
-                        }
+                        return mDatabaseHelper
+                                .getDatabase(getApplication())
+                                .videoDao()
+                                .searchVideos(queryMessage);
                     }
                 });
 
@@ -131,20 +94,10 @@ public class VideosViewModel extends AndroidViewModel {
                         /**
                          * Fetching live data from database
                          */
-                        final LiveData<VideoEntity> source =
-                                mDatabaseHelper
-                                        .getDatabase()
-                                        .videoDao()
-                                        .loadVideoById(videoId);
-
-                        /**
-                         * If latency is enabled, we will return the data using the mediator
-                         * live data
-                         */
-                        if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED) {
-                            return sendThroughMediatorLiveData(source, 2000L);
-                        }
-                        return source;
+                        return mDatabaseHelper
+                                .getDatabase(getApplication())
+                                .videoDao()
+                                .loadVideoById(videoId);
                     }
                 });
 
@@ -176,36 +129,5 @@ public class VideosViewModel extends AndroidViewModel {
 
     public void setCategory(String category) {
         mVideoCategory.setValue(category);
-    }
-
-    /**
-     * Helper function to use mediator live data to emit the live data using specified delay
-     *
-     * @param source source live data
-     * @param ms     for delay
-     * @param <T>    The type of data you want to emit in the live data
-     * @return The mediator live data
-     */
-    private <T> MediatorLiveData<T> sendThroughMediatorLiveData(LiveData<T> source, final Long ms) {
-        final MediatorLiveData<T> mediator =
-                new MediatorLiveData<>();
-
-        mediator.addSource(source, new Observer<T>() {
-            @Override
-            public void onChanged(@Nullable final T sourceEntity) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(ms);
-                            mediator.postValue(sourceEntity);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }).start();
-            }
-        });
-        return mediator;
     }
 }

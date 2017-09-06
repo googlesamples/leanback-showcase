@@ -222,7 +222,7 @@ public class LiveDataFragment extends BrowseSupportFragment
                     @Override
                     protected Void doInBackground(Void... voids) {
 
-                        if (AppConfiguration.IS_NETWORK_LATENCY_ENABLED){
+                        if (AppConfiguration.IS_NETWORK_LATENCY_ENABLED) {
                             addLatency(1000L);
                         }
                         DatabaseHelper.getInstance().updateDatabase(videoEntity, CARD, desc.getStoragePath());
@@ -253,7 +253,7 @@ public class LiveDataFragment extends BrowseSupportFragment
                     getActivity().findViewById(R.id.no_internet).setVisibility(View.GONE);
 
                     // When network is available, always try to recreate the database.
-                    DatabaseHelper.getInstance().createDb(getActivity());
+                    DatabaseHelper.getInstance().getDatabase(getActivity());
                 } else {
                     getActivity().findViewById(R.id.no_internet).setVisibility(View.VISIBLE);
                 }
