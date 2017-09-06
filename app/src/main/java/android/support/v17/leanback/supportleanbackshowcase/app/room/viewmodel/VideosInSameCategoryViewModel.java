@@ -17,13 +17,10 @@
 package android.support.v17.leanback.supportleanbackshowcase.app.room.viewmodel;
 
 import android.app.Application;
-import android.arch.core.util.Function;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
@@ -36,8 +33,6 @@ import java.util.List;
 
 public class VideosInSameCategoryViewModel extends AndroidViewModel {
 
-    private static final MutableLiveData ABSENT = new MutableLiveData();
-
     // The parameter used to create view model
     private final String mCategory;
 
@@ -46,11 +41,8 @@ public class VideosInSameCategoryViewModel extends AndroidViewModel {
     /**
      * List of VideoEntities in same category
      */
-    private final LiveData<List<VideoEntity>> mVideosInSameCategory;
+    private LiveData<List<VideoEntity>> mVideosInSameCategory;
 
-    {
-        ABSENT.setValue(null);
-    }
 
     public VideosInSameCategoryViewModel(@NonNull Application application, final String category) {
         super(application);
@@ -58,35 +50,21 @@ public class VideosInSameCategoryViewModel extends AndroidViewModel {
 
         mDatabaseHelper = DatabaseHelper.getInstance();
 
-        mVideosInSameCategory = Transformations.switchMap(mDatabaseHelper.isDatabaseCreated(),
-                new Function<Boolean, LiveData<List<VideoEntity>>>() {
-                    @Override
-                    public LiveData<List<VideoEntity>> apply(Boolean isDatabaseCreated) {
-
-                        // If the database has not been created, return a null value wrapped in the
-                        // live data
-                        if (!isDatabaseCreated) {
-                            return ABSENT;
-                        }
-
-                        LiveData<List<VideoEntity>> source =
-                                mDatabaseHelper
-                                        .getDatabase()
-                                        .videoDao()
-                                        .loadVideoInSameCateogry(mCategory);
-
-                        if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED) {
-
-                            /**
-                             * Emit the result with specified delay using mediator live data
-                             */
-                            return sendThroughMediatorLiveData(source, 2000L);
-                        }
-                        return source;
-                    }
-                });
-
+        // create database in main thread
         mDatabaseHelper.createDb(this.getApplication());
+
+        mVideosInSameCategory = mDatabaseHelper
+                .getDatabase()
+                .videoDao()
+                .loadVideoInSameCateogry(mCategory);
+
+        if (AppConfiguration.IS_DATABASE_ACCESS_LATENCY_ENABLED) {
+
+            /**
+             * Emit the result with specified delay using mediator live data
+             */
+            mVideosInSameCategory = sendThroughMediatorLiveData(mVideosInSameCategory, 2000L);
+        }
     }
 
     /**
