@@ -327,7 +327,8 @@ public class LiveDataFragment extends BrowseSupportFragment
                             mRowsAdapter.setItems(rows, new Comparator<ListRow>() {
                                 @Override
                                 public int compare(ListRow o1, ListRow o2) {
-                                    return o1.getId() == o2.getId() ? 0 : -1;
+                                    return o1.getHeaderItem().getName()
+                                            .equals(o2.getHeaderItem().getName()) ? 0 : -1;
                                 }
                             }, new Comparator<ListRow>() {
                                 @Override
