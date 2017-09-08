@@ -39,6 +39,7 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -66,7 +67,8 @@ public class VideosRepository {
     private CategoryDao mCategoryDao;
 
     // maintain the local cache so the live data can be shared among different components
-    private HashMap<String, LiveData<List<VideoEntity>>> mRepositoryCache;
+    private Map<String, LiveData<List<VideoEntity>>> mVideoEntitiesCache;
+    private LiveData<List<CategoryEntity>> mCategories;
 
     public static VideosRepository getVideosRepositoryInstance() {
         if (sVideosRepository == null) {
@@ -78,14 +80,21 @@ public class VideosRepository {
     public LiveData<List<VideoEntity>> getVideosInSameCategoryLiveData(String category) {
 
         // always try to retrive from local cache firstly
-        if (mRepositoryCache.containsKey(category)) {
-            return mRepositoryCache.get(category);
+        if (mVideoEntitiesCache.containsKey(category)) {
+            return mVideoEntitiesCache.get(category);
         }
-        return mVideoDao.loadVideoInSameCateogry(category);
+        LiveData<List<VideoEntity>> videoEntities = mVideoDao.loadVideoInSameCateogry(category);
+        mVideoEntitiesCache.put(category, videoEntities);
+        return videoEntities;
     }
 
     public LiveData<List<CategoryEntity>> getAllCategories() {
-        return mCategoryDao.loadAllCategories();
+
+        // TODO: handle the situation when the categories get updated periodically
+        if (mCategories == null) {
+            mCategories = mCategoryDao.loadAllCategories();
+        }
+        return mCategories;
     }
 
     public LiveData<List<VideoEntity>> getSearchResult(String query) {
@@ -133,15 +142,11 @@ public class VideosRepository {
         }
     }
 
-    public void reCreateDatabaseIfNecessary() {
-        createAndPopulateDatabase();
-    }
-
     private VideosRepository() {
         createAndPopulateDatabase();
         mVideoDao = mDb.videoDao();
         mCategoryDao = mDb.categoryDao();
-        mRepositoryCache = new HashMap<>();
+        mVideoEntitiesCache = new HashMap<>();
     }
 
     private void createAndPopulateDatabase() {
