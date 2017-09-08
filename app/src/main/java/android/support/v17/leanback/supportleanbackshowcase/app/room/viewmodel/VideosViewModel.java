@@ -23,6 +23,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.DatabaseHelper;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.db.repo.VideosRepository;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.CategoryEntity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
 
@@ -39,49 +40,19 @@ public class VideosViewModel extends AndroidViewModel {
     private final MutableLiveData<String> mQuery = new MutableLiveData<>();
     private final MutableLiveData<Long> mVideoId = new MutableLiveData<>();
     private final MutableLiveData<String> mVideoCategory = new MutableLiveData<>();
-    private DatabaseHelper mDatabaseHelper;
 
     public VideosViewModel(Application application) {
         super(application);
 
-        mDatabaseHelper = DatabaseHelper.getInstance();
+        final VideosRepository instance = VideosRepository.getVideosRepositoryInstance();
 
-        mAllCategories = mDatabaseHelper
-                .getDatabase(this.getApplication())
-                .categoryDao()
-                .loadAllCategories();
-
-        /**
-         * Using switch map function to react to the change of observed variable, the benefits of
-         * this mapping method is we don't have to re-create the live data every time.
-         */
-        mAllVideosByCategory = Transformations.switchMap(
-                mVideoCategory, new Function<String, LiveData<List<VideoEntity>>>() {
-                    @Override
-                    public LiveData<List<VideoEntity>> apply(final String category) {
-
-                        /**
-                         * Fetching live data from database
-                         */
-                        return mDatabaseHelper
-                                .getDatabase(getApplication())
-                                .videoDao()
-                                .loadVideoInSameCateogry(category);
-                    }
-                });
+        mAllCategories = instance.getAllCategories();
 
         mSearchResults = Transformations.switchMap(
                 mQuery, new Function<String, LiveData<List<VideoEntity>>>() {
                     @Override
                     public LiveData<List<VideoEntity>> apply(final String queryMessage) {
-
-                        /**
-                         * Fetching live data from database
-                         */
-                        return mDatabaseHelper
-                                .getDatabase(getApplication())
-                                .videoDao()
-                                .searchVideos(queryMessage);
+                        return instance.getSearchResult(queryMessage);
                     }
                 });
 
@@ -90,17 +61,20 @@ public class VideosViewModel extends AndroidViewModel {
                 mVideoId, new Function<Long, LiveData<VideoEntity>>() {
                     @Override
                     public LiveData<VideoEntity> apply(final Long videoId) {
-
-                        /**
-                         * Fetching live data from database
-                         */
-                        return mDatabaseHelper
-                                .getDatabase(getApplication())
-                                .videoDao()
-                                .loadVideoById(videoId);
+                        return instance.getVideoById(videoId);
                     }
                 });
 
+        /**
+         * Using switch map function to react to the change of observed variable, the benefits of
+         * this mapping method is we don't have to re-create the live data every time.
+         */
+        mAllVideosByCategory = Transformations.switchMap(mVideoCategory, new Function<String, LiveData<List<VideoEntity>>>() {
+            @Override
+            public LiveData<List<VideoEntity>> apply(String category) {
+                return instance.getVideosInSameCategoryLiveData(category);
+            }
+        });
     }
 
     public LiveData<List<VideoEntity>> getSearchResult() {

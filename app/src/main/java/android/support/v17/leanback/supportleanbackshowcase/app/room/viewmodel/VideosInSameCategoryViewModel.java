@@ -19,14 +19,10 @@ package android.support.v17.leanback.supportleanbackshowcase.app.room.viewmodel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MediatorLiveData;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.config.AppConfiguration;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.DatabaseHelper;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.db.repo.VideosRepository;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
 
 import java.util.List;
@@ -35,8 +31,6 @@ public class VideosInSameCategoryViewModel extends AndroidViewModel {
 
     // The parameter used to create view model
     private final String mCategory;
-
-    private DatabaseHelper mDatabaseHelper;
 
     /**
      * List of VideoEntities in same category
@@ -48,12 +42,9 @@ public class VideosInSameCategoryViewModel extends AndroidViewModel {
         super(application);
         this.mCategory = category;
 
-        mDatabaseHelper = DatabaseHelper.getInstance();
-
-        mVideosInSameCategory = mDatabaseHelper
-                .getDatabase(this.getApplication())
-                .videoDao()
-                .loadVideoInSameCateogry(mCategory);
+        mVideosInSameCategory = VideosRepository
+                .getVideosRepositoryInstance()
+                .getVideosInSameCategoryLiveData(mCategory);
     }
 
     /**

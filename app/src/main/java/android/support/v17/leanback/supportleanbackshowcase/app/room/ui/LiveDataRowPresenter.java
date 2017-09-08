@@ -45,7 +45,6 @@ public class LiveDataRowPresenter extends ListRowPresenter {
 
     private ListRow mRow;
     private List<DataLoadedListener> mDataLoadedListeners;
-    private VideosInSameCategoryViewModel mViewModel;
     private LifecycleOwner mLifecycleOwner;
 
     public LiveDataRowPresenter() {
@@ -105,12 +104,12 @@ public class LiveDataRowPresenter extends ListRowPresenter {
 
         // view model will not be re-created as long as the lifecycle owner
         // lifecycle observer and tag doesn't change
-        mViewModel = ViewModelProviders.of(attachedFragmentActivity, factory).get(
+        VideosInSameCategoryViewModel viewModel = ViewModelProviders.of(attachedFragmentActivity, factory).get(
                 category, VideosInSameCategoryViewModel.class);
 
 
         // bind live data to view holder
-        vh.setLiveData(mViewModel.getVideosInSameCategory());
+        vh.setLiveData(viewModel.getVideosInSameCategory());
 
         // observe the live data when this row is bound to view holder
         vh.getLiveData().observe(mLifecycleOwner,
