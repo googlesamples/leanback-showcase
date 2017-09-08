@@ -26,10 +26,13 @@ import android.support.v17.leanback.supportleanbackshowcase.app.room.SampleAppli
 import android.support.v17.leanback.supportleanbackshowcase.app.room.adapter.ListAdapter;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.viewmodel.VideosInSameCategoryViewModel;
+import android.support.v17.leanback.widget.HorizontalGridView;
 import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v4.app.FragmentActivity;
+import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -38,42 +41,53 @@ import java.util.List;
 /**
  * The presenter for live data row
  */
-public class LiveDataRowPresenter extends ListRowPresenter{
+public class LiveDataRowPresenter extends ListRowPresenter {
 
     private ListRow mRow;
-    private List<StartEntranceListener> mEntranceListeners;
+    private List<DataLoadedListener> mDataLoadedListeners;
     private VideosInSameCategoryViewModel mViewModel;
     private LifecycleOwner mLifecycleOwner;
 
     public LiveDataRowPresenter() {
         super();
-        mEntranceListeners = new ArrayList<>();
+        mDataLoadedListeners = new ArrayList<>();
     }
 
-    public interface StartEntranceListener {
-        void startEntrance();
+    public interface DataLoadedListener {
+        void onDataLoaded();
     }
 
     /**
      * Register Entrance Listener.
      */
-    public void registerStartEntranceListener(StartEntranceListener listener) {
-        mEntranceListeners.add(listener);
+    public void registerDataLoadedListener(DataLoadedListener listener) {
+        mDataLoadedListeners.add(listener);
     }
 
     /**
-     * Dispatch the event when the data is bound to the adapter.
+     * Dispatch the even when the data is bound to the adapter.
      */
-    public void notifyEntranceStarted() {
-        for (int i = 0; i < mEntranceListeners.size(); i++) {
-            mEntranceListeners.get(i).startEntrance();
+    public void notifyDataLoaded() {
+        for (int i = 0; i < mDataLoadedListeners.size(); i++) {
+            mDataLoadedListeners.get(i).onDataLoaded();
         }
+    }
+
+    @Override
+    protected LiveDataRowPresenterViewHolder createRowViewHolder(ViewGroup parent) {
+        ListRowPresenter.ViewHolder listRowPresenterViewHolder
+                = (ListRowPresenter.ViewHolder) super.createRowViewHolder(parent);
+        return new LiveDataRowPresenterViewHolder(
+                listRowPresenterViewHolder.view,
+                listRowPresenterViewHolder.getGridView(),
+                listRowPresenterViewHolder.getListRowPresenter());
     }
 
     @Override
     protected void onBindRowViewHolder(RowPresenter.ViewHolder holder, Object item) {
         super.onBindRowViewHolder(holder, item);
-        mRow = (ListRow)item;
+        mRow = (ListRow) item;
+        LiveDataRowPresenterViewHolder vh = (LiveDataRowPresenterViewHolder)holder;
 
         String category = mRow.getHeaderItem().getName();
 
@@ -92,10 +106,14 @@ public class LiveDataRowPresenter extends ListRowPresenter{
         // view model will not be re-created as long as the lifecycle owner
         // lifecycle observer and tag doesn't change
         mViewModel = ViewModelProviders.of(attachedFragmentActivity, factory).get(
-                        category, VideosInSameCategoryViewModel.class);
+                category, VideosInSameCategoryViewModel.class);
+
+
+        // bind live data to view holder
+        vh.setLiveData(mViewModel.getVideosInSameCategory());
 
         // observe the live data when this row is bound to view holder
-        mViewModel.getVideosInSameCategory().observe(mLifecycleOwner,
+        vh.getLiveData().observe(mLifecycleOwner,
                 new Observer<List<VideoEntity>>() {
                     @Override
                     public void onChanged(
@@ -104,7 +122,7 @@ public class LiveDataRowPresenter extends ListRowPresenter{
 
                             // When the data is bound to the adapter, dispatch start Entrance
                             // transition event
-                            notifyEntranceStarted();
+                            notifyDataLoaded();
 
                             adapter.setItems(videoEntities,
                                     new Comparator<VideoEntity>() {
@@ -128,6 +146,28 @@ public class LiveDataRowPresenter extends ListRowPresenter{
     @Override
     protected void onUnbindRowViewHolder(RowPresenter.ViewHolder holder) {
         super.onUnbindRowViewHolder(holder);
-        mViewModel.getVideosInSameCategory().removeObservers(mLifecycleOwner);
+        LiveDataRowPresenterViewHolder vh = (LiveDataRowPresenterViewHolder)holder;
+        vh.getLiveData().removeObservers(mLifecycleOwner);
+    }
+
+    /**
+     * Extend view holder to hold the live data
+     */
+    private class LiveDataRowPresenterViewHolder extends ListRowPresenter.ViewHolder {
+
+        private LiveData<List<VideoEntity>> mLiveData;
+
+        public LiveDataRowPresenterViewHolder(View rootView, HorizontalGridView gridView, ListRowPresenter p) {
+            super(rootView, gridView, p);
+        }
+
+
+        public void setLiveData(LiveData<List<VideoEntity>> liveData) {
+            mLiveData = liveData;
+        }
+
+        public final LiveData<List<VideoEntity>> getLiveData() {
+            return mLiveData;
+        }
     }
 }

@@ -40,12 +40,10 @@ import android.support.v17.leanback.supportleanbackshowcase.app.room.network.Dow
 import android.support.v17.leanback.supportleanbackshowcase.app.room.network.NetworkLiveData;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.ui.LiveDataRowPresenter;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.ui.VideoCardPresenter;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.viewmodel.VideosInSameCategoryViewModel;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.viewmodel.VideosViewModel;
 import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.ListRow;
-import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.OnItemViewClickedListener;
 import android.support.v17.leanback.widget.OnItemViewSelectedListener;
 import android.support.v17.leanback.widget.Presenter;
@@ -69,7 +67,7 @@ import java.util.List;
 
 public class LiveDataFragment extends BrowseSupportFragment
         implements DownloadCompleteBroadcastReceiver.DownloadCompleteListener,
-        LiveDataRowPresenter.StartEntranceListener{
+        LiveDataRowPresenter.DataLoadedListener {
 
     // For debugging purpose
     private static final Boolean DEBUG = false;
@@ -104,7 +102,7 @@ public class LiveDataFragment extends BrowseSupportFragment
         mRowPresenter = new LiveDataRowPresenter();
 
         // register the listener for start entrance transition notification
-        mRowPresenter.registerStartEntranceListener(this);
+        mRowPresenter.registerDataLoadedListener(this);
 
 
         // the adapter which contains all the rows
@@ -174,7 +172,7 @@ public class LiveDataFragment extends BrowseSupportFragment
      * Perform StartEntranceTransition when the item (row) is bound to the view holder
      */
     @Override
-    public void startEntrance() {
+    public void onDataLoaded() {
         startEntranceTransition();
     }
 
