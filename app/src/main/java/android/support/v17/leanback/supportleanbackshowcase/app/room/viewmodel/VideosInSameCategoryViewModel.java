@@ -37,14 +37,16 @@ public class VideosInSameCategoryViewModel extends AndroidViewModel {
      */
     private final LiveData<List<VideoEntity>> mVideosInSameCategory;
 
+    // instance of the repository
+    private final VideosRepository mRepository;
+
 
     public VideosInSameCategoryViewModel(@NonNull Application application, final String category) {
         super(application);
-        this.mCategory = category;
+        mCategory = category;
+        mRepository = VideosRepository.getVideosRepositoryInstance();
 
-        mVideosInSameCategory = VideosRepository
-                .getVideosRepositoryInstance()
-                .getVideosInSameCategoryLiveData(mCategory);
+        mVideosInSameCategory =mRepository.getVideosInSameCategoryLiveData(mCategory);
     }
 
     /**
@@ -74,5 +76,9 @@ public class VideosInSameCategoryViewModel extends AndroidViewModel {
         public <T extends ViewModel> T create(Class<T> modelClass) {
             return (T) new VideosInSameCategoryViewModel(mApplication, mCategory);
         }
+    }
+
+    public void updateDatabase(VideoEntity video, String category, String value) {
+        mRepository.updateDatabase(video, category, value);
     }
 }

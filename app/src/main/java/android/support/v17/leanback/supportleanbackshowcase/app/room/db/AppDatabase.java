@@ -24,7 +24,7 @@ import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.V
 
 @Database(entities = {VideoEntity.class, CategoryEntity.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase{
-    static final String DATABASE_NAME = "leanback_showcase.db";
+    public static final String DATABASE_NAME = "leanback_showcase.db";
 
     public abstract VideoDao videoDao();
 

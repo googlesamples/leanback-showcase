@@ -33,7 +33,6 @@ import android.support.v17.leanback.media.MediaPlayerGlue;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.adapter.ListAdapter;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.config.AppConfiguration;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.DatabaseHelper;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.network.NetworkLiveData;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.ui.DetailsDescriptionPresenter;
@@ -345,7 +344,7 @@ public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSuppor
                         }
 
                         // update the database with rented field
-                        DatabaseHelper.getInstance().updateDatabase(mObservedVideo, RENTED, "");
+                        mViewModel.updateDatabase(mObservedVideo, RENTED, "");
                         return null;
                     }
                 }.execute();

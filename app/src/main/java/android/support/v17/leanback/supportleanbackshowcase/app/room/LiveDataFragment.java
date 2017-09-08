@@ -32,18 +32,18 @@ import android.support.v17.leanback.app.BrowseSupportFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.adapter.ListAdapter;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.config.AppConfiguration;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.DatabaseHelper;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.CategoryEntity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.network.DownloadCompleteBroadcastReceiver;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.network.DownloadingTaskDescription;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.network.NetworkLiveData;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.ui.LiveDataRowPresenter;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.ui.VideoCardPresenter;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.viewmodel.VideosInSameCategoryViewModel;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.viewmodel.VideosViewModel;
 import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.ListRow;
+import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.OnItemViewClickedListener;
 import android.support.v17.leanback.widget.OnItemViewSelectedListener;
 import android.support.v17.leanback.widget.Presenter;
@@ -66,8 +66,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class LiveDataFragment extends BrowseSupportFragment
-        implements DownloadCompleteBroadcastReceiver.DownloadCompleteListener,
-        LiveDataRowPresenter.DataLoadedListener {
+        implements DownloadCompleteBroadcastReceiver.DownloadCompleteListener {
 
     // For debugging purpose
     private static final Boolean DEBUG = false;
@@ -92,21 +91,13 @@ public class LiveDataFragment extends BrowseSupportFragment
     private ListAdapter<ListRow> mRowsAdapter;
     private VideoEntity mSelectedVideo;
     private VideosViewModel mViewModel;
-    private LiveDataRowPresenter mRowPresenter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // presenter for each row
-        mRowPresenter = new LiveDataRowPresenter();
-
-        // register the listener for start entrance transition notification
-        mRowPresenter.registerDataLoadedListener(this);
-
-
         // the adapter which contains all the rows
-        mRowsAdapter = new ListAdapter<>(mRowPresenter);
+        mRowsAdapter = new ListAdapter<>(new ListRowPresenter());
         setAdapter(mRowsAdapter);
 
         mBackgroundManager = BackgroundManager.getInstance(getActivity());
@@ -168,13 +159,6 @@ public class LiveDataFragment extends BrowseSupportFragment
         subscribeUi(mViewModel);
     }
 
-    /**
-     * Perform StartEntranceTransition when the item (row) is bound to the view holder
-     */
-    @Override
-    public void onDataLoaded() {
-        startEntranceTransition();
-    }
 
     /**
      * Implement downloading completion listener
@@ -194,7 +178,7 @@ public class LiveDataFragment extends BrowseSupportFragment
                         if (AppConfiguration.IS_NETWORK_LATENCY_ENABLED) {
                             addLatency(3000L);
                         }
-                        DatabaseHelper.getInstance().updateDatabase(videoEntity, VIDEO, desc.getStoragePath());
+                        mViewModel.updateDatabase(videoEntity, VIDEO, desc.getStoragePath());
                         return null;
                     }
 
@@ -217,7 +201,7 @@ public class LiveDataFragment extends BrowseSupportFragment
                         if (AppConfiguration.IS_NETWORK_LATENCY_ENABLED) {
                             addLatency(2000L);
                         }
-                        DatabaseHelper.getInstance().updateDatabase(videoEntity, BACKGROUND, desc.getStoragePath());
+                        mViewModel.updateDatabase(videoEntity, BACKGROUND, desc.getStoragePath());
                         return null;
                     }
 
@@ -237,10 +221,10 @@ public class LiveDataFragment extends BrowseSupportFragment
                     @Override
                     protected Void doInBackground(Void... voids) {
 
-                        if (AppConfiguration.IS_NETWORK_LATENCY_ENABLED){
+                        if (AppConfiguration.IS_NETWORK_LATENCY_ENABLED) {
                             addLatency(1000L);
                         }
-                        DatabaseHelper.getInstance().updateDatabase(videoEntity, CARD, desc.getStoragePath());
+                        mViewModel.updateDatabase(videoEntity, CARD, desc.getStoragePath());
                         return null;
                     }
 
@@ -261,14 +245,11 @@ public class LiveDataFragment extends BrowseSupportFragment
      * Helper function to observe network status
      */
     private void subscribeNetworkInfo() {
-        NetworkLiveData.get(mFragmentActivity).observe(mLifecycleOwner, new Observer<Boolean>() {
+        NetworkLiveData.sync(mFragmentActivity).observe(mLifecycleOwner, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
                 if (aBoolean) {
                     getActivity().findViewById(R.id.no_internet).setVisibility(View.GONE);
-
-                    // When network is available, always try to recreate the database.
-                    DatabaseHelper.getInstance().createDb(getActivity());
                 } else {
                     getActivity().findViewById(R.id.no_internet).setVisibility(View.VISIBLE);
                 }
@@ -292,22 +273,65 @@ public class LiveDataFragment extends BrowseSupportFragment
                             // Prepare all the rows in current fragment
                             for (CategoryEntity categoryEntity : categoryEntities) {
 
+                                final ListAdapter<VideoEntity> adapter =
+                                        new ListAdapter<>(new VideoCardPresenter());
+
+                                String category = categoryEntity.getCategoryName();
+
+                                // each category will have a separate view model
+                                VideosInSameCategoryViewModel.Factory factory =
+                                        new VideosInSameCategoryViewModel.Factory(
+                                                getActivity().getApplication(), category);
+
+                                // view model will not be re-created as long as the lifecycle owner
+                                // lifecycle observer and tag doesn't change
+                                VideosInSameCategoryViewModel viewModel =
+                                        ViewModelProviders.of(mFragmentActivity, factory).get(
+                                                category, VideosInSameCategoryViewModel.class);
+
+                                viewModel.getVideosInSameCategory().observe(mLifecycleOwner,
+                                        new Observer<List<VideoEntity>>() {
+                                            @Override
+                                            public void onChanged(
+                                                    @Nullable List<VideoEntity> videoEntities) {
+                                                if (videoEntities != null) {
+                                                    startEntranceTransition();
+                                                    adapter.setItems(videoEntities,
+                                                            new Comparator<VideoEntity>() {
+                                                                @Override
+                                                                public int compare(VideoEntity o1,
+                                                                                   VideoEntity o2) {
+                                                                    return o1.getId() == o2.getId() ? 0 : -1;
+                                                                }
+                                                            }, new Comparator<VideoEntity>() {
+                                                                @Override
+                                                                public int compare(VideoEntity o1,
+                                                                                   VideoEntity o2) {
+                                                                    return o1.equals(o2) ? 0 : -1;
+                                                                }
+                                                            });
+                                                }
+                                            }
+                                        });
+
                                 // create current category row
-                                ListRow row = new ListRow(new HeaderItem(categoryEntity.getCategoryName()),
-                                        new ListAdapter<>(new VideoCardPresenter()));
+                                ListRow row = new ListRow(categoryEntity.getId(),
+                                        new HeaderItem(categoryEntity.getCategoryName()), adapter);
                                 rows.add(row);
                             }
 
+                            // first comparator: same item comparator
+                            // second comparator: same content comparator
                             mRowsAdapter.setItems(rows, new Comparator<ListRow>() {
                                 @Override
                                 public int compare(ListRow o1, ListRow o2) {
-                                    return o1.getHeaderItem().getName().equals(
-                                            o2.getHeaderItem().getName()) ? 0 : -1;
+                                    return o1.getId() == o2.getId() ? 0 : -1;
                                 }
                             }, new Comparator<ListRow>() {
                                 @Override
                                 public int compare(ListRow o1, ListRow o2) {
-                                    return o1.getHeaderItem().getName().equals(o2.getHeaderItem().getName()) ? 0 : -1;
+                                    return o1.getHeaderItem().getName()
+                                            .equals(o2.getHeaderItem().getName()) ? 0 : -1;
                                 }
                             });
                         }
@@ -349,7 +373,6 @@ public class LiveDataFragment extends BrowseSupportFragment
 
         mHandler.removeCallbacks(mBackgroundRunnable);
     }
-
 
     /**
      * Click listener

@@ -26,7 +26,6 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.config.AppConfiguration;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.DatabaseHelper;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.network.NetworkLiveData;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.network.NetworkManagerUtil;
@@ -194,7 +193,7 @@ public class VideoCardPresenter extends Presenter {
                         @Override
                         protected Void doInBackground(VideoEntity... videos) {
                             mVideoEntity = videos[0];
-                            DatabaseHelper.getInstance().updateDatabase(mVideoEntity, STATUS, DOWNLOADING);
+                            mViewModel.updateDatabase(mVideoEntity, STATUS, DOWNLOADING);
                             return null;
                         }
                     }.execute(mVideo);
@@ -207,7 +206,7 @@ public class VideoCardPresenter extends Presenter {
                         @Override
                         protected Void doInBackground(VideoEntity... videos) {
                             mVideoEntity = videos[0];
-                            DatabaseHelper.getInstance().updateDatabase(mVideoEntity, STATUS, REMOVING);
+                            mViewModel.updateDatabase(mVideoEntity, STATUS, REMOVING);
                             return null;
                         }
                     }.execute(mVideo);
@@ -399,7 +398,7 @@ public class VideoCardPresenter extends Presenter {
                                 break;
                         }
                     }
-                    DatabaseHelper.getInstance().updateDatabase(par.getVideo(), cat, "");
+                    mViewModel.updateDatabase(par.getVideo(), cat, "");
                 } else {
                     if (DEBUG) {
                         Log.e(TAG, "doInBackground (delete file): " + url + " cannot find file");

@@ -22,7 +22,6 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.DatabaseHelper;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.repo.VideosRepository;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.CategoryEntity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
@@ -41,18 +40,20 @@ public class VideosViewModel extends AndroidViewModel {
     private final MutableLiveData<Long> mVideoId = new MutableLiveData<>();
     private final MutableLiveData<String> mVideoCategory = new MutableLiveData<>();
 
+    private final VideosRepository mRepository;
+
     public VideosViewModel(Application application) {
         super(application);
 
-        final VideosRepository instance = VideosRepository.getVideosRepositoryInstance();
+        mRepository = VideosRepository.getVideosRepositoryInstance();
 
-        mAllCategories = instance.getAllCategories();
+        mAllCategories = mRepository.getAllCategories();
 
         mSearchResults = Transformations.switchMap(
                 mQuery, new Function<String, LiveData<List<VideoEntity>>>() {
                     @Override
                     public LiveData<List<VideoEntity>> apply(final String queryMessage) {
-                        return instance.getSearchResult(queryMessage);
+                        return mRepository.getSearchResult(queryMessage);
                     }
                 });
 
@@ -61,7 +62,7 @@ public class VideosViewModel extends AndroidViewModel {
                 mVideoId, new Function<Long, LiveData<VideoEntity>>() {
                     @Override
                     public LiveData<VideoEntity> apply(final Long videoId) {
-                        return instance.getVideoById(videoId);
+                        return mRepository.getVideoById(videoId);
                     }
                 });
 
@@ -72,7 +73,7 @@ public class VideosViewModel extends AndroidViewModel {
         mAllVideosByCategory = Transformations.switchMap(mVideoCategory, new Function<String, LiveData<List<VideoEntity>>>() {
             @Override
             public LiveData<List<VideoEntity>> apply(String category) {
-                return instance.getVideosInSameCategoryLiveData(category);
+                return mRepository.getVideosInSameCategoryLiveData(category);
             }
         });
     }
@@ -103,5 +104,9 @@ public class VideosViewModel extends AndroidViewModel {
 
     public void setCategory(String category) {
         mVideoCategory.setValue(category);
+    }
+
+    public void updateDatabase(VideoEntity video, String category, String value) {
+        mRepository.updateDatabase(video, category, value);
     }
 }
