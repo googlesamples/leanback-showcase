@@ -93,14 +93,13 @@ public class LiveDataFragment extends BrowseSupportFragment
     private ListAdapter<ListRow> mRowsAdapter;
     private VideoEntity mSelectedVideo;
     private VideosViewModel mViewModel;
-    private LiveDataRowPresenter mRowPresenter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // presenter for each row
-        mRowPresenter = new LiveDataRowPresenter();
+        LiveDataRowPresenter mRowPresenter = new LiveDataRowPresenter();
 
         // register the listener for start entrance transition notification
         mRowPresenter.registerDataLoadedListener(this);
