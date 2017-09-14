@@ -99,14 +99,14 @@ public class LiveDataFragment extends BrowseSupportFragment
         super.onCreate(savedInstanceState);
 
         // presenter for each row
-        LiveDataRowPresenter mRowPresenter = new LiveDataRowPresenter();
+        LiveDataRowPresenter rowPresenter = new LiveDataRowPresenter();
 
         // register the listener for start entrance transition notification
-        mRowPresenter.registerDataLoadedListener(this);
+        rowPresenter.registerDataLoadedListener(this);
 
 
         // the adapter which contains all the rows
-        mRowsAdapter = new ListAdapter<>(mRowPresenter);
+        mRowsAdapter = new ListAdapter<>(rowPresenter);
         setAdapter(mRowsAdapter);
 
         mBackgroundManager = BackgroundManager.getInstance(getActivity());
