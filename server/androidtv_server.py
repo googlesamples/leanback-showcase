@@ -50,13 +50,9 @@ class MovieOverview(ndb.Model):
     studio = ndb.StringProperty(indexed=False, required=True)
 
 
-# global variable to track database status
-# when the database is created, this flag will be toggled to true
-DATABASE_CREATED = False
-
 # global variable to track movie's id
 # for same video, the MovieClip and MovieOverview will share the same id
-movie_id = 0
+MOVIE_ID = 0
 
 # All movies' meta information
 MOVIES = """
@@ -388,7 +384,7 @@ MOVIES = """
 class GetVideosInSameCategory(webapp2.RequestHandler):
     def get(self):
         # add artificial random latency
-        time.sleep(generateRandomLatency())
+        time.sleep(generate_random_latency())
 
         category = self.request.get('category')
         # we will randomize the database every time when the request is received by server
@@ -421,7 +417,7 @@ class GetVideosInSameCategory(webapp2.RequestHandler):
 class GetAllCategory(webapp2.RequestHandler):
     def get(self):
         # add artificial random latency
-        time.sleep(generateRandomLatency())
+        time.sleep(generate_random_latency())
 
         categories = getAllCategory()
 
@@ -455,7 +451,7 @@ class GetAllCategory(webapp2.RequestHandler):
 class GetVideoById(webapp2.RequestHandler):
     def get(self):
         # add artificial random latency
-        time.sleep(generateRandomLatency())
+        time.sleep(generate_random_latency())
 
         # get id information from url
         id = self.request.get('id')
@@ -474,7 +470,7 @@ class UnRentVideo(webapp2.RequestHandler):
     # using post method to handle this request
     def post(self):
         # add artificial random latency
-        time.sleep(generateRandomLatency())
+        time.sleep(generate_random_latency())
 
         # extract id information from post url
         id = int(self.request.get('id'))
@@ -485,7 +481,7 @@ class UnRentVideo(webapp2.RequestHandler):
 class RentVideo(webapp2.RequestHandler):
     def post(self):
         # add artificial random latency
-        time.sleep(generateRandomLatency())
+        time.sleep(generate_random_latency())
 
         id = int(self.request.get('id'))
         rent_video_by_id(id)
@@ -495,13 +491,16 @@ class RentVideo(webapp2.RequestHandler):
 class CreateDb(webapp2.RequestHandler):
     def get(self):
         # add artificial random latency
-        time.sleep(generateRandomLatency())
+        time.sleep(generate_random_latency())
 
-        global DATABASE_CREATED
-        if not DATABASE_CREATED:
-            createDataBase()
-            DATABASE_CREATED = True
+        # call the following function to find to initialize the global MOVIE_ID
+
+        if not is_database_created():
+            create_database()
             self.response.write("Database Created")
+        else:
+            # if the database is created, just update the global MOVIE_ID starts with the largest id + 1
+            find_largest_id()
 
 
 # handler to clear database
@@ -509,13 +508,11 @@ class CreateDb(webapp2.RequestHandler):
 class ClearDb(webapp2.RequestHandler):
     def get(self):
         # add artificial random latency
-        time.sleep(generateRandomLatency())
+        time.sleep(generate_random_latency())
 
-        global DATABASE_CREATED
-        if DATABASE_CREATED:
+        if is_database_created():
             clear_database()
             self.response.write("Database Cleared")
-            DATABASE_CREATED = False
 
 
 # handler to duplicate specific category
@@ -523,7 +520,7 @@ class ClearDb(webapp2.RequestHandler):
 class DuplicateCategory(webapp2.RequestHandler):
     def get(self):
         # add artificial random latency
-        time.sleep(generateRandomLatency())
+        time.sleep(generate_random_latency())
 
         test_channel = "Google+"
         duplicate_category(test_channel)
@@ -535,35 +532,53 @@ class DuplicateCategory(webapp2.RequestHandler):
 class RemoveDuplicatedCategory(webapp2.RequestHandler):
     def get(self):
         # add artificial random latency
-        time.sleep(generateRandomLatency())
+        time.sleep(generate_random_latency())
 
         test_channel = "Google+"
         remove_duplicate_category(test_channel)
         self.response.write("Duplicated Channel Removed")
 
 
+# handler to return if database is created
+# only for testing purpose
+class IsDatabaseCreated(webapp2.RequestHandler):
+    def get(self):
+
+        # is_database_created() function
+        self.response.write(is_database_created())
+
+# handler to find the largest id in database
+# only for testing purpose
+class FindLargestIdInDatabase(webapp2.RequestHandler):
+    def get(self):
+        global MOVIE_ID
+        find_largest_id()
+
+        # test if MOVIE_ID global variable is created correctly
+        self.response.write(MOVIE_ID)
+
 # helper function to create database
 # shouldn't be called by client directly
-def createDataBase():
+def create_database():
     videosCapturedInCategory = json.loads(MOVIES)
-    global movie_id
+    global MOVIE_ID
     for each in videosCapturedInCategory:
         cat = Category(category=each['category'])
         cat.put()
         for each_video in each['videos']:
-            video = MovieClip(id=movie_id,
+            video = MovieClip(id=MOVIE_ID,
                               category=cat.category,
                               description=each_video["description"], source=each_video["sources"][0],
                               card=each_video["card"], background=each_video["background"],
                               title=each_video["title"], studio=each_video["studio"], rented=False)
-            videoOverview = MovieOverview(id=movie_id,
+            videoOverview = MovieOverview(id=MOVIE_ID,
                                           category=cat.category,
                                           source=each_video["sources"][0],
                                           card=each_video["card"], background=each_video["background"],
                                           title=each_video["title"], studio=each_video["studio"])
             videoOverview.put()
             video.put()
-            movie_id += 1
+            MOVIE_ID += 1
 
 
 # helper function to find MovieClip through specific id
@@ -576,7 +591,6 @@ def get_detailed_video_by_id(id):
 # we have three tables in our database: MovieClip/ MovieClipOverview/ Category
 # all those information will be cleared through this function
 def clear_database():
-
     # clear the category table
     for category in Category.query().fetch():
         category.key.delete()
@@ -599,38 +613,38 @@ def duplicate_category(category):
     new_category = category + "_dup"
     duplicated_category = Category(category=new_category)
     duplicated_category.put()
-    global movie_id
+    global MOVIE_ID
     for each in movies:
 
         # create new movie/ movie overview in the new category
-        new_movie_overview = MovieOverview(id=movie_id,
+        new_movie_overview = MovieOverview(id=MOVIE_ID,
                                            category=new_category,
                                            source=each.source,
                                            card=each.card, background=each.background,
                                            title=each.title, studio=each.studio)
-        new_movie = MovieClip(id=movie_id,
+        new_movie = MovieClip(id=MOVIE_ID,
                               category=new_category,
                               description=each.description, source=each.source,
                               card=each.card, background=each.background,
                               title=each.title, studio=each.studio, rented=False)
         # the overview and movie should share the same id, so the id will only be incremented once
-        movie_id += 1
+        MOVIE_ID += 1
 
         # insert the same video clip/ overview in the previous category
-        movie_in_same_category_duplicate_overview = MovieOverview(id=movie_id,
+        movie_in_same_category_duplicate_overview = MovieOverview(id=MOVIE_ID,
                                                                   category=category,
                                                                   source=each.source,
                                                                   card=each.card, background=each.background,
                                                                   title=each.title, studio=each.studio)
 
-        movie_in_same_category_duplicate = MovieClip(id=movie_id,
+        movie_in_same_category_duplicate = MovieClip(id=MOVIE_ID,
                                                      category=category,
                                                      description=each.description, source=each.source,
                                                      card=each.card, background=each.background,
                                                      title=each.title, studio=each.studio, rented=False)
 
         # the overview and movie should share the same id, so the id will only be incremented once
-        movie_id += 1
+        MOVIE_ID += 1
 
         # insert them in database
         new_movie.put()
@@ -726,8 +740,34 @@ def update_category_name(old_category, new_category):
         overview.put()
 
 
+# helper function to judge if the database is created or not
+def is_database_created():
+    if len(Category.query().fetch()) > 0 \
+            or len(MovieClip.query().fetch()) > 0 \
+            or len(MovieOverview.query().fetch()) > 0:
+        return True
+    return False
+
+
+# helper function to find the largest id in database if the database is existed
+def find_largest_id():
+
+    # update globla movie id
+    global MOVIE_ID
+
+    if is_database_created():
+        # if the database is already created, find the largest id from existed entity. And start with the largest
+        # id + 1
+        movie_with_largest_id = sorted(MovieClip.query().fetch(), key = lambda x: -x.to_dict()['id'])[0]
+        MOVIE_ID = movie_with_largest_id.to_dict()['id'] + 2
+    else:
+        # otherwise initialize the start id to be 0
+        MOVIE_ID = 0
+
+
+
 # helper function to generate a random number to add artificial network request latency
-def generateRandomLatency():
+def generate_random_latency():
     return random.randrange(2, 5)
 
 # create handler and url mapping
@@ -744,10 +784,26 @@ app = webapp2.WSGIApplication([
     # shouldn't be used by client
     ('/duplicate_test_remove', RemoveDuplicatedCategory),
 
-    # server's api
+    # shouldn't be used by client
+    ('/is_database_created', IsDatabaseCreated),
+
+    # shouldn't be used by client
+    ('/find_largest_movie_id', FindLargestIdInDatabase),
+
+    # server's api (can be used publicly)
+
+    # api to get all categories
     ('/get_all_categories', GetAllCategory),
+
+    # api to get all videos in a specific category
     ('/get_videos_by_category', GetVideosInSameCategory),
+
+    # api to get video through id
     ('/get_video_by_id', GetVideoById),
+
+    # api to update video's is rented information to true
     ('/rent_video', RentVideo),
+
+    # api to update video's is rented information to false
     ('/un_rent_video', UnRentVideo),
 ], debug=True)
