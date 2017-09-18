@@ -17,6 +17,7 @@
 import json
 import random
 import webapp2
+import time
 from google.appengine.ext import ndb
 
 
@@ -386,6 +387,9 @@ MOVIES = """
 # the category information will be passed from the url
 class GetVideosInSameCategory(webapp2.RequestHandler):
     def get(self):
+        # add artificial random latency
+        time.sleep(generateRandomLatency())
+
         category = self.request.get('category')
         # we will randomize the database every time when the request is received by server
         if random.random() > 0.5:
@@ -416,6 +420,9 @@ class GetVideosInSameCategory(webapp2.RequestHandler):
 # handler to get all video's categories
 class GetAllCategory(webapp2.RequestHandler):
     def get(self):
+        # add artificial random latency
+        time.sleep(generateRandomLatency())
+
         categories = getAllCategory()
 
         # we will chose a category randomly and change it's name randomly
@@ -433,7 +440,7 @@ class GetAllCategory(webapp2.RequestHandler):
             new_categoryName = old_categoryName + '_new'
 
         # when the new category name is valid, update the category and all movies/ movies overview in this category
-        if not new_categoryName:
+        if new_categoryName:
             update_category_name(old_category=old_categoryName, new_category=new_categoryName)
             categories = getAllCategory()
             random.shuffle(categories)
@@ -447,6 +454,9 @@ class GetAllCategory(webapp2.RequestHandler):
 # handler to handle get specific video through id request
 class GetVideoById(webapp2.RequestHandler):
     def get(self):
+        # add artificial random latency
+        time.sleep(generateRandomLatency())
+
         # get id information from url
         id = self.request.get('id')
 
@@ -463,6 +473,9 @@ class GetVideoById(webapp2.RequestHandler):
 class UnRentVideo(webapp2.RequestHandler):
     # using post method to handle this request
     def post(self):
+        # add artificial random latency
+        time.sleep(generateRandomLatency())
+
         # extract id information from post url
         id = int(self.request.get('id'))
         unrent_video_by_id(id)
@@ -471,6 +484,9 @@ class UnRentVideo(webapp2.RequestHandler):
 # handler to rent the video
 class RentVideo(webapp2.RequestHandler):
     def post(self):
+        # add artificial random latency
+        time.sleep(generateRandomLatency())
+
         id = int(self.request.get('id'))
         rent_video_by_id(id)
 
@@ -478,6 +494,9 @@ class RentVideo(webapp2.RequestHandler):
 # shouldn't be called by client
 class CreateDb(webapp2.RequestHandler):
     def get(self):
+        # add artificial random latency
+        time.sleep(generateRandomLatency())
+
         global DATABASE_CREATED
         if not DATABASE_CREATED:
             createDataBase()
@@ -489,6 +508,9 @@ class CreateDb(webapp2.RequestHandler):
 # shouldn't be called by client
 class ClearDb(webapp2.RequestHandler):
     def get(self):
+        # add artificial random latency
+        time.sleep(generateRandomLatency())
+
         global DATABASE_CREATED
         if DATABASE_CREATED:
             clear_database()
@@ -500,6 +522,9 @@ class ClearDb(webapp2.RequestHandler):
 # only used for testing purpose, shouldn't be called by client
 class DuplicateCategory(webapp2.RequestHandler):
     def get(self):
+        # add artificial random latency
+        time.sleep(generateRandomLatency())
+
         test_channel = "Google+"
         duplicate_category(test_channel)
         self.response.write("Duplicated Channel Created")
@@ -509,10 +534,16 @@ class DuplicateCategory(webapp2.RequestHandler):
 # only used for testing purpose, shouldn't be called by client
 class RemoveDuplicatedCategory(webapp2.RequestHandler):
     def get(self):
+        # add artificial random latency
+        time.sleep(generateRandomLatency())
+
         test_channel = "Google+"
         remove_duplicate_category(test_channel)
         self.response.write("Duplicated Channel Removed")
 
+
+# helper function to create database
+# shouldn't be called by client directly
 def createDataBase():
     videosCapturedInCategory = json.loads(MOVIES)
     global movie_id
