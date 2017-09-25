@@ -379,79 +379,117 @@ MOVIES = """
 """
 
 
-# handler to get all videos in same category
+# handler to get all videos in a category
 # the category information will be passed from the url
 class GetVideosInSameCategory(webapp2.RequestHandler):
     def get(self):
-        # add artificial random latency
-        time.sleep(generate_random_latency())
 
         category = self.request.get('category')
-        # we will randomize the database every time when the request is received by server
-        if random.random() > 0.5:
 
-            # in this randomize method, for category x, we will copy all the movie from category x
-            # and create a new category "x_dup"
-            # also for all the movie/ movie overview in category "x", it will be duplicated
-            duplicate_category(category)
-        else:
-
-            # in this randomize method, for category x, if the duplicated category is existed
-            # i.e. if category "x_dup" is existed, we will remove this category and all video clips
-            # in this category (the movie, movie overview and category are put in different table,
-            # but they are associated with each other)
-            # also for all the movie/ movie overview in category "x", it will be duplicated
-            remove_duplicate_category(category)
         movies = get_videos_in_same_category(category)
-
-        # we will shuffle the result every time for testing purpose
-        random.shuffle(movies)
 
         # return the result in json format
         self.response.write(
             json.dumps([mov.to_dict() for mov in movies])
-        )
+            )
 
+# handler to get all videos in a category
+# the category information will be passed from the url
+# and instead of using random factor in the server directly, different handler will be allocated with different url
+# so client can decide whih endpoint to hit
+class GetShuffledVideosInSameCategory(webapp2.RequestHandler):
+    def get(self):
+
+        category = self.request.get('category')
+
+        movies = get_videos_in_same_category(category)
+
+        shuffleVideosInCategory(movies)
+
+        # return the result in json format
+        self.response.write(
+            json.dumps([mov.to_dict() for mov in movies])
+            )
+
+# handler to return all the videos from a category
+# also this channel will be duplicated
+class GetVideosInSameCategoryAndDuplicateToNewCategory(webapp2.RequestHandler):
+    def get(self):
+
+        # the url format should be base_url?from=old_category_name&to=new_category_name
+        old_category = self.request.get('from')
+
+        # extract the string from the url
+        new_category = self.request.get('to')
+
+        # duplicate the channel to a new channel
+        duplicate_category_to_new_category(old_category, new_category)
+
+        # also the old channel will have the duplicated video clip
+        create_video_duplication_in_current_channel(old_category)
+
+        movies = get_videos_in_same_category(old_category)
+
+        # return the result in json format
+        self.response.write(
+            json.dumps([mov.to_dict() for mov in movies])
+            )
+
+# handler to return all the videos from a category in a shuffled order
+# also this channel will be duplicated
+class GetShuffledVideosInSameCategoryAndDuplicateToNewCategory(webapp2.RequestHandler):
+    def get(self):
+
+        # the url format should be base_url?from=old_category_name&to=new_category_name
+        old_category = self.request.get('from')
+
+        # extract the string from the url
+        new_category = self.request.get('to')
+
+        # duplicate the channel to a new channel
+        duplicate_category_to_new_category(old_category, new_category)
+
+        # also the old channel will have the duplicated video clip
+        create_video_duplication_in_current_channel(old_category)
+
+        movies = get_videos_in_same_category(old_category)
+
+        shuffleVideosInCategory(movies)
+
+        # return the result in json format
+        self.response.write(
+            json.dumps([mov.to_dict() for mov in movies])
+            )
 
 # handler to get all video's categories
-class GetAllCategory(webapp2.RequestHandler):
+class GetAllCategories(webapp2.RequestHandler):
     def get(self):
-        # add artificial random latency
-        time.sleep(generate_random_latency())
 
         categories = getAllCategory()
-
-        # we will chose a category randomly and change it's name randomly
-        random_index = random.randrange(0, len(categories))
-        random.shuffle(categories)
-        old_categoryName = categories[random_index].category
-
-        # generate a new category name based on it's previous name
-        # it could be one of the following two scenarios
-        # 1. the last character is removed
-        # 2. the '_new' is append at the end
-        if random.random() > 0.5:
-            new_categoryName = old_categoryName[0:len(old_categoryName) - 1]
-        else:
-            new_categoryName = old_categoryName + '_new'
-
-        # when the new category name is valid, update the category and all movies/ movies overview in this category
-        if new_categoryName:
-            update_category_name(old_category=old_categoryName, new_category=new_categoryName)
-            categories = getAllCategory()
-            random.shuffle(categories)
 
         # return the reuslt in json format
         self.response.write(
             json.dumps([cat.to_dict() for cat in categories])
         )
 
+# handler to get all video's categories which has been shuffled
+class GetAllShuffledCategories(webapp2.RequestHandler):
+    def get(self):
+
+        categories = getAllCategory()
+
+        shuffleCategories(categories)
+
+        # return the reuslt in json format
+        self.response.write(
+            json.dumps([cat.to_dict() for cat in categories])
+            )
+
+
 
 # handler to handle get specific video through id request
 class GetVideoById(webapp2.RequestHandler):
     def get(self):
-        # add artificial random latency
-        time.sleep(generate_random_latency())
 
         # get id information from url
         id = self.request.get('id')
@@ -469,8 +507,6 @@ class GetVideoById(webapp2.RequestHandler):
 class UnRentVideo(webapp2.RequestHandler):
     # using post method to handle this request
     def post(self):
-        # add artificial random latency
-        time.sleep(generate_random_latency())
 
         # extract id information from post url
         id = int(self.request.get('id'))
@@ -480,8 +516,6 @@ class UnRentVideo(webapp2.RequestHandler):
 # handler to rent the video
 class RentVideo(webapp2.RequestHandler):
     def post(self):
-        # add artificial random latency
-        time.sleep(generate_random_latency())
 
         id = int(self.request.get('id'))
         rent_video_by_id(id)
@@ -490,8 +524,6 @@ class RentVideo(webapp2.RequestHandler):
 # shouldn't be called by client
 class CreateDb(webapp2.RequestHandler):
     def get(self):
-        # add artificial random latency
-        time.sleep(generate_random_latency())
 
         # call the following function to find to initialize the global MOVIE_ID
 
@@ -507,32 +539,16 @@ class CreateDb(webapp2.RequestHandler):
 # shouldn't be called by client
 class ClearDb(webapp2.RequestHandler):
     def get(self):
-        # add artificial random latency
-        time.sleep(generate_random_latency())
 
         if is_database_created():
             clear_database()
             self.response.write("Database Cleared")
 
 
-# handler to duplicate specific category
-# only used for testing purpose, shouldn't be called by client
-class DuplicateCategory(webapp2.RequestHandler):
-    def get(self):
-        # add artificial random latency
-        time.sleep(generate_random_latency())
-
-        test_channel = "Google+"
-        duplicate_category(test_channel)
-        self.response.write("Duplicated Channel Created")
-
-
 # handler to remove a specific category
 # only used for testing purpose, shouldn't be called by client
 class RemoveDuplicatedCategory(webapp2.RequestHandler):
     def get(self):
-        # add artificial random latency
-        time.sleep(generate_random_latency())
 
         test_channel = "Google+"
         remove_duplicate_category(test_channel)
@@ -604,54 +620,96 @@ def clear_database():
         overview.key.delete()
 
 
-# helper function duplicate the category
-def duplicate_category(category):
-    movies_in_same_category_query = MovieClip.query(MovieClip.category == category)
-    movies = movies_in_same_category_query.fetch()
+# old_cateogyr: the name of old_category which will be duplicated
+# new_category: the name of the new category which is a duplication of the old_category
+# This method will copy all the video clips from the old_category to the new_category
+def duplicate_category_to_new_category(old_category, new_category):
 
-    # create a new category named as "previous_category_name" + "_dup"
-    new_category = category + "_dup"
+    # save new category into the database
     duplicated_category = Category(category=new_category)
     duplicated_category.put()
+
+    # get all movies
+    movies_in_old_category = MovieClip.query(MovieClip.category == old_category)
+
+    # duplicate all movies in the new category
     global MOVIE_ID
-    for each in movies:
+    for each_movie in movies_in_old_category:
 
         # create new movie/ movie overview in the new category
         new_movie_overview = MovieOverview(id=MOVIE_ID,
                                            category=new_category,
-                                           source=each.source,
-                                           card=each.card, background=each.background,
-                                           title=each.title, studio=each.studio)
+                                           source=each_movie.source,
+                                           card=each_movie.card,
+                                           background=each_movie.background,
+                                           title=each_movie.title,
+                                           studio=each_movie.studio)
         new_movie = MovieClip(id=MOVIE_ID,
                               category=new_category,
-                              description=each.description, source=each.source,
-                              card=each.card, background=each.background,
-                              title=each.title, studio=each.studio, rented=False)
-        # the overview and movie should share the same id, so the id will only be incremented once
-        MOVIE_ID += 1
-
-        # insert the same video clip/ overview in the previous category
-        movie_in_same_category_duplicate_overview = MovieOverview(id=MOVIE_ID,
-                                                                  category=category,
-                                                                  source=each.source,
-                                                                  card=each.card, background=each.background,
-                                                                  title=each.title, studio=each.studio)
-
-        movie_in_same_category_duplicate = MovieClip(id=MOVIE_ID,
-                                                     category=category,
-                                                     description=each.description, source=each.source,
-                                                     card=each.card, background=each.background,
-                                                     title=each.title, studio=each.studio, rented=False)
+                              description=each_movie.description,
+                              source=each_movie.source,
+                              card=each_movie.card,
+                              background=each_movie.background,
+                              title=each_movie.title,
+                              studio=each_movie.studio,
+                              rented=False)
 
         # the overview and movie should share the same id, so the id will only be incremented once
         MOVIE_ID += 1
 
-        # insert them in database
-        new_movie.put()
         new_movie_overview.put()
-        movie_in_same_category_duplicate.put()
-        movie_in_same_category_duplicate_overview.put()
+        new_movie.put()
 
+# category: the name of the category to process
+# this method will duplicate the first
+# of the category channel
+def create_video_duplication_in_current_channel(category):
+
+    # find all the videos firstly
+    movies = MovieClip.query(MovieClip.category == category)
+
+    # select one of the video to duplicate
+    random_index = random.randrange(0, len(movies))
+    selected_movie = movies[random_index]
+
+    global MOVIE_ID
+    duplicated_video = MovieClip(id=MOVIE_ID,
+                                 category=category,
+                                 description=selected_movie.description,
+                                 source=selected_movie.source,
+                                 card=selected_movie.card,
+                                 background=selected_movie.background,
+                                 title=selected_movie.title,
+                                 studio=selected_movie.studio,
+                                 rented=False)
+
+    # also duplicate the video overview so it will be shown in the first fragment
+    # compared with video itself, the overview doesn't contain the rental information as well as the the detailed
+    # description for each video
+
+    duplicated_video_overview =MovieClip(id=MOVIE_ID,
+                                 category=category,
+                                 source=selected_movie.source,
+                                 card=selected_movie.card,
+                                 background=selected_movie.background,
+                                 title=selected_movie.title,
+                                 studio=selected_movie.studio)
+
+    # the movie id always points to next available id
+    MOVIE_ID += 1
+
+    # save to database
+    duplicated_video.put()
+    duplicated_video_overview.put()
+
+
+# shuffle the vidoes' array
+def shuffleVideosInCategory(videos):
+    random.shuffle(videos)
+
+# shuffle the cateogries' array
+def shuffleCategories(categories):
+    random.shuffle(categories)
 
 # helper function to remove the artificial duplicated category and all the related videos
 def remove_duplicate_category(category):
@@ -793,10 +851,25 @@ app = webapp2.WSGIApplication([
     # server's api (can be used publicly)
 
     # api to get all categories
-    ('/get_all_categories', GetAllCategory),
+    ('/get_categories', GetAllCategories),
+
+    # api to get all categories
+    ('/get_shuffled_categories', GetAllShuffledCategories),
 
     # api to get all videos in a specific category
     ('/get_videos_by_category', GetVideosInSameCategory),
+
+    # api to get all videos in a specific category
+    ('/get_shuffled_videos_by_category', GetShuffledVideosInSameCategory),
+
+    # api to get all videos in a specific category
+    ('/get_videos_by_category_and_duplicate_to_new_category',
+     GetVideosInSameCategoryAndDuplicateToNewCategory),
+
+    # api to get all videos in a specific category
+    ('/get_shuffled_videos_by_category_and_duplicate_to_new_category',
+     GetShuffledVideosInSameCategoryAndDuplicateToNewCategory),
+
 
     # api to get video through id
     ('/get_video_by_id', GetVideoById),
