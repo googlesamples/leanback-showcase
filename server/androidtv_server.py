@@ -545,15 +545,6 @@ class ClearDb(webapp2.RequestHandler):
             self.response.write("Database Cleared")
 
 
-# handler to remove a specific category
-# only used for testing purpose, shouldn't be called by client
-class RemoveDuplicatedCategory(webapp2.RequestHandler):
-    def get(self):
-
-        test_channel = "Google+"
-        remove_duplicate_category(test_channel)
-        self.response.write("Duplicated Channel Removed")
-
 
 # handler to return if database is created
 # only for testing purpose
@@ -663,6 +654,13 @@ def duplicate_category_to_new_category(old_category, new_category):
 # category: the name of the category to process
 # this method will duplicate the first
 # of the category channel
+#
+# NOTE: this server is mainly designed for testing purpose. When client hit this handler to request the videos from
+# specific channel, one of the videos in this category will be duplicated in the same channel. To test if
+# list adapter can leverage the diffUtil to compute the difference from the change of data set and dispatch this
+# difference correctly.
+# Similarly we have method to duplicate the category/ channel itself, since in the first fragment, all the categories
+# are also held in a list adapter.
 def create_video_duplication_in_current_channel(category):
 
     # find all the videos firstly
@@ -710,26 +708,6 @@ def shuffleVideosInCategory(videos):
 # shuffle the cateogries' array
 def shuffleCategories(categories):
     random.shuffle(categories)
-
-# helper function to remove the artificial duplicated category and all the related videos
-def remove_duplicate_category(category):
-    duplicated_category = category + "_dup"
-    if len(Category.query(Category.category == duplicated_category).fetch()) > 0:
-
-        # remove the selected category from category table
-        Category.query(Category.category == duplicated_category).fetch()[0].key.delete()
-        movies_in_same_category_query = MovieClip.query(MovieClip.category == duplicated_category)
-        movie_overviews_in_same_category_qeury = MovieOverview.query(MovieOverview.category == duplicated_category)
-        movies = movies_in_same_category_query.fetch()
-
-        # remove all associate movies
-        movie_overviews = movie_overviews_in_same_category_qeury.fetch()
-        for each in movies:
-            each.key.delete()
-
-        # remove all associate overviews
-        for each in movie_overviews:
-            each.key.delete()
 
 
 # helper function to unrent the video
@@ -835,12 +813,6 @@ app = webapp2.WSGIApplication([
 
     # shouldn't be used by client
     ('/clear', ClearDb),
-
-    # shouldn't be used by client
-    ('/duplicate_test_add', DuplicateCategory),
-
-    # shouldn't be used by client
-    ('/duplicate_test_remove', RemoveDuplicatedCategory),
 
     # shouldn't be used by client
     ('/is_database_created', IsDatabaseCreated),
