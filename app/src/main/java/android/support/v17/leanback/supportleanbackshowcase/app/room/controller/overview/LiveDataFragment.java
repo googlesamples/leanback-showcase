@@ -250,6 +250,8 @@ public class LiveDataFragment extends BrowseSupportFragment
                         if (categoryEntities != null) {
                             List<ListRow> rows = new ArrayList<>();
 
+                            // The ListRow here cannot be used with dependency injection, since it
+                            // rely on the run time information getCategoryName
                             for (CategoryEntity categoryEntity : categoryEntities) {
                                 ListRow row = new ListRow(
                                         new HeaderItem(categoryEntity.getCategoryName()),
