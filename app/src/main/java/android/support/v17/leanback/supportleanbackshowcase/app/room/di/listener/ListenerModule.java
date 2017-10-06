@@ -57,6 +57,8 @@ public class ListenerModule {
 
     private static final int BACKGROUND_UPDATE_DELAY = 300;
 
+    private RunnableClass lastTime;
+
     @PerFragment
     @Provides
     @IntoMap
@@ -148,7 +150,6 @@ public class ListenerModule {
         };
     }
 
-    private RunnableClass lastTime;
 
     @PerFragment
     @Provides
@@ -194,6 +195,10 @@ public class ListenerModule {
         };
     }
 
+    /**
+     * Define this runnable class explicitly so it can take dependency injected parameter to
+     * construct the runnable object for execution
+     */
     private class RunnableClass implements Runnable {
 
         private VideoEntity mSelectedVideo;
