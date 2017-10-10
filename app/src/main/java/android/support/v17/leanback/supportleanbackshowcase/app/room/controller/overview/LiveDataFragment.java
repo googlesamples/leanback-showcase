@@ -54,7 +54,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 // TOOD: why we need injectable interface here
 // just like regular class it can specify some component to provide
@@ -93,7 +92,6 @@ public class LiveDataFragment extends BrowseSupportFragment
     @Inject
     ViewModelProvider.Factory viewModelFactory;
 
-
     @Inject
     VideoCardPresenter videoCardPresenter;
 
@@ -108,15 +106,12 @@ public class LiveDataFragment extends BrowseSupportFragment
         AndroidSupportInjection.inject(this);
         super.onCreate(savedInstanceState);
 
-        // DaggerLiveDataFragmentComponent.builder().application(SampleApplication.getInstance())
-        //         .activity(this.getActivity()).dataLoadedListener(this).build().inject(this);
-
         Log.e(TAG, "onCreate: " + " the map is: " + viewOnSelectListenerMap.get(this.getClass()));
 
-        // Previously I forget to change it dependency injection flavor
-        // mRowsAdapter = new ListAdapter<>(rowPresenter);
+        // set top level adapter
         setAdapter(mRowsAdapter);
 
+        // retrive appropriate listener from listener map and set on it
         setOnItemViewClickedListener(viewOnClickListenerMap.get(this.getClass()));
         setOnItemViewSelectedListener(viewOnSelectListenerMap.get(this.getClass()));
         setOnSearchClickedListener(onClickListener.get(this.getClass()));

@@ -27,7 +27,6 @@ import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
 import dagger.Module;
 import dagger.Provides;
-import javax.inject.Named;
 
 @Module
 public class RowModule {
