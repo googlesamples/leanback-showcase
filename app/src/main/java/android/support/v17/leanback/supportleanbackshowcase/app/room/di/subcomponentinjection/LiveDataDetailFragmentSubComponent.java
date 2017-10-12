@@ -75,7 +75,6 @@ public interface LiveDataDetailFragmentSubComponent {
 
     void inject(LiveDataDetailViewWithVideoBackgroundFragment frag);
 
-
     DetailsSupportFragmentBackgroundController fragmentBackgroundController();
 
     MediaPlayerGlue mediaPlayerGlue();

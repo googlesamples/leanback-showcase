@@ -33,7 +33,9 @@ import android.support.v17.leanback.widget.PresenterSelector;
 import dagger.Module;
 import dagger.Provides;
 
-// the adapter should live inside of each fragment and shouldn't be shared among different fragments
+/**
+ * the adapter should live inside of each fragment and shouldn't be shared among different fragments
+ */
 @Module
 public class AdapterModule {
 

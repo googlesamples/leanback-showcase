@@ -24,7 +24,7 @@ import dagger.android.AndroidInjector;
 import dagger.android.support.FragmentKey;
 import dagger.multibindings.IntoMap;
 
-@Module
+@Module(subcomponents = LiveDataOverviewFragmentSubComponent.class)
 public abstract class FragmentBuildersModule {
 
     @Binds

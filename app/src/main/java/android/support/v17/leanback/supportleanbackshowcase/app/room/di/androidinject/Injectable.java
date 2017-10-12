@@ -1,9 +1,9 @@
 package android.support.v17.leanback.supportleanbackshowcase.app.room.di.androidinject;
 
-/**
- * Created by lijingjiang on 9/25/17.
- */
 
+/**
+ * A flag interface to inform dagger to do the dependency injection on the targeted fragment
+ */
 public interface Injectable {
 
 }

@@ -37,7 +37,6 @@ import android.support.v17.leanback.supportleanbackshowcase.app.room.di.action.q
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.action.qualifier.PlayActionQualifier;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.action.qualifier.PreviewActionQualifier;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.action.qualifier.RentActionQualifier;
-// import android.support.v17.leanback.supportleanbackshowcase.app.room.di.application.DaggerApplicationComponent;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.adapter.qualifier.DetailFragmentArrayObjectAdapterForActionsQualifier;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.adapter.qualifier.DetailFragmentArrayObjectAdapterForRowsQualifier;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.adapter.qualifier.ListAdapterForRelatedRowQualifier;
@@ -151,7 +150,10 @@ public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSuppor
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //
+
+        // As we have stated in the readme, we have used three different approach to implement the
+        // dependency injection on the app level. For LiveDataDetailViewWithVideoBackgroundFragment
+        // .java, we use the traditionaly subcomponent method to implement the DI
         DaggerApplicationComponent.builder().application(SampleApplication.getInstance())
                 .build().presenterBuilder().activity(this.getActivity())
                 .detailsSupportFragment(this).actionClickedListener(new ActionClickedListener())
@@ -267,6 +269,9 @@ public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSuppor
                 });
     }
 
+
+    // Action Listener is dependent on Runtime information. Cannot be injected in the Listener's
+    // module
     private final class ActionClickedListener implements OnActionClickedListener {
 
         @Override
@@ -297,7 +302,6 @@ public class LiveDataDetailViewWithVideoBackgroundFragment extends DetailsSuppor
             }
         }
     }
-
 
     private void loadAndSetVideoCardImage() {
         String loadedUri = findLocalContentUriOrNetworkUrl(CARD);

@@ -34,16 +34,22 @@ public class RowModule {
 
     @Provides
     @PerFragment
-    DetailsOverviewRow provideDetailsOverviewRow(@DetailFragmentArrayObjectAdapterForActionsQualifier ArrayObjectAdapter adapter) {
+    DetailsOverviewRow provideDetailsOverviewRow(
+            @DetailFragmentArrayObjectAdapterForActionsQualifier ArrayObjectAdapter adapter) {
         DetailsOverviewRow row = new DetailsOverviewRow(new Object());
         row.setActionsAdapter(adapter);
         return row;
     }
 
 
+    // In this provision method, the header item was set to "Related Row" on default, since the
+    // ListRow used in this application all starts with the same header item Related Row
+    // But the main responsibility for Dagger is to construct the object. It can be configured
+    // accordingly in the runtime.
     @Provides
     @PerFragment
-    ListRow provideRelatedListRow(@ListAdapterForRelatedRowQualifier ListAdapter<VideoEntity> relatedRowAdapter) {
+    ListRow provideRelatedListRow(
+            @ListAdapterForRelatedRowQualifier ListAdapter<VideoEntity> relatedRowAdapter) {
 
         HeaderItem mRelatedRowHeaderItem = new HeaderItem(RELATED_ROW);
         return new ListRow(mRelatedRowHeaderItem,relatedRowAdapter);

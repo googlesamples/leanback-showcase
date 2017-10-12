@@ -21,7 +21,7 @@ import android.support.v17.leanback.supportleanbackshowcase.app.room.controller.
 import dagger.Binds;
 import dagger.Module;
 
-@Module(subcomponents = LiveDataOverviewFragmentSubComponent.class)
+@Module
 public abstract class ActivityModule {
 
     @Binds
