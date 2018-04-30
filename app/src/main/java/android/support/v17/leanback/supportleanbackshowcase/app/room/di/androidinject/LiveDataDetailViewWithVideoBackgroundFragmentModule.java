@@ -17,7 +17,6 @@
 package android.support.v17.leanback.supportleanbackshowcase.app.room.di.androidinject;
 
 import android.support.v17.leanback.supportleanbackshowcase.app.room.controller.detail.LiveDataDetailViewWithVideoBackgroundFragment;
-
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.presenter.PresenterModule;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.scope.PerFragment;
 

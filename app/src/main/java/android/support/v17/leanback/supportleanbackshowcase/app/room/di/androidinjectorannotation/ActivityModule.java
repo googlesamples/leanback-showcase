@@ -18,6 +18,7 @@ package android.support.v17.leanback.supportleanbackshowcase.app.room.di.android
 
 import android.app.Activity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.controller.overview.LiveDataRowsActivity;
+
 import dagger.Binds;
 import dagger.Module;
 

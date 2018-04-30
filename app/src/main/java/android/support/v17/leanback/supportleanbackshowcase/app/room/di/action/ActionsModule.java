@@ -29,7 +29,6 @@ import android.support.v4.content.res.ResourcesCompat;
 
 import dagger.Module;
 import dagger.Provides;
-import javax.inject.Singleton;
 
 
 @Module

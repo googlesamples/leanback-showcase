@@ -18,6 +18,7 @@ package android.support.v17.leanback.supportleanbackshowcase.app.room.di.adapter
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+
 import javax.inject.Qualifier;
 
 /**

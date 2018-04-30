@@ -7,9 +7,11 @@ import android.support.v17.leanback.supportleanbackshowcase.app.room.db.dao.Cate
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.dao.VideoDao;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.androidinjectorannotation.LiveDataOverviewActivitySubcomponent;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.viewmodel.ViewModelModule;
+
+import javax.inject.Singleton;
+
 import dagger.Module;
 import dagger.Provides;
-import javax.inject.Singleton;
 
 
 @Module(includes= ViewModelModule.class, subcomponents = LiveDataOverviewActivitySubcomponent.class)

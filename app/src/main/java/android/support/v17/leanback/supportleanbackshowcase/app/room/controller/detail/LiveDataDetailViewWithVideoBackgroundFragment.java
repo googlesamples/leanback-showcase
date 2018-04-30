@@ -55,13 +55,16 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+
 import javax.inject.Inject;
 
 

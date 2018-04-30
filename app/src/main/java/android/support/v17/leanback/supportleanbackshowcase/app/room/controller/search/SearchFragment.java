@@ -37,12 +37,13 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.text.TextUtils;
 import android.view.View;
 
-import dagger.android.support.AndroidSupportInjection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+
 import javax.inject.Inject;
-import javax.inject.Named;
+
+import dagger.android.support.AndroidSupportInjection;
 
 public class SearchFragment extends android.support.v17.leanback.app.SearchSupportFragment
         implements android.support.v17.leanback.app.SearchSupportFragment.SearchResultProvider,

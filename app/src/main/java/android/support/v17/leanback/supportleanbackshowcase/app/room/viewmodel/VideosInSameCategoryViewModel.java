@@ -19,11 +19,9 @@ package android.support.v17.leanback.supportleanbackshowcase.app.room.viewmodel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.repo.VideosRepository;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.db.repo.VideosRepository;
 
 import java.util.List;
 

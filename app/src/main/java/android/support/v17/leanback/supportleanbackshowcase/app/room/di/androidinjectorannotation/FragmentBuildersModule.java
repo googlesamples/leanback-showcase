@@ -18,6 +18,7 @@ package android.support.v17.leanback.supportleanbackshowcase.app.room.di.android
 
 import android.support.v17.leanback.supportleanbackshowcase.app.room.controller.overview.LiveDataFragment;
 import android.support.v4.app.Fragment;
+
 import dagger.Binds;
 import dagger.Module;
 import dagger.android.AndroidInjector;

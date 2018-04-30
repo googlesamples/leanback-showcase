@@ -28,15 +28,13 @@ package android.support.v17.leanback.supportleanbackshowcase.app.media;
  * the License.
  *
  */
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.support.v17.leanback.widget.Action;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.PlaybackControlsRow;

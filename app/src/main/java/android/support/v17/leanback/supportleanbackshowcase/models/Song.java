@@ -16,19 +16,8 @@
 package android.support.v17.leanback.supportleanbackshowcase.models;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.support.v17.leanback.supportleanbackshowcase.R;
-import android.support.v17.leanback.widget.BaseOnItemViewSelectedListener;
 import android.support.v17.leanback.widget.MultiActionsProvider;
-import android.support.v17.leanback.widget.Row;
-import android.support.v17.leanback.widget.RowPresenter;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 public class Song implements MultiActionsProvider {

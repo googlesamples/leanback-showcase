@@ -18,11 +18,9 @@ package android.support.v17.leanback.supportleanbackshowcase.app.room.di.android
 
 
 import android.app.Activity;
-import android.support.v17.leanback.app.SearchFragment;
-import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.controller.search.SearchActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.scope.PerActivity;
-import android.support.v17.leanback.widget.SpeechRecognitionCallback;
+
 import dagger.Module;
 import dagger.Provides;
 

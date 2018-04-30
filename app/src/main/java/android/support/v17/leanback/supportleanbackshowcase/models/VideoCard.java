@@ -15,10 +15,9 @@
 package android.support.v17.leanback.supportleanbackshowcase.models;
 
 
-import com.google.gson.annotations.SerializedName;
-
-import java.io.Serializable;
 import android.support.v17.leanback.supportleanbackshowcase.R;
+
+import com.google.gson.annotations.SerializedName;
 
 /**
  * The video card data structure used to hold the fields of each video card fetched from the

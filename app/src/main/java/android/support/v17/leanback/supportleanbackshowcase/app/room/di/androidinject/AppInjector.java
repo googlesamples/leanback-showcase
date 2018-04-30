@@ -3,15 +3,13 @@ package android.support.v17.leanback.supportleanbackshowcase.app.room.di.android
 
 import android.app.Activity;
 import android.app.Application.ActivityLifecycleCallbacks;
-import android.app.FragmentManager.FragmentLifecycleCallbacks;
 import android.os.Bundle;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.controller.app.SampleApplication;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
+
 import dagger.android.AndroidInjection;
-import dagger.android.HasFragmentInjector;
 import dagger.android.support.AndroidSupportInjection;
 import dagger.android.support.HasSupportFragmentInjector;
 

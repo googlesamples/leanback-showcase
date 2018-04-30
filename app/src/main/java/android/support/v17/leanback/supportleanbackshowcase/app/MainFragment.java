@@ -29,7 +29,7 @@ import android.support.v17.leanback.supportleanbackshowcase.app.media.VideoExamp
 import android.support.v17.leanback.supportleanbackshowcase.app.media.VideoExampleWithExoPlayerActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.page.PageAndListRowActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.controller.overview.LiveDataRowsActivity;
-import android.support.v17.leanback.supportleanbackshowcase.app.rows.*;
+import android.support.v17.leanback.supportleanbackshowcase.app.rows.DynamicVideoRowsActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.settings.SettingsExampleActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.wizard.WizardExampleActivity;
 import android.support.v17.leanback.supportleanbackshowcase.cards.presenters.CardPresenterSelector;

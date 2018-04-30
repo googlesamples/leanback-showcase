@@ -15,7 +15,6 @@
 package android.support.v17.leanback.supportleanbackshowcase.app.settings;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 

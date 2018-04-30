@@ -17,9 +17,7 @@
 package android.support.v17.leanback.supportleanbackshowcase.app.room.api;
 
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.http.GET;
-import retrofit2.http.Query;
 
 /**
  * Use retrofit for network request

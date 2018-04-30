@@ -18,11 +18,10 @@ package android.support.v17.leanback.supportleanbackshowcase.app.room.di.listene
 
 import android.support.v17.leanback.widget.OnItemViewClickedListener;
 import android.support.v17.leanback.widget.OnItemViewSelectedListener;
-import android.support.v17.preference.LeanbackListPreferenceDialogFragment.ViewHolder.OnItemClickListener;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
+
 import java.util.Map;
+
 import javax.inject.Inject;
 
 public class ListenerFactory {

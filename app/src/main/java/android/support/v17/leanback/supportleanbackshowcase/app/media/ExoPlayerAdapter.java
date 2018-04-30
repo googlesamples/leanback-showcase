@@ -1,7 +1,6 @@
 package android.support.v17.leanback.supportleanbackshowcase.app.media;
 
 import android.content.Context;
-import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.v17.leanback.media.PlaybackGlueHost;

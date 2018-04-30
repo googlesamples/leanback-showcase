@@ -17,9 +17,11 @@
 package android.support.v17.leanback.supportleanbackshowcase.app.room.di.subcomponentinjection;
 
 import android.app.Application;
+
+import javax.inject.Singleton;
+
 import dagger.BindsInstance;
 import dagger.Component;
-import javax.inject.Singleton;
 
 @Singleton
 @Component(modules = {ApplicationModule.class, SubComponentInstallmentModule.class})

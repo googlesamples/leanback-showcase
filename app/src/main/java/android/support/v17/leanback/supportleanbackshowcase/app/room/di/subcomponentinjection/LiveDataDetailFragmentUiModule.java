@@ -27,6 +27,7 @@ import android.support.v17.leanback.widget.FullWidthDetailsOverviewRowPresenter;
 import android.support.v17.leanback.widget.FullWidthDetailsOverviewSharedElementHelper;
 import android.support.v17.leanback.widget.OnActionClickedListener;
 import android.support.v17.leanback.widget.PresenterSelector;
+
 import dagger.Module;
 import dagger.Provides;
 

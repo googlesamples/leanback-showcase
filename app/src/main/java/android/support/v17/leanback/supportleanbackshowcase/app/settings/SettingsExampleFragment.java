@@ -22,7 +22,6 @@ import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.preference.LeanbackPreferenceFragment;
 import android.support.v17.preference.LeanbackSettingsFragment;
 import android.support.v7.preference.DialogPreference;
-import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceScreen;
 import android.widget.Toast;

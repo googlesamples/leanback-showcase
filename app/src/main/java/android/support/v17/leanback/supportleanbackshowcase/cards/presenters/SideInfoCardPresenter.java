@@ -19,7 +19,6 @@ import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.models.Card;
 import android.support.v17.leanback.widget.BaseCardView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 

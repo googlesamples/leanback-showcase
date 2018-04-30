@@ -19,7 +19,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v17.leanback.supportleanbackshowcase.R;
-import android.support.v17.leanback.supportleanbackshowcase.app.details.DetailViewExampleWithVideoBackgroundActivity;
 import android.support.v17.leanback.widget.GuidanceStylist;
 import android.support.v17.leanback.widget.GuidedAction;
 import android.widget.Toast;

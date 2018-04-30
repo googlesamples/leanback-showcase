@@ -17,15 +17,11 @@
 package android.support.v17.leanback.supportleanbackshowcase.app.room.network;
 
 import android.app.DownloadManager;
-import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.LifecycleOwner;
-import android.arch.lifecycle.OnLifecycleEvent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;

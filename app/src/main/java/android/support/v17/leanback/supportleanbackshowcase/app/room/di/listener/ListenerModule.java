@@ -46,7 +46,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
-import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;

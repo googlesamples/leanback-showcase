@@ -21,6 +21,7 @@ import android.support.v17.leanback.supportleanbackshowcase.app.room.controller.
 import android.support.v17.leanback.supportleanbackshowcase.app.room.controller.search.SearchActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.androidinjectorannotation.LiveDataOverviewActivitySubcomponent;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.scope.PerActivity;
+
 import dagger.Binds;
 import dagger.Module;
 import dagger.android.ActivityKey;

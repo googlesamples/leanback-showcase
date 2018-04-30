@@ -17,11 +17,9 @@
 package android.support.v17.leanback.supportleanbackshowcase.app.room.di.listener;
 
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.scope.PerFragment;
-import android.support.v17.leanback.widget.OnItemViewClickedListener;
+
 import dagger.Binds;
 import dagger.Module;
-import dagger.Provides;
-import java.util.Map;
 
 // may be removed for this version (subcomponent)
 

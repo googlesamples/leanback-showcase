@@ -16,7 +16,6 @@
 package android.support.v17.leanback.supportleanbackshowcase.models;
 
 import android.content.Context;
-import android.support.v17.leanback.supportleanbackshowcase.models.Card;
 
 import com.google.gson.annotations.SerializedName;
 

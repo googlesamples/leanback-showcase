@@ -22,19 +22,16 @@ import android.support.v17.leanback.supportleanbackshowcase.app.room.di.scope.Pe
 import android.support.v17.leanback.supportleanbackshowcase.app.room.ui.DetailsDescriptionPresenter;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.ui.LiveDataRowPresenter;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.ui.LiveDataRowPresenter.DataLoadedListener;
-import android.support.v17.leanback.widget.Presenter;
-import android.support.v17.leanback.widget.PresenterSelector;
-import dagger.Module;
-import dagger.Provides;
-import java.util.Map;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.ui.VideoCardPresenter;
-import android.support.v17.leanback.supportleanbackshowcase.models.Card;
-import android.support.v17.leanback.supportleanbackshowcase.utils.CardListRow;
 import android.support.v17.leanback.widget.DetailsOverviewRow;
 import android.support.v17.leanback.widget.FullWidthDetailsOverviewRowPresenter;
 import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.Presenter;
+import android.support.v17.leanback.widget.PresenterSelector;
+
+import java.util.Map;
+
 import dagger.Module;
 import dagger.Provides;
 import dagger.multibindings.IntoMap;

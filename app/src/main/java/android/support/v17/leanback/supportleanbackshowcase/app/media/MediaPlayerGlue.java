@@ -26,8 +26,6 @@ import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.PlaybackControlsRow;
 import android.support.v17.leanback.widget.PlaybackControlsRowPresenter;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.View;
 
 /**
  * This glue extends the {@link PlaybackControlGlue} with a {@link MediaMetaData} support.

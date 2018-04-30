@@ -19,6 +19,7 @@ package android.support.v17.leanback.supportleanbackshowcase.app.room.di.android
 import android.support.v17.leanback.supportleanbackshowcase.app.room.controller.overview.LiveDataFragment;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.scope.PerFragment;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.ui.LiveDataRowPresenter.DataLoadedListener;
+
 import dagger.Module;
 import dagger.Provides;
 

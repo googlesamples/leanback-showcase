@@ -27,7 +27,6 @@ import android.support.v17.leanback.app.BrowseSupportFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.adapter.ListAdapter;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.config.AppConfiguration;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.controller.app.SampleApplication;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.CategoryEntity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.adapter.qualifier.ListAdapteWithLiveDataRowPresenterQualifier;
@@ -42,18 +41,19 @@ import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.OnItemViewClickedListener;
 import android.support.v17.leanback.widget.OnItemViewSelectedListener;
-import android.support.v17.leanback.widget.PresenterSelector;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
-import dagger.android.AndroidInjector;
-import dagger.android.support.AndroidSupportInjection;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+
 import javax.inject.Inject;
+
+import dagger.android.support.AndroidSupportInjection;
 
 // TOOD: why we need injectable interface here
 // just like regular class it can specify some component to provide

@@ -16,7 +16,6 @@ package android.support.v17.leanback.supportleanbackshowcase.app.wizard;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.v17.leanback.app.GuidedStepFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 

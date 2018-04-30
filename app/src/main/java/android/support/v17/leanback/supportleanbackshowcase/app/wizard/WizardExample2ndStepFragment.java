@@ -15,16 +15,12 @@
 package android.support.v17.leanback.supportleanbackshowcase.app.wizard;
 
 import android.app.FragmentManager;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v17.leanback.app.GuidedStepFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.widget.GuidanceStylist;
 import android.support.v17.leanback.widget.GuidedAction;
-import android.support.v17.leanback.widget.GuidedActionsStylist;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -41,9 +41,11 @@ import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.OnActionClickedListener;
 import android.support.v17.leanback.widget.OnItemViewClickedListener;
 import android.support.v17.leanback.widget.PresenterSelector;
+
+import java.util.Map;
+
 import dagger.BindsInstance;
 import dagger.Subcomponent;
-import java.util.Map;
 
 @PerFragment
 @Subcomponent(modules = {PresenterModule.class, RowModule.class,

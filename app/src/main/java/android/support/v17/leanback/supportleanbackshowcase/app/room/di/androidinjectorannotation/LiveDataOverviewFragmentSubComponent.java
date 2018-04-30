@@ -17,14 +17,15 @@
 package android.support.v17.leanback.supportleanbackshowcase.app.room.di.androidinjectorannotation;
 
 import android.support.v17.leanback.supportleanbackshowcase.app.room.controller.overview.LiveDataFragment;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.di.adapter.AdapterModule;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.display.DisplayModule;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.listener.ListenerModule;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.di.scope.PerFragment;
-import dagger.Subcomponent;
-import dagger.android.AndroidInjector;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.di.adapter.AdapterModule;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.presenter.PresenterModule;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.row.RowModule;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.di.scope.PerFragment;
+
+import dagger.Subcomponent;
+import dagger.android.AndroidInjector;
 
 @PerFragment
 @Subcomponent(modules = {ListenerModule.class, PresenterModule.class, DisplayModule.class,

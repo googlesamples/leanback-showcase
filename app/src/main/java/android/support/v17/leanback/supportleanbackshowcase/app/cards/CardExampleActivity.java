@@ -15,11 +15,7 @@
 package android.support.v17.leanback.supportleanbackshowcase.app.cards;
 
 import android.app.Activity;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v17.leanback.app.GuidedStepFragment;
-import android.support.v17.leanback.supportleanbackshowcase.app.dialog.DialogExampleFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 
 /**

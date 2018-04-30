@@ -22,11 +22,12 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.repo.VideosRepository;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.CategoryEntity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
+import android.support.v17.leanback.supportleanbackshowcase.app.room.db.repo.VideosRepository;
 
 import java.util.List;
+
 import javax.inject.Inject;
 
 public class VideosViewModel extends AndroidViewModel {

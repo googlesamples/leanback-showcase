@@ -17,8 +17,8 @@
 package android.support.v17.leanback.supportleanbackshowcase.app.room.controller.overview;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.DownloadManager;
-import android.arch.lifecycle.LifecycleActivity;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -29,17 +29,18 @@ import android.support.v17.leanback.supportleanbackshowcase.app.room.network.Per
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+
+import javax.inject.Inject;
+
 import dagger.android.AndroidInjection;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
-import dagger.android.HasFragmentInjector;
 import dagger.android.support.HasSupportFragmentInjector;
-import javax.inject.Inject;
 
 /**
  * Extend from LifecycleActivity so this activity can be used as the owner of lifecycle event
  */
-public class LiveDataRowsActivity extends LifecycleActivity implements HasSupportFragmentInjector{
+public class LiveDataRowsActivity extends Activity implements HasSupportFragmentInjector{
 
     private static final int WRITE_PERMISSION = 0;
 

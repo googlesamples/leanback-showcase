@@ -17,14 +17,12 @@ package android.support.v17.leanback.supportleanbackshowcase.app.page;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v17.leanback.supportleanbackshowcase.R;
-import android.support.v17.leanback.widget.SearchOrbView;
 import android.support.v17.leanback.widget.TitleViewAdapter;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.ImageView;
 
 /**
  * Custom title view to be used in {@link android.support.v17.leanback.app.BrowseFragment}.

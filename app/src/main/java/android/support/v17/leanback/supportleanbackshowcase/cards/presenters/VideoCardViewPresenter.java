@@ -15,13 +15,10 @@
 package android.support.v17.leanback.supportleanbackshowcase.cards.presenters;
 
 import android.content.Context;
-import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.models.Card;
 import android.support.v17.leanback.supportleanbackshowcase.models.VideoCard;
 import android.support.v17.leanback.widget.ImageCardView;
-import android.view.ContextThemeWrapper;
-import android.view.View;
-import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 
 /**

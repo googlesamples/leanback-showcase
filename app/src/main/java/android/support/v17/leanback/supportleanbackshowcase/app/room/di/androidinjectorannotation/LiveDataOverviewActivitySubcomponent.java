@@ -18,6 +18,7 @@ package android.support.v17.leanback.supportleanbackshowcase.app.room.di.android
 
 import android.support.v17.leanback.supportleanbackshowcase.app.room.controller.overview.LiveDataRowsActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.scope.PerActivity;
+
 import dagger.Subcomponent;
 import dagger.android.AndroidInjector;
 

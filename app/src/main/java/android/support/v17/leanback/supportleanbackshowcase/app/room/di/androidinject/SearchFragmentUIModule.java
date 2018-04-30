@@ -20,9 +20,8 @@ import android.support.v17.leanback.supportleanbackshowcase.app.room.di.adapter.
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.listener.ListenerModule;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.presenter.PresenterModule;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.row.RowModule;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.di.scope.PerFragment;
+
 import dagger.Module;
-import dagger.Provides;
 
 @Module(includes = {AdapterModule.class, RowModule.class, ListenerModule.class, PresenterModule.class})
 public class SearchFragmentUIModule {

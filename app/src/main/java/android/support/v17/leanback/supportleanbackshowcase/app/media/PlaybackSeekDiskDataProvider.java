@@ -21,7 +21,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-
 import android.support.v17.leanback.media.PlaybackGlue;
 import android.support.v17.leanback.media.PlaybackTransportControlGlue;
 
