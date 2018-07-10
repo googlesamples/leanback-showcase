@@ -16,16 +16,16 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.rows;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v17.leanback.supportleanbackshowcase.R;
+import android.support.v4.app.FragmentActivity;
 
 /**
  * The main activity to demonstrate how to add/ remove video rows from app to android tv launcher
  *
  * It will hold DynamicRowsFragment for all UI interaction
  */
-public class DynamicVideoRowsActivity extends Activity {
+public class DynamicVideoRowsActivity extends FragmentActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

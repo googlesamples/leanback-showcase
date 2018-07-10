@@ -17,6 +17,7 @@ package android.support.v17.leanback.supportleanbackshowcase.app.wizard;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v17.leanback.app.GuidedStepFragment;
+import android.support.v17.leanback.app.GuidedStepSupportFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.widget.GuidanceStylist;
 import android.support.v17.leanback.widget.GuidedAction;
@@ -64,7 +65,7 @@ public class WizardExample1stStepFragment extends WizardExampleBaseStepFragment 
     @Override
     public void onGuidedActionClicked(GuidedAction action) {
         boolean rentHd = ACTION_ID_BUY_HD == action.getId();
-        GuidedStepFragment fragment = WizardExample2ndStepFragment.build(rentHd, this);
+        GuidedStepSupportFragment fragment = WizardExample2ndStepFragment.build(rentHd, this);
         add(getFragmentManager(), fragment);
     }
 }

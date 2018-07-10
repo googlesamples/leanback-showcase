@@ -14,11 +14,9 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.page;
 
-import android.app.Fragment;
 import android.os.Bundle;
-import android.support.v17.leanback.app.BrowseFragment;
+import android.support.v17.leanback.app.BrowseSupportFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
-import android.support.v17.leanback.transition.TransitionHelper;
 import android.support.v17.leanback.widget.ObjectAdapter;
 import android.support.v17.leanback.widget.OnChildLaidOutListener;
 import android.support.v17.leanback.widget.OnItemViewClickedListener;
@@ -27,6 +25,7 @@ import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v17.leanback.widget.VerticalGridPresenter;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,7 +34,7 @@ import android.view.ViewGroup;
 /**
  * A fragment for rendering items in a vertical grids.
  */
-public class GridFragment extends Fragment implements BrowseFragment.MainFragmentAdapterProvider {
+public class GridFragment extends Fragment implements BrowseSupportFragment.MainFragmentAdapterProvider {
     private static final String TAG = "VerticalGridFragment";
     private static boolean DEBUG = false;
 
@@ -46,8 +45,8 @@ public class GridFragment extends Fragment implements BrowseFragment.MainFragmen
     private OnItemViewClickedListener mOnItemViewClickedListener;
     private Object mSceneAfterEntranceTransition;
     private int mSelectedPosition = -1;
-    private BrowseFragment.MainFragmentAdapter mMainFragmentAdapter =
-            new BrowseFragment.MainFragmentAdapter(this) {
+    private BrowseSupportFragment.MainFragmentAdapter mMainFragmentAdapter =
+            new BrowseSupportFragment.MainFragmentAdapter(this) {
                 @Override
                 public void setEntranceTransitionState(boolean state) {
                     GridFragment.this.setEntranceTransitionState(state);
@@ -171,12 +170,13 @@ public class GridFragment extends Fragment implements BrowseFragment.MainFragmen
         gridDock.addView(mGridViewHolder.view);
         mGridViewHolder.getGridView().setOnChildLaidOutListener(mChildLaidOutListener);
 
-        mSceneAfterEntranceTransition = TransitionHelper.createScene(gridDock, new Runnable() {
-            @Override
-            public void run() {
-                setEntranceTransitionState(true);
-            }
-        });
+//      FIXME needed?
+//        mSceneAfterEntranceTransition = TransitionHelper.createScene(gridDock, new Runnable() {
+//            @Override
+//            public void run() {O
+//                setEntranceTransitionState(true);
+//            }
+//        });
 
         getMainFragmentAdapter().getFragmentHost().notifyViewCreated(mMainFragmentAdapter);
         updateAdapter();
@@ -190,7 +190,7 @@ public class GridFragment extends Fragment implements BrowseFragment.MainFragmen
     }
 
     @Override
-    public BrowseFragment.MainFragmentAdapter getMainFragmentAdapter() {
+    public BrowseSupportFragment.MainFragmentAdapter getMainFragmentAdapter() {
         return mMainFragmentAdapter;
     }
 

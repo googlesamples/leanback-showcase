@@ -16,7 +16,6 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.room.di.subcomponentinjection;
 
-import android.app.Activity;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.v17.leanback.app.DetailsSupportFragment;
 import android.support.v17.leanback.app.DetailsSupportFragmentBackgroundController;
@@ -41,6 +40,8 @@ import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.OnActionClickedListener;
 import android.support.v17.leanback.widget.OnItemViewClickedListener;
 import android.support.v17.leanback.widget.PresenterSelector;
+import android.support.v4.app.FragmentActivity;
+
 import dagger.BindsInstance;
 import dagger.Subcomponent;
 import java.util.Map;
@@ -62,7 +63,7 @@ public interface LiveDataDetailFragmentSubComponent {
 
 
         @BindsInstance
-        Builder activity(Activity activity);
+        Builder activity(FragmentActivity activity);
 
         @BindsInstance
         Builder detailsSupportFragment(DetailsSupportFragment fragment);

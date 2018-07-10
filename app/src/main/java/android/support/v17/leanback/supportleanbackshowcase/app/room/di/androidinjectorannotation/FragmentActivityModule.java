@@ -16,14 +16,15 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.room.di.androidinjectorannotation;
 
-import android.app.Activity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.controller.overview.LiveDataRowsActivity;
+import android.support.v4.app.FragmentActivity;
+
 import dagger.Binds;
 import dagger.Module;
 
 @Module
-public abstract class ActivityModule {
+public abstract class FragmentActivityModule {
 
     @Binds
-    public abstract Activity bindsLiveDataRowsActivity(LiveDataRowsActivity act);
+    public abstract FragmentActivity bindsLiveDataRowsActivity(LiveDataRowsActivity act);
 }

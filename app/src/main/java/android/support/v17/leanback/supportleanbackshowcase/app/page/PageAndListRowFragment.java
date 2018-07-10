@@ -14,13 +14,12 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.page;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
-import android.support.v17.leanback.app.RowsFragment;
+import android.support.v17.leanback.app.BrowseSupportFragment;
+import android.support.v17.leanback.app.RowsSupportFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.app.details.ShadowRowPresenterSelector;
 import android.support.v17.leanback.supportleanbackshowcase.cards.presenters.CardPresenterSelector;
@@ -40,6 +39,8 @@ import android.support.v17.leanback.widget.PresenterSelector;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v17.leanback.widget.VerticalGridPresenter;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,13 +48,14 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+
 import com.google.gson.Gson;
 
 /**
  * Sample {@link BrowseFragment} implementation showcasing the use of {@link PageRow} and
  * {@link ListRow}.
  */
-public class PageAndListRowFragment extends BrowseFragment {
+public class PageAndListRowFragment extends BrowseSupportFragment {
     private static final long HEADER_ID_1 = 1;
     private static final String HEADER_NAME_1 = "Page Fragment";
     private static final long HEADER_ID_2 = 2;
@@ -126,7 +128,7 @@ public class PageAndListRowFragment extends BrowseFragment {
         mRowsAdapter.add(pageRow4);
     }
 
-    private static class PageRowFragmentFactory extends BrowseFragment.FragmentFactory {
+    private static class PageRowFragmentFactory extends BrowseSupportFragment.FragmentFactory {
         private final BackgroundManager mBackgroundManager;
 
         PageRowFragmentFactory(BackgroundManager backgroundManager) {
@@ -210,7 +212,7 @@ public class PageAndListRowFragment extends BrowseFragment {
     /**
      * Page fragment embeds a rows fragment.
      */
-    public static class SampleFragmentB extends RowsFragment {
+    public static class SampleFragmentB extends RowsSupportFragment {
         private final ArrayObjectAdapter mRowsAdapter;
 
         public SampleFragmentB() {
@@ -260,7 +262,7 @@ public class PageAndListRowFragment extends BrowseFragment {
         }
     }
 
-    public static class SettingsFragment extends RowsFragment {
+    public static class SettingsFragment extends RowsSupportFragment {
         private final ArrayObjectAdapter mRowsAdapter;
 
         public SettingsFragment() {
@@ -270,8 +272,8 @@ public class PageAndListRowFragment extends BrowseFragment {
             setAdapter(mRowsAdapter);
         }
 
-        @Override
-        public void onAttach(Activity activity) {
+//        FIXME is needed? @Override
+        public void onAttach(FragmentActivity activity) {
             super.onAttach(activity);
             new Handler().postDelayed(new Runnable() {
                 @Override

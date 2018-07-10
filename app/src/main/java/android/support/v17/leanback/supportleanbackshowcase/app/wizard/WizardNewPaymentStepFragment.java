@@ -82,7 +82,7 @@ public class WizardNewPaymentStepFragment extends WizardExampleBaseStepFragment 
             CharSequence cardNumber = findActionById(ACTION_ID_CARD_NUMBER).getDescription();
             WizardExample2ndStepFragment.sSelectedCard = WizardExample2ndStepFragment.sCards.size();
             WizardExample2ndStepFragment.sCards.add(cardNumber.toString());
-            popBackStackToGuidedStepFragment(WizardNewPaymentStepFragment.class,
+            popBackStackToGuidedStepSupportFragment(WizardNewPaymentStepFragment.class,
                     FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
     }

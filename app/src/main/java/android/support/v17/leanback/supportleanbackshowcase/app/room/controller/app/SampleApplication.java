@@ -18,13 +18,13 @@ package android.support.v17.leanback.supportleanbackshowcase.app.room.controller
 
 import android.app.Activity;
 import android.app.Application;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.di.androidinject.AppComponent;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.androidinject.AppInjector;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.di.androidinject.DaggerAppComponent;
+
+import javax.inject.Inject;
+
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasActivityInjector;
-import javax.inject.Inject;
 
 /**
  * Customized application class.

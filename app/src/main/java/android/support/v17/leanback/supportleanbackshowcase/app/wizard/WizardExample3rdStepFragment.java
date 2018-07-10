@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v17.leanback.app.GuidedStepFragment;
+import android.support.v17.leanback.app.GuidedStepSupportFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.widget.GuidanceStylist;
 import android.support.v17.leanback.widget.GuidedAction;
@@ -90,7 +91,7 @@ public class WizardExample3rdStepFragment extends WizardExampleBaseStepFragment 
     private final Runnable fakeHttpRequestRunnable = new Runnable() {
         @Override
         public void run() {
-            GuidedStepFragment fragment = new WizardExample4thStepFragment();
+            GuidedStepSupportFragment fragment = new WizardExample4thStepFragment();
             fragment.setArguments(getArguments());
             add(getFragmentManager(), fragment);
         }

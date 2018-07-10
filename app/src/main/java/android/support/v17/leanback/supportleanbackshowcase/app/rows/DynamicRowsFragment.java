@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
+import android.support.v17.leanback.app.BrowseSupportFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.app.media.VideoExampleActivity;
 import android.support.v17.leanback.supportleanbackshowcase.cards.presenters.IconCardInChannelPublishPresenter;
@@ -56,7 +57,7 @@ import java.util.List;
  * <p>
  * like adding/ removing rows from app to launcher, play video within the app
  */
-public class DynamicRowsFragment extends BrowseFragment {
+public class DynamicRowsFragment extends BrowseSupportFragment {
 
     private static final String TAG = "DynamicRowsFragment";
     private static final boolean DEBUG = false;

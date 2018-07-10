@@ -17,6 +17,7 @@ package android.support.v17.leanback.supportleanbackshowcase.app.grid;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v17.leanback.app.VerticalGridFragment;
+import android.support.v17.leanback.app.VerticalGridSupportFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.utils.Utils;
 import android.support.v17.leanback.supportleanbackshowcase.models.CardRow;
@@ -31,7 +32,7 @@ import com.google.gson.Gson;
 /**
  * An example how to use leanback's {@link VerticalGridFragment}.
  */
-public class GridExampleFragment extends VerticalGridFragment {
+public class GridExampleFragment extends VerticalGridSupportFragment {
 
     private static final int COLUMNS = 4;
     private static final int ZOOM_FACTOR = FocusHighlight.ZOOM_FACTOR_MEDIUM;
