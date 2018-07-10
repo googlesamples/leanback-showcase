@@ -14,15 +14,14 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.settings;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v17.leanback.supportleanbackshowcase.R;
+import android.support.v4.app.FragmentActivity;
 
 /*
  * TODO: Javadoc
  */
-public class SettingsExampleActivity extends Activity {
+public class SettingsExampleActivity extends FragmentActivity {
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

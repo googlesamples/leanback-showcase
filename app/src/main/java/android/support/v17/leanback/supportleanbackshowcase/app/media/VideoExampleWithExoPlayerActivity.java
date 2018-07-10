@@ -14,19 +14,19 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.media;
 
-import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v17.leanback.supportleanbackshowcase.R;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.os.BuildCompat;
 
 /**
  * Activity that hosts VideoConsumptionExampleWithExoPlayerFragment.
  */
-public class VideoExampleWithExoPlayerActivity extends Activity {
+public class VideoExampleWithExoPlayerActivity extends FragmentActivity {
 
     public static final String TAG = "VideoExampleWithExoPlayerActivity";
 
@@ -36,9 +36,8 @@ public class VideoExampleWithExoPlayerActivity extends Activity {
         setContentView(R.layout.activity_video_example);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.add(R.id.videoFragment, new VideoConsumptionExampleWithExoPlayerFragment(),
-                VideoConsumptionExampleWithExoPlayerFragment.TAG);
-        ft.commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.videoFragment, new VideoConsumptionExampleWithExoPlayerFragment(),
+                VideoConsumptionExampleWithExoPlayerFragment.TAG).commit();
     }
 
     @Override

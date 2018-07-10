@@ -39,6 +39,7 @@ import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
 import android.view.View;
 
@@ -64,7 +65,7 @@ public class ListenerModule {
     @IntoMap
     @ListenerModuleKey(LiveDataFragment.class)
     public OnItemViewClickedListener provideOnItemViewClickListenerForLiveDataFragment(
-            final Activity currentActivity) {
+            final FragmentActivity currentActivity) {
         return new OnItemViewClickedListener() {
             @Override
             public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
@@ -93,7 +94,7 @@ public class ListenerModule {
     @IntoMap
     @ListenerModuleKey(SearchFragment.class)
     public OnItemViewClickedListener provideOnItemViewClickListenerForLiveDataDetailFragmentSearch(
-            final Activity currentActivity) {
+            final FragmentActivity currentActivity) {
         return new OnItemViewClickedListener() {
             @Override
             public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
@@ -124,7 +125,7 @@ public class ListenerModule {
     @IntoMap
     @ListenerModuleKey(LiveDataDetailViewWithVideoBackgroundFragment.class)
     public OnItemViewClickedListener provideOnItemViewClickListenerForLiveDataDetailFragment(
-            final Activity currentActivity) {
+            final FragmentActivity currentActivity) {
         return new OnItemViewClickedListener() {
             @Override
             public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
@@ -227,9 +228,9 @@ public class ListenerModule {
     }
 
     private void loadAndSetBackgroundImageParameter(VideoEntity selectedVideo,
-            final Activity activity, DisplayMetrics metrics,
-            final BackgroundManager backgroundManager, RequestOptions defaultPlaceHolder,
-            Drawable defualtDrawble) {
+                                                    final Activity activity, DisplayMetrics metrics,
+                                                    final BackgroundManager backgroundManager, RequestOptions defaultPlaceHolder,
+                                                    Drawable defualtDrawble) {
         if (selectedVideo == null) {
             return;
         }

@@ -17,12 +17,10 @@
 package android.support.v17.leanback.supportleanbackshowcase.app.room.di.androidinject;
 
 
-import android.app.Activity;
-import android.support.v17.leanback.app.SearchFragment;
-import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.controller.search.SearchActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.scope.PerActivity;
-import android.support.v17.leanback.widget.SpeechRecognitionCallback;
+import android.support.v4.app.FragmentActivity;
+
 import dagger.Module;
 import dagger.Provides;
 
@@ -34,7 +32,7 @@ public class SearchActivityModule {
     // @BindInstance like what we have done in processing the traditional sub component
     @Provides
     @PerActivity
-    Activity provideSearchActivityModule(SearchActivity searchActivity) {
+    FragmentActivity provideSearchActivityModule(SearchActivity searchActivity) {
         return searchActivity;
     }
 

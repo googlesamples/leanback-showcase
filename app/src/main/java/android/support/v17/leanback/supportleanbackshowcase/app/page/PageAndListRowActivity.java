@@ -14,15 +14,15 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.page;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v17.leanback.supportleanbackshowcase.R;
+import android.support.v4.app.FragmentActivity;
 
 /**
  * Activity showcasing the use of {@link android.support.v17.leanback.widget.PageRow} and
  * {@link android.support.v17.leanback.widget.ListRow}.
  */
-public class PageAndListRowActivity extends Activity {
+public class PageAndListRowActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

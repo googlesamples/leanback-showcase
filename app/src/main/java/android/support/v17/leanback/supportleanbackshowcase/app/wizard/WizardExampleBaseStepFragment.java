@@ -15,15 +15,15 @@
 package android.support.v17.leanback.supportleanbackshowcase.app.wizard;
 
 import android.os.Bundle;
-import android.support.v17.leanback.app.GuidedStepFragment;
-import android.support.v17.leanback.supportleanbackshowcase.models.Movie;
+import android.support.v17.leanback.app.GuidedStepSupportFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
+import android.support.v17.leanback.supportleanbackshowcase.models.Movie;
 
 /**
  * A base class which provides all it's implementations with a method #getWizardActivity(). It also
  * makes sure that the wizard is using the correct theme.
  */
-public abstract class WizardExampleBaseStepFragment extends GuidedStepFragment {
+public abstract class WizardExampleBaseStepFragment extends GuidedStepSupportFragment {
 
     protected Movie mMovie;
 

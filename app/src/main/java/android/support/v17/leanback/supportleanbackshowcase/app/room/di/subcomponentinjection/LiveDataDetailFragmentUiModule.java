@@ -16,7 +16,6 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.room.di.subcomponentinjection;
 
-import android.app.Activity;
 import android.support.v17.leanback.app.DetailsSupportFragment;
 import android.support.v17.leanback.app.DetailsSupportFragmentBackgroundController;
 import android.support.v17.leanback.media.MediaPlayerGlue;
@@ -27,6 +26,8 @@ import android.support.v17.leanback.widget.FullWidthDetailsOverviewRowPresenter;
 import android.support.v17.leanback.widget.FullWidthDetailsOverviewSharedElementHelper;
 import android.support.v17.leanback.widget.OnActionClickedListener;
 import android.support.v17.leanback.widget.PresenterSelector;
+import android.support.v4.app.FragmentActivity;
+
 import dagger.Module;
 import dagger.Provides;
 
@@ -36,8 +37,8 @@ public class LiveDataDetailFragmentUiModule {
 
     @Provides
     @PerFragment
-    public FullWidthDetailsOverviewSharedElementHelper provideHelper(Activity activity,
-            PresenterSelector mPs, DetailsOverviewRow row, OnActionClickedListener listener) {
+    public FullWidthDetailsOverviewSharedElementHelper provideHelper(FragmentActivity activity,
+                                                                     PresenterSelector mPs, DetailsOverviewRow row, OnActionClickedListener listener) {
         FullWidthDetailsOverviewSharedElementHelper mHelper =
                 new FullWidthDetailsOverviewSharedElementHelper();
         mHelper.setSharedElementEnterTransition(activity,
@@ -63,7 +64,7 @@ public class LiveDataDetailFragmentUiModule {
 
     @Provides
     @PerFragment
-    MediaPlayerGlue provideMediaPlayerGlue(Activity activity) {
+    MediaPlayerGlue provideMediaPlayerGlue(FragmentActivity activity) {
         return new MediaPlayerGlue(activity);
     }
 }

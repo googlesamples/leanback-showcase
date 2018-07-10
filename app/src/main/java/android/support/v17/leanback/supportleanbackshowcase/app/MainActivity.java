@@ -14,15 +14,16 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v17.leanback.supportleanbackshowcase.R;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 
 /*
  * MainActivity class that loads MainFragment
  */
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
+    private static final String TAG = MainActivity.class.getName();
 
     /**
      * Called when the activity is first created.
@@ -32,7 +33,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
             Fragment fragment = new MainFragment();
-            getFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragment)
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, fragment)
                                 .commit();
         }
     }

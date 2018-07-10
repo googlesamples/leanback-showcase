@@ -16,20 +16,20 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.rows;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.support.v17.leanback.app.GuidedStepFragment;
+import android.support.v17.leanback.app.GuidedStepSupportFragment;
+import android.support.v4.app.FragmentActivity;
 
 /**
  * Activity that showcases different aspects of GuidedStepFragments.
  */
-public class ChannelPublishActivity extends Activity {
+public class ChannelPublishActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (null == savedInstanceState) {
-            GuidedStepFragment.addAsRoot(this, new PublishChannelFragment(), android.R.id.content);
+            GuidedStepSupportFragment.addAsRoot(this, new PublishChannelFragment(), android.R.id.content);
         }
     }
 

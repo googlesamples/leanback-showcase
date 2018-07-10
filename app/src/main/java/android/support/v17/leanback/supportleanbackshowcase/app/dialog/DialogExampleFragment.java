@@ -16,7 +16,7 @@ package android.support.v17.leanback.supportleanbackshowcase.app.dialog;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v17.leanback.app.GuidedStepFragment;
+import android.support.v17.leanback.app.GuidedStepSupportFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.widget.GuidanceStylist.Guidance;
 import android.support.v17.leanback.widget.GuidedAction;
@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * TODO: Javadoc
  */
-public class DialogExampleFragment extends GuidedStepFragment {
+public class DialogExampleFragment extends GuidedStepSupportFragment {
 
     private static final int ACTION_ID_POSITIVE = 1;
     private static final int ACTION_ID_NEGATIVE = ACTION_ID_POSITIVE + 1;

@@ -23,6 +23,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v17.leanback.app.GuidedStepFragment;
+import android.support.v17.leanback.app.GuidedStepSupportFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.widget.GuidanceStylist;
 import android.support.v17.leanback.widget.GuidedAction;
@@ -37,7 +38,7 @@ import java.util.List;
  * <p>
  * It extends the GuidedStepFragment to share the similar UI as GuidedStepFragment
  */
-public class PublishChannelFragment extends GuidedStepFragment {
+public class PublishChannelFragment extends GuidedStepSupportFragment {
     /**
      * Tracking the action which is currently selected by the user
      */

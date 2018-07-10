@@ -18,6 +18,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v17.leanback.app.BrowseFragment;
+import android.support.v17.leanback.app.BrowseSupportFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.app.details.DetailViewExampleActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.details.DetailViewExampleFragment;
@@ -50,7 +51,7 @@ import com.google.gson.Gson;
  * This fragment will be shown when the "Card Examples" card is selected at the home menu. It will
  * display multiple card types.
  */
-public class CardExampleFragment extends BrowseFragment {
+public class CardExampleFragment extends BrowseSupportFragment {
 
     private ArrayObjectAdapter mRowsAdapter;
 

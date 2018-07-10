@@ -14,14 +14,14 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.grid;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v17.leanback.supportleanbackshowcase.R;
+import android.support.v4.app.FragmentActivity;
 
 /**
  * TODO: Javadoc
  */
-public class GridExampleActivity extends Activity {
+public class GridExampleActivity extends FragmentActivity {
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -16,11 +16,13 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.room.di.androidinject;
 
-import android.app.Activity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.controller.overview.LiveDataRowsActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.controller.search.SearchActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.androidinjectorannotation.LiveDataOverviewActivitySubcomponent;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.scope.PerActivity;
+import android.support.v17.leanback.supportleanbackshowcase.utils.dagger.support.FragmentActivityKey;
+import android.support.v4.app.FragmentActivity;
+
 import dagger.Binds;
 import dagger.Module;
 import dagger.android.ActivityKey;
@@ -39,6 +41,6 @@ public abstract class ActivityBuildersModule {
 
     @Binds
     @IntoMap
-    @ActivityKey(LiveDataRowsActivity.class)
-    abstract AndroidInjector.Factory<? extends Activity> bindActivityInjectorFactory(LiveDataOverviewActivitySubcomponent.Builder builder);
+    @FragmentActivityKey(LiveDataRowsActivity.class)
+    abstract AndroidInjector.Factory<? extends FragmentActivity> bindActivityInjectorFactory(LiveDataOverviewActivitySubcomponent.Builder builder);
 }

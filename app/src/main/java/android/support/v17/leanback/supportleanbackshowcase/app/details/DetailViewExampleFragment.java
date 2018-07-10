@@ -19,6 +19,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v17.leanback.app.DetailsFragment;
 import android.support.v17.leanback.app.DetailsFragmentBackgroundController;
+import android.support.v17.leanback.app.DetailsSupportFragment;
+import android.support.v17.leanback.app.DetailsSupportFragmentBackgroundController;
 import android.support.v17.leanback.media.MediaPlayerGlue;
 import android.support.v17.leanback.supportleanbackshowcase.models.DetailedCard;
 import android.support.v17.leanback.supportleanbackshowcase.R;
@@ -49,7 +51,7 @@ import com.google.gson.Gson;
 /**
  * Displays a card with more details using a {@link DetailsFragment}.
  */
-public class DetailViewExampleFragment extends DetailsFragment implements OnItemViewClickedListener,
+public class DetailViewExampleFragment extends DetailsSupportFragment implements OnItemViewClickedListener,
         OnItemViewSelectedListener {
 
     public static final String TRANSITION_NAME = "t_for_transition";
@@ -63,8 +65,8 @@ public class DetailViewExampleFragment extends DetailsFragment implements OnItem
     private Action mActionWishList;
     private Action mActionRelated;
     private ArrayObjectAdapter mRowsAdapter;
-    private final DetailsFragmentBackgroundController mDetailsBackground =
-            new DetailsFragmentBackgroundController(this);
+    private final DetailsSupportFragmentBackgroundController mDetailsBackground =
+            new DetailsSupportFragmentBackgroundController(this);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

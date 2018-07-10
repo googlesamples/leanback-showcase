@@ -22,7 +22,7 @@ import dagger.Subcomponent;
 import dagger.android.AndroidInjector;
 
 @PerActivity
-@Subcomponent(modules = {ActivityModule.class, FragmentBuildersModule.class})
+@Subcomponent(modules = {FragmentActivityModule.class, FragmentBuildersModule.class})
 public interface LiveDataOverviewActivitySubcomponent extends AndroidInjector<LiveDataRowsActivity>{
 
     @Subcomponent.Builder

@@ -14,14 +14,13 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.wizard;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v17.leanback.supportleanbackshowcase.R;
-import android.support.v17.leanback.supportleanbackshowcase.app.details.DetailViewExampleWithVideoBackgroundActivity;
 import android.support.v17.leanback.widget.GuidanceStylist;
 import android.support.v17.leanback.widget.GuidedAction;
+import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
 
 import java.util.List;
@@ -71,7 +70,7 @@ public class WizardExample4thStepFragment extends WizardExampleBaseStepFragment 
 
         }
 
-        getActivity().setResult(Activity.RESULT_OK, returnIntent);
+        getActivity().setResult(FragmentActivity.RESULT_OK, returnIntent);
         getActivity().finish();
     }
 }

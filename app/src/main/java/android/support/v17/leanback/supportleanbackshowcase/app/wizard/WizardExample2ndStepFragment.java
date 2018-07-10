@@ -14,16 +14,17 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.wizard;
 
-import android.app.FragmentManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v17.leanback.app.GuidedStepFragment;
+import android.support.v17.leanback.app.GuidedStepSupportFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.widget.GuidanceStylist;
 import android.support.v17.leanback.widget.GuidedAction;
 import android.support.v17.leanback.widget.GuidedActionsStylist;
+import android.support.v4.app.FragmentManager;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -48,8 +49,8 @@ public class WizardExample2ndStepFragment extends WizardExampleBaseStepFragment 
     }
 
 
-    public static GuidedStepFragment build(boolean hd, WizardExampleBaseStepFragment previousFragment) {
-        GuidedStepFragment fragment = new WizardExample2ndStepFragment();
+    public static GuidedStepSupportFragment build(boolean hd, WizardExampleBaseStepFragment previousFragment) {
+        GuidedStepSupportFragment fragment = new WizardExample2ndStepFragment();
         // Reuse the same arguments this fragment was given.
         Bundle args = previousFragment.getArguments();
         args.putBoolean(ARG_HD, hd);
@@ -134,7 +135,7 @@ public class WizardExample2ndStepFragment extends WizardExampleBaseStepFragment 
             return true;
         } else {
             FragmentManager fm = getFragmentManager();
-            GuidedStepFragment fragment = new WizardNewPaymentStepFragment();
+            GuidedStepSupportFragment fragment = new WizardNewPaymentStepFragment();
             fragment.setArguments(getArguments());
             add(fm, fragment);
             return false;
@@ -144,7 +145,7 @@ public class WizardExample2ndStepFragment extends WizardExampleBaseStepFragment 
     @Override
     public void onGuidedActionClicked(GuidedAction action) {
         if (ACTION_ID_CONFIRM == action.getId()) {
-            GuidedStepFragment fragment = new WizardExample3rdStepFragment();
+            GuidedStepSupportFragment fragment = new WizardExample3rdStepFragment();
             fragment.setArguments(getArguments());
             add(getFragmentManager(), fragment);
         }

@@ -131,7 +131,6 @@ public class VideoContent implements Parcelable {
     }
 
 
-    @TvContractCompat.PreviewProgramColumns.AspectRatio
     public int getAspectRatio() {
         return mAspectRatio;
     }
