@@ -29,7 +29,7 @@ import android.util.Log;
 public class NetworkLiveData extends LiveData<Boolean> {
 
     // For debugging purpose
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private static final String TAG = "NetworkLiveData";
 
     // The network live data should existed as long as the application is still running

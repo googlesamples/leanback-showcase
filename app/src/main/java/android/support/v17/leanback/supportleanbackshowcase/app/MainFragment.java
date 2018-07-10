@@ -16,7 +16,7 @@ package android.support.v17.leanback.supportleanbackshowcase.app;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v17.leanback.app.BrowseFragment;
+import android.support.v17.leanback.app.BrowseSupportFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.app.cards.CardExampleActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.details.DetailViewExampleActivity;
@@ -29,7 +29,7 @@ import android.support.v17.leanback.supportleanbackshowcase.app.media.VideoExamp
 import android.support.v17.leanback.supportleanbackshowcase.app.media.VideoExampleWithExoPlayerActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.page.PageAndListRowActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.controller.overview.LiveDataRowsActivity;
-import android.support.v17.leanback.supportleanbackshowcase.app.rows.*;
+import android.support.v17.leanback.supportleanbackshowcase.app.rows.DynamicVideoRowsActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.settings.SettingsExampleActivity;
 import android.support.v17.leanback.supportleanbackshowcase.app.wizard.WizardExampleActivity;
 import android.support.v17.leanback.supportleanbackshowcase.cards.presenters.CardPresenterSelector;
@@ -47,17 +47,25 @@ import android.support.v17.leanback.widget.PresenterSelector;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.content.ContextCompat;
 
 import com.google.gson.Gson;
 
 
-public class MainFragment extends BrowseFragment {
+public class MainFragment extends BrowseSupportFragment {
+
+    private static final String TAG = MainFragment.class.getName();
 
     private ArrayObjectAdapter mRowsAdapter;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInitialState) {
+        super.onCreate(savedInitialState);
 
         setupUIElements();
         setupRowAdapter();
@@ -93,7 +101,7 @@ public class MainFragment extends BrowseFragment {
         setBadgeDrawable(getResources().getDrawable(R.drawable.title_android_tv, null));
         setHeadersState(HEADERS_DISABLED);
         setHeadersTransitionOnBackEnabled(false);
-        setBrandColor(getResources().getColor(R.color.fastlane_background));
+        setBrandColor(ContextCompat.getColor(getContext(), R.color.fastlane_background));
     }
 
     private void setupEventListeners() {

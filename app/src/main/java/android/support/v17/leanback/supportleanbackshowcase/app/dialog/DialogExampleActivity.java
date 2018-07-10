@@ -14,24 +14,24 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.dialog;
 
-import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v17.leanback.app.GuidedStepFragment;
+import android.support.v17.leanback.app.GuidedStepSupportFragment;
+import android.support.v4.app.FragmentActivity;
 
 /**
  * TODO: Javadoc
  */
-public class DialogExampleActivity extends Activity {
+public class DialogExampleActivity extends FragmentActivity {
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#21272A")));
 
         if (savedInstanceState == null) {
-            GuidedStepFragment fragment = new DialogExampleFragment();
-            GuidedStepFragment.addAsRoot(this, fragment, android.R.id.content);
+            GuidedStepSupportFragment fragment = new DialogExampleFragment();
+            GuidedStepSupportFragment.addAsRoot(this, fragment, android.R.id.content);
         }
     }
 }

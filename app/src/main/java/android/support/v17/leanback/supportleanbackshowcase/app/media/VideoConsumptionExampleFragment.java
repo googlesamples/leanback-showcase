@@ -18,22 +18,21 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v17.leanback.app.VideoFragment;
-import android.support.v17.leanback.app.VideoFragmentGlueHost;
+import android.support.v17.leanback.app.VideoSupportFragment;
+import android.support.v17.leanback.app.VideoSupportFragmentGlueHost;
 import android.support.v17.leanback.media.MediaPlayerAdapter;
 import android.support.v17.leanback.media.PlaybackGlue;
-import android.support.v17.leanback.media.PlaybackTransportControlGlue;
 import android.support.v17.leanback.widget.PlaybackControlsRow;
 import android.util.Log;
 
 
-public class VideoConsumptionExampleFragment extends VideoFragment {
+public class VideoConsumptionExampleFragment extends VideoSupportFragment {
 
     private static final String URL = "https://storage.googleapis.com/android-tv/Sample videos/"
             + "April Fool's 2013/Explore Treasure Mode with Google Maps.mp4";
     public static final String TAG = "VideoConsumption";
     private VideoMediaPlayerGlue<MediaPlayerAdapter> mMediaPlayerGlue;
-    final VideoFragmentGlueHost mHost = new VideoFragmentGlueHost(this);
+    final VideoSupportFragmentGlueHost mHost = new VideoSupportFragmentGlueHost(this);
 
     static void playWhenReady(PlaybackGlue glue) {
         if (glue.isPrepared()) {

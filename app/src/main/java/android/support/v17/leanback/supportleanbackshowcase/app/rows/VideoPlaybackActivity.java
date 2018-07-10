@@ -16,7 +16,6 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.rows;
 
-import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,6 +23,7 @@ import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.app.media.MediaMetaData;
 import android.support.v17.leanback.supportleanbackshowcase.app.media.VideoConsumptionExampleFragment;
 import android.support.v17.leanback.supportleanbackshowcase.app.media.VideoExampleActivity;
+import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 
 import java.util.List;
@@ -43,7 +43,7 @@ import java.util.List;
  *        android:pathPrefix="/playvideo"
  *        />
  */
-public class VideoPlaybackActivity extends Activity {
+public class VideoPlaybackActivity extends FragmentActivity {
 
     private static final String PLAY_VIDEO_ACTION_PATH = "playvideo";
 
@@ -133,8 +133,8 @@ public class VideoPlaybackActivity extends Activity {
 
         VideoConsumptionExampleFragment videoPlaybackFragment = new VideoConsumptionExampleFragment();
 
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.add(android.R.id.content, videoPlaybackFragment);
-        fragmentTransaction.commit();
+        getSupportFragmentManager().beginTransaction()
+                .add(android.R.id.content, videoPlaybackFragment)
+                .commit();
     }
 }

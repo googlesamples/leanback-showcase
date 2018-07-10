@@ -14,15 +14,15 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.details;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v17.leanback.app.DetailsFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
+import android.support.v4.app.FragmentActivity;
 
 /**
  * Contains a {@link DetailsFragment} in order to display more details for a given card.
  */
-public class DetailViewExampleActivity extends Activity {
+public class DetailViewExampleActivity extends FragmentActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -31,7 +31,7 @@ public class DetailViewExampleActivity extends Activity {
 
         if (savedInstanceState == null) {
             DetailViewExampleFragment fragment = new DetailViewExampleFragment();
-            getFragmentManager().beginTransaction()
+            getSupportFragmentManager().beginTransaction()
                     .replace(R.id.details_fragment, fragment)
                     .commit();
         }

@@ -16,11 +16,12 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.room.controller.detail;
 
-import android.arch.lifecycle.LifecycleActivity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+
 import dagger.android.DispatchingAndroidInjector;
 import javax.inject.Inject;
 
@@ -28,7 +29,7 @@ import javax.inject.Inject;
 /**
  * Extend from LifecycleActivity so this activity can be used as the owner of lifecycle event
  */
-public class LiveDataDetailActivity extends LifecycleActivity {
+public class LiveDataDetailActivity extends FragmentActivity {
 
     public static final String SHARED_ELEMENT_NAME = "hero";
     public static final String VIDEO_ID = "video_id";

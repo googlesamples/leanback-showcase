@@ -21,6 +21,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v17.leanback.app.PlaybackFragment;
 import android.support.v17.leanback.app.PlaybackFragmentGlueHost;
+import android.support.v17.leanback.app.PlaybackSupportFragment;
+import android.support.v17.leanback.app.PlaybackSupportFragmentGlueHost;
 import android.support.v17.leanback.supportleanbackshowcase.utils.Constants;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.utils.Utils;
@@ -39,7 +41,7 @@ import java.util.List;
 /**
  * This example shows how to play music files and build a simple track list.
  */
-public class MusicConsumptionExampleFragment extends PlaybackFragment implements
+public class MusicConsumptionExampleFragment extends PlaybackSupportFragment implements
         BaseOnItemViewClickedListener {
 
     private static final String TAG = "MusicConsumptionExampleFragment";
@@ -54,7 +56,7 @@ public class MusicConsumptionExampleFragment extends PlaybackFragment implements
         if (Constants.LOCAL_LOGD) Log.d(TAG, "onCreate");
 
         mGlue = new MusicMediaPlayerGlue(getActivity());
-        mGlue.setHost(new PlaybackFragmentGlueHost(this));
+        mGlue.setHost(new PlaybackSupportFragmentGlueHost(this));
 
         String json = Utils.inputStreamToString(
                 getResources().openRawResource(R.raw.music_consumption_example));

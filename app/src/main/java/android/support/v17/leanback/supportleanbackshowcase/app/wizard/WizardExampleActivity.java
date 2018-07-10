@@ -14,16 +14,15 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.wizard;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.support.v17.leanback.app.GuidedStepFragment;
+import android.support.v17.leanback.app.GuidedStepSupportFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
+import android.support.v4.app.FragmentActivity;
 
 /**
  * An Activity displaying a wizard for renting a movie.
  */
-public class WizardExampleActivity extends Activity {
+public class WizardExampleActivity extends FragmentActivity {
 
     public static final String WATCH_NOW = "watch_movie_now";
 
@@ -32,14 +31,14 @@ public class WizardExampleActivity extends Activity {
         super.onCreate(savedInstanceState);
         getWindow().setBackgroundDrawableResource(R.drawable.wizard_background_blackned);
 
-        GuidedStepFragment fragment = new WizardExample1stStepFragment();
+        GuidedStepSupportFragment fragment = new WizardExample1stStepFragment();
         fragment.setArguments(getIntent().getExtras()); // Delegate Movie to first step.
-        GuidedStepFragment.addAsRoot(this, fragment, android.R.id.content);
+        GuidedStepSupportFragment.addAsRoot(this, fragment, android.R.id.content);
     }
 
     @Override
     public void onBackPressed() {
-        if (GuidedStepFragment.getCurrentGuidedStepFragment(getFragmentManager())
+        if (GuidedStepSupportFragment.getCurrentGuidedStepSupportFragment(getSupportFragmentManager())
                 instanceof WizardExample4thStepFragment) {
             // The user 'bought' the product. When he presses 'Back' the Wizard will be closed and
             // he will not be send back to 'Processing Payment...'-Screen.

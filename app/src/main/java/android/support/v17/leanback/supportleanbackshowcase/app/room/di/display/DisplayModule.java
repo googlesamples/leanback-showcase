@@ -16,36 +16,27 @@
 
 package android.support.v17.leanback.supportleanbackshowcase.app.room.di.display;
 
-import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v17.leanback.app.BackgroundManager;
-import android.support.v17.leanback.app.DetailsSupportFragmentBackgroundController;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.adapter.ListAdapter;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.controller.detail.LiveDataDetailActivity;
-import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.di.scope.PerFragment;
 import android.support.v17.leanback.supportleanbackshowcase.app.room.ui.LiveDataRowPresenter;
-import android.support.v17.leanback.widget.FullWidthDetailsOverviewRowPresenter;
-import android.support.v17.leanback.widget.FullWidthDetailsOverviewSharedElementHelper;
 import android.support.v17.leanback.widget.ListRow;
+import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
-import com.bumptech.glide.Glide;
+
 import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.transition.Transition;
+
 import dagger.Module;
 import dagger.Provides;
-import javax.inject.Singleton;
 
 @Module
 public class DisplayModule {
 
     @PerFragment
     @Provides
-    public DisplayMetrics provideDisplayMetrics(Activity activity) {
+    public DisplayMetrics provideDisplayMetrics(FragmentActivity activity) {
 
         DisplayMetrics metrics = new DisplayMetrics();
 
@@ -56,7 +47,7 @@ public class DisplayModule {
 
     @PerFragment
     @Provides
-    public BackgroundManager provideBackgroundManager(Activity activity) {
+    public BackgroundManager provideBackgroundManager(FragmentActivity activity) {
 
         final BackgroundManager backgroundManager = BackgroundManager.getInstance(activity);
 
@@ -66,7 +57,7 @@ public class DisplayModule {
 
     @PerFragment
     @Provides
-    public Drawable provideDefaultBackground(Activity activity) {
+    public Drawable provideDefaultBackground(FragmentActivity activity) {
         Drawable defaultBackground = activity.getResources()
                 .getDrawable(R.drawable.no_cache_no_internet, null);
         return defaultBackground;

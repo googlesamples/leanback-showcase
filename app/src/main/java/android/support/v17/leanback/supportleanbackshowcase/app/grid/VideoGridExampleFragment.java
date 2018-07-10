@@ -20,6 +20,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v17.leanback.app.VerticalGridFragment;
+import android.support.v17.leanback.app.VerticalGridSupportFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.app.media.MediaMetaData;
 import android.support.v17.leanback.supportleanbackshowcase.app.media.VideoExampleActivity;
@@ -61,7 +62,7 @@ import java.util.Map;
  * On clicking on each one of these video cards, a fresh instance of the
  * VideoExampleActivity starts which plays the video item.
  */
-public class VideoGridExampleFragment extends VerticalGridFragment implements
+public class VideoGridExampleFragment extends VerticalGridSupportFragment implements
         OnItemViewSelectedListener, OnItemViewClickedListener {
 
     private static final int COLUMNS = 4;

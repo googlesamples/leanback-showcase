@@ -1,16 +1,16 @@
 package android.support.v17.leanback.supportleanbackshowcase.app.details;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v17.leanback.app.DetailsFragment;
 import android.support.v17.leanback.supportleanbackshowcase.R;
+import android.support.v4.app.FragmentActivity;
 
 /**
  * Contains a {@link DetailsFragment} with video background in order to display more details
  * for a given card.
  */
 
-public class DetailViewExampleWithVideoBackgroundActivity extends Activity {
+public class DetailViewExampleWithVideoBackgroundActivity extends FragmentActivity {
 
     static final int BUY_MOVIE_REQUEST = 987;
 
@@ -22,7 +22,7 @@ public class DetailViewExampleWithVideoBackgroundActivity extends Activity {
         if (savedInstanceState == null) {
             DetailViewExampleWithVideoBackgroundFragment fragment =
                     new DetailViewExampleWithVideoBackgroundFragment();
-            getFragmentManager().beginTransaction()
+            getSupportFragmentManager().beginTransaction()
                     .replace(R.id.details_fragment, fragment)
                     .commit();
         }

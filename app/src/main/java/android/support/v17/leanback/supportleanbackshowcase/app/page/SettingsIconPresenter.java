@@ -19,7 +19,6 @@ import android.support.v17.leanback.supportleanbackshowcase.R;
 import android.support.v17.leanback.supportleanbackshowcase.cards.presenters.ImageCardViewPresenter;
 import android.support.v17.leanback.widget.ImageCardView;
 import android.view.View;
-import android.widget.ImageView;
 
 /**
  * Simple presenter implementation to represent settings icon as cards.
