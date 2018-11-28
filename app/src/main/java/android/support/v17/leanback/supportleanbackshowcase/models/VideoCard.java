@@ -26,7 +26,7 @@ import android.support.v17.leanback.supportleanbackshowcase.R;
  */
 public class VideoCard extends Card {
 
-    @SerializedName("sources") private String mVideoSource = "";
+    @SerializedName("sources") private String[] mVideoSource;
     @SerializedName("background") private String mBackgroundUrl = "";
     @SerializedName("studio") private String mStudio = "";
 
@@ -35,11 +35,11 @@ public class VideoCard extends Card {
         setType(Type.VIDEO_GRID);
     }
 
-    public String getVideoSource() {
+    public String[] getVideoSource() {
         return mVideoSource;
     }
 
-    public void setVideoSource(String sources) {
+    public void setVideoSource(String[] sources) {
         mVideoSource = sources;
     }
 

@@ -32,7 +32,7 @@ import java.util.Stack;
 
 public class SettingsExampleFragment extends LeanbackSettingsFragment implements DialogPreference.TargetFragment {
 
-    private final Stack<Fragment> fragments = new Stack<Fragment>();
+    public static Stack<Fragment> fragments = new Stack<Fragment>();
 
     @Override
     public void onPreferenceStartInitialScreen() {
@@ -67,7 +67,7 @@ public class SettingsExampleFragment extends LeanbackSettingsFragment implements
         return fragment;
     }
 
-    private class PrefFragment extends LeanbackPreferenceFragment {
+    public static class PrefFragment extends LeanbackPreferenceFragment {
 
         @Override
         public void onCreatePreferences(Bundle bundle, String s) {

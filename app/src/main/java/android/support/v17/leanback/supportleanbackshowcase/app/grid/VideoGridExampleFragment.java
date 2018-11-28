@@ -115,7 +115,10 @@ public class VideoGridExampleFragment extends VerticalGridFragment implements
     private void onFetchVideosInfoSuccess(JSONObject jsonObj) {
         try {
             String videoRowsJson = jsonObj.getString(TAG_CATEGORY);
+            System.out.println("###GurraG " + jsonObj);
+            System.out.println("###HEJBARRA " + videoRowsJson);
             VideoRow[] videoRows = new Gson().fromJson(videoRowsJson, VideoRow[].class);
+            System.out.println("###Urban " + videoRows);
             for(VideoRow videoRow : videoRows) {
                 if (!categoryVideosMap.containsKey(videoRow.getCategory())) {
                     categoryVideosMap.put(videoRow.getCategory(), new ArrayList<VideoCard>());
@@ -221,7 +224,7 @@ public class VideoGridExampleFragment extends VerticalGridFragment implements
         if (item instanceof  VideoCard) {
             VideoCard itemCard = (VideoCard) item;
             MediaMetaData metaData = new MediaMetaData();
-            metaData.setMediaSourcePath(itemCard.getVideoSource());
+            metaData.setMediaSourcePath(itemCard.getVideoSource()[0]);
             metaData.setMediaTitle(itemCard.getTitle());
             metaData.setMediaArtistName(itemCard.getDescription());
             metaData.setMediaAlbumArtUrl(itemCard.getImageUrl());

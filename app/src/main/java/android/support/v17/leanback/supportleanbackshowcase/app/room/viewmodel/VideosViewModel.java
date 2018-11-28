@@ -27,6 +27,7 @@ import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.C
 import android.support.v17.leanback.supportleanbackshowcase.app.room.db.entity.VideoEntity;
 
 import java.util.List;
+
 import javax.inject.Inject;
 
 public class VideosViewModel extends AndroidViewModel {

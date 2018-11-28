@@ -18,10 +18,10 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion rootProject.buildToolsVersion
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId 'com.example.android.persistence'
-        minSdkVersion 21
+        minSdkVersion 24
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -80,7 +80,7 @@ dependencies {
     compile 'com.android.support:preference-leanback-v17:' + rootProject.supportLibVersion
     compile 'com.android.support:preference-v14:' + rootProject.supportLibVersion
 
-    compile "com.google.code.gson:gson:2.8.1"
+    compile "com.google.code.gson:gson:2.8.5"
     compile "com.android.support:palette-v7:" + rootProject.supportLibVersion
     compile 'com.google.android.exoplayer:exoplayer:r2.2.0'
 
@@ -90,11 +90,11 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
 
-    implementation "com.google.dagger:dagger:2.11"
-    implementation "com.google.dagger:dagger-android:2.11"
-    implementation "com.google.dagger:dagger-android-support:2.11"
+    implementation "com.google.dagger:dagger:2.15"
+    implementation "com.google.dagger:dagger-android:2.15"
+    implementation "com.google.dagger:dagger-android-support:2.15"
 
-    annotationProcessor "com.google.dagger:dagger-android-processor:2.11"
-    annotationProcessor "com.google.dagger:dagger-compiler:2.11"
+    annotationProcessor "com.google.dagger:dagger-android-processor:2.15"
+    annotationProcessor "com.google.dagger:dagger-compiler:2.15"
 }
 
