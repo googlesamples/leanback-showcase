@@ -59,7 +59,7 @@ public class SettingsExampleFragment extends LeanbackSettingsFragment implements
     }
 
     private PreferenceFragment buildPreferenceFragment(int preferenceResId, String root) {
-        PreferenceFragment fragment = new PrefFragment();
+        PreferenceFragment fragment = PrefFragment.create(fragments);
         Bundle args = new Bundle();
         args.putInt("preferenceResource", preferenceResId);
         args.putString("root", root);
@@ -67,7 +67,14 @@ public class SettingsExampleFragment extends LeanbackSettingsFragment implements
         return fragment;
     }
 
-    private class PrefFragment extends LeanbackPreferenceFragment {
+    public static class PrefFragment extends LeanbackPreferenceFragment {
+        private Stack<Fragment> fragments;
+
+        public static PrefFragment create(Stack<Fragment> fragments) {
+            PrefFragment prefFragment = new PrefFragment();
+            prefFragment.fragments = fragments;
+            return prefFragment;
+        }
 
         @Override
         public void onCreatePreferences(Bundle bundle, String s) {
